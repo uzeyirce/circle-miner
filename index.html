@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base Cyber Miner & Lucky Flip</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="A decentralized Web3 cyberpunk idle mining and coin flip betting game on the Base Sepolia network. Upgrade your mining rigs and bet your BPLAY tokens on-chain.">
+  <link rel="icon" href="https://mintcdn.com/base-a060aa97/WDEkk5ygvN2tLyve/logo/logo_light.svg" type="image/svg+xml">
+  
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Local Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Cyber Background Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="cyber-container">
+    <!-- Main Header -->
+    <header class="cyber-header">
+      <div class="brand">
+        <div class="base-logo-mini"></div>
+        <h1>BASE <span class="accent-text">CYBER MINER</span></h1>
+      </div>
+      
+      <div class="header-stats">
+        <div class="token-display hidden" id="token-display">
+          <span class="token-symbol">$BPLAY</span>
+          <span class="token-balance" id="player-balance">0.00</span>
+        </div>
+        
+        <button class="btn btn-connect" id="btn-connect">
+          <i class="fa-solid fa-wallet"></i> Connect Wallet
+        </button>
+      </div>
+    </header>
+
+    <!-- Network Warning Banner -->
+    <div class="warning-banner hidden" id="network-warning">
+      <i class="fa-solid fa-triangle-exclamation"></i> Please connect to the <span class="highlight">Base Sepolia Testnet</span>.
+      <button class="btn btn-sm btn-switch" id="btn-switch-network">Switch Network</button>
+    </div>
+
+    <!-- Main Workspace Grid -->
+    <main class="cyber-main">
+      <!-- Left sidebar: Tabs and Stats -->
+      <aside class="cyber-sidebar">
+        <!-- Navigation Tabs -->
+        <nav class="cyber-nav">
+          <button class="nav-tab active" data-tab="miner-tab" id="tab-btn-miner">
+            <i class="fa-solid fa-microchip"></i> Cyber Miner
+          </button>
+          <button class="nav-tab" data-tab="flip-tab" id="tab-btn-flip">
+            <i class="fa-solid fa-coins"></i> Lucky Flip
+          </button>
+          <button class="nav-tab" data-tab="admin-tab" id="tab-btn-admin">
+            <i class="fa-solid fa-gears"></i> Developer Panel
+          </button>
+        </nav>
+
+        <!-- Player status panel -->
+        <div class="glass-panel profile-panel">
+          <h2 class="section-title"><i class="fa-solid fa-circle-user"></i> Player Profile</h2>
+          <div class="profile-stats">
+            <div class="stat-row">
+              <span class="stat-label">Address:</span>
+              <span class="stat-value monospace" id="wallet-address-abbr">Not Connected</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Click Power:</span>
+              <span class="stat-value" id="click-multiplier">1x</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Mining Rig:</span>
+              <span class="stat-value" id="miner-level-val">Level 0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Passive Income:</span>
+              <span class="stat-value" id="passive-income-val">0.00 BPLAY/sec</span>
+            </div>
+          </div>
+          
+          <button class="btn btn-faucet full-width" id="btn-faucet" disabled>
+            <i class="fa-solid fa-faucet-drip"></i> Claim 1,000 Faucet Tokens
+            <span class="cooldown-timer" id="faucet-cooldown"></span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Center & Right: Tab Contents -->
+      <div class="cyber-content">
+        
+        <!-- Tab 1: Miner Clicker Game -->
+        <section class="tab-panel active" id="miner-tab">
+          <div class="miner-grid">
+            <!-- Center clickable crystal -->
+            <div class="glass-panel clicker-panel">
+              <div class="clicker-glow"></div>
+              <div class="clicker-wrapper">
+                <!-- Glowing rotating Base logo -->
+                <div class="base-crystal" id="click-crystal">
+                  <div class="crystal-core"></div>
+                  <div class="crystal-ring"></div>
+                </div>
+              </div>
+              <div class="click-instruction">CLICK THE CRYSTAL TO GENERATE ENERGY</div>
+              <div class="click-stats">
+                <div class="stat-box">
+                  <span class="box-label">Local Energy</span>
+                  <span class="box-value" id="local-clicks">0</span>
+                </div>
+                <div class="stat-box">
+                  <span class="box-label">Pending Claim</span>
+                  <span class="box-value" id="mining-pending">0.000</span>
+                </div>
+              </div>
+              <button class="btn btn-claim-mining full-width" id="btn-claim-mining" disabled>
+                <i class="fa-solid fa-cloud-arrow-down"></i> Claim Mining Rewards to Wallet
+              </button>
+            </div>
+
+            <!-- Upgrades section -->
+            <div class="glass-panel upgrades-panel">
+              <h2 class="section-title"><i class="fa-solid fa-bolt"></i> Cyber Upgrades</h2>
+              <p class="panel-desc">Spend your $BPLAY tokens on-chain to boost your energy production.</p>
+              
+              <div class="upgrades-list">
+                <!-- Upgrade Card 1 -->
+                <div class="upgrade-card" id="card-click-upgrade">
+                  <div class="upgrade-info">
+                    <div class="upgrade-icon"><i class="fa-solid fa-arrow-pointer"></i></div>
+                    <div class="upgrade-details">
+                      <h3>Super-Click Mult</h3>
+                      <p>Increases local click multiplier (+1x)</p>
+                      <div class="upgrade-level">Current level: <span id="click-level-lbl">0</span></div>
+                    </div>
+                  </div>
+                  <button class="btn btn-upgrade" id="btn-upgrade-click" disabled>
+                    <span class="cost-val" id="click-upgrade-cost">50</span> $BPLAY
+                  </button>
+                </div>
+
+                <!-- Upgrade Card 2 -->
+                <div class="upgrade-card" id="card-miner-upgrade">
+                  <div class="upgrade-info">
+                    <div class="upgrade-icon"><i class="fa-solid fa-server"></i></div>
+                    <div class="upgrade-details">
+                      <h3>Cyber Mining Rig</h3>
+                      <p>Boosts passive generation (+0.01 BPLAY/sec)</p>
+                      <div class="upgrade-level">Current level: <span id="miner-level-lbl">0</span></div>
+                    </div>
+                  </div>
+                  <button class="btn btn-upgrade" id="btn-upgrade-miner" disabled>
+                    <span class="cost-val" id="miner-upgrade-cost">100</span> $BPLAY
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 2: Lucky Flip -->
+        <section class="tab-panel" id="flip-tab">
+          <div class="glass-panel flip-panel-container">
+            <h2 class="section-title"><i class="fa-solid fa-dice"></i> Lucky Flip (On-chain Coin Toss)</h2>
+            <p class="panel-desc">Place your bet using $BPLAY tokens. Correct guesses payout double your bet amount!</p>
+            
+            <div class="flip-gameplay">
+              <!-- Coin flip visualizer -->
+              <div class="coin-container">
+                <div class="coin" id="coin-visual">
+                  <div class="side heads">
+                    <div class="coin-face">
+                      <i class="fa-solid fa-shield-halved"></i>
+                      <span>HEADS</span>
+                    </div>
+                  </div>
+                  <div class="side tails">
+                    <div class="coin-face">
+                      <i class="fa-solid fa-clover"></i>
+                      <span>TAILS</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bet controls -->
+              <div class="bet-controls">
+                <div class="side-selector">
+                  <button class="btn-choice active" id="btn-bet-heads" data-choice="heads">
+                    <i class="fa-solid fa-shield-halved"></i> Heads
+                  </button>
+                  <button class="btn-choice" id="btn-bet-tails" data-choice="tails">
+                    <i class="fa-solid fa-clover"></i> Tails
+                  </button>
+                </div>
+
+                <div class="bet-input-wrapper">
+                  <label for="bet-amount">Bet Amount ($BPLAY):</label>
+                  <div class="input-group">
+                    <input type="number" id="bet-amount" value="50" min="10" step="10">
+                    <button class="btn btn-sm btn-outline" id="btn-bet-max">MAX</button>
+                  </div>
+                  <span class="input-hint">Min bet: 10 BPLAY. Bets require on-chain transaction.</span>
+                </div>
+
+                <button class="btn btn-roll full-width" id="btn-roll" disabled>
+                  <i class="fa-solid fa-fire"></i> Roll On-Chain
+                </button>
+              </div>
+            </div>
+            
+            <div class="flip-status-message" id="flip-status-msg">
+              Connect your wallet and place a bet to start.
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 3: Dev Panel -->
+        <section class="tab-panel" id="admin-tab">
+          <div class="glass-panel admin-panel-container">
+            <h2 class="section-title"><i class="fa-solid fa-terminal"></i> Developer Control Center</h2>
+            <p class="panel-desc">Deploy a new smart contract directly from your browser or change the active contract address.</p>
+            
+            <div class="admin-grid">
+              <!-- Active Contract Card -->
+              <div class="admin-card">
+                <h3>Active Smart Contract</h3>
+                <div class="input-group font-sans">
+                  <input type="text" id="contract-address-input" placeholder="0x..." class="monospace">
+                  <button class="btn btn-sm" id="btn-save-contract">Update Address</button>
+                </div>
+                <div class="admin-info-box">
+                  <div class="info-row">
+                    <span>Default Base Sepolia Address:</span>
+                    <span class="monospace text-glow-blue cursor-pointer" id="default-contract-address">0x5FbDB2315678afecb367f032d93F642f64180aa3</span>
+                  </div>
+                  <p class="help-text">Updating the address changes which contract the frontend communicates with. Values are persisted to your browser's local storage.</p>
+                </div>
+              </div>
+
+              <!-- Browser Compiler & Deployer -->
+              <div class="admin-card">
+                <h3>1-Click Contract Deployer</h3>
+                <p>Deploy a new instance of the game contract directly using MetaMask/Coinbase Wallet. Perfect for clean testing!</p>
+                
+                <div class="deploy-action">
+                  <button class="btn btn-deploy" id="btn-deploy-browser" disabled>
+                    <i class="fa-solid fa-rocket"></i> Deploy Contract via Wallet
+                  </button>
+                  <div class="deploy-progress hidden" id="deploy-loader">
+                    <div class="spinner"></div>
+                    <span id="deploy-status-txt">Waiting for MetaMask signature...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Bottom: Transaction Log -->
+    <section class="glass-panel tx-log-panel">
+      <div class="tx-header">
+        <h2 class="section-title"><i class="fa-solid fa-list-check"></i> Cyber Transaction Logs</h2>
+        <span class="badge" id="tx-count">0 Transactions</span>
+      </div>
+      <div class="tx-list-container">
+        <table class="tx-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Action</th>
+              <th>Status</th>
+              <th>Gas / Details</th>
+              <th>TX Hash</th>
+            </tr>
+          </thead>
+          <tbody id="tx-tbody">
+            <tr id="tx-empty-row">
+              <td colspan="5" class="text-center text-muted">No blockchain transactions recorded in this session.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="cyber-footer">
+      <p>Built for the Base Ecosystem. Connected to Base Sepolia.</p>
+      <div class="footer-links">
+        <a href="https://docs.base.org/" target="_blank"><i class="fa-solid fa-book"></i> Base Docs</a>
+        <a href="https://sepolia.basescan.org/" target="_blank"><i class="fa-solid fa-magnifying-glass"></i> Basescan</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Load Ethers v6 from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+  
+  <!-- Hardhat Compiled Artifacts -->
+  <script src="artifacts.js"></script>
+  
+  <!-- Frontend Script -->
+  <script src="app.js"></script>
+</body>
+</html>
