@@ -43,6 +43,7 @@ function saveContractAddress(chainId, address) {
 
 // Page Elements
 const btnConnect = document.getElementById('btn-connect');
+const btnDisconnect = document.getElementById('btn-disconnect');
 const tokenDisplay = document.getElementById('token-display');
 const playerBalanceEl = document.getElementById('player-balance');
 const networkWarning = document.getElementById('network-warning');
@@ -159,6 +160,7 @@ async function connectWallet() {
     btnConnect.innerHTML = `<i class="fa-solid fa-circle-nodes"></i> Connected: ${walletAddress.substring(0, 6)}...${walletAddress.substring(38)}`;
     btnConnect.classList.remove('btn-connect');
     btnConnect.classList.add('btn-outline');
+    btnDisconnect.classList.remove('hidden');
     
     walletAddressAbbr.textContent = `${walletAddress.substring(0, 10)}...${walletAddress.substring(34)}`;
     tokenDisplay.classList.remove('hidden');
@@ -195,13 +197,25 @@ function disconnectWallet() {
   btnConnect.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect Wallet`;
   btnConnect.classList.add('btn-connect');
   btnConnect.classList.remove('btn-outline');
+  btnDisconnect.classList.add('hidden');
   walletAddressAbbr.textContent = "Not Connected";
   tokenDisplay.classList.add('hidden');
   disableGameControls();
   if (miningUpdateInterval) {
     clearInterval(miningUpdateInterval);
   }
+
+  // Best-effort: ask the wallet to revoke its own connection permission too
+  // (supported by newer MetaMask versions; silently ignored if unsupported).
+  if (window.ethereum && window.ethereum.request) {
+    window.ethereum.request({
+      method: 'wallet_revokePermissions',
+      params: [{ eth_accounts: {} }],
+    }).catch(() => { /* not supported by this wallet, that's fine */ });
+  }
 }
+
+btnDisconnect.addEventListener('click', disconnectWallet);
 
 function disableGameControls() {
   btnFaucet.disabled = true;

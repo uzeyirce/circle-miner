@@ -222,6 +222,17 @@ h1, h2, h3, h4 {
   box-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
 }
 
+.btn-disconnect {
+  background: rgba(255, 92, 92, 0.12);
+  color: #FF5C5C;
+  border: 1px solid rgba(255, 92, 92, 0.4);
+}
+
+.btn-disconnect:hover {
+  background: rgba(255, 92, 92, 0.2);
+  transform: translateY(-2px);
+}
+
 .btn-sm {
   padding: 6px 12px;
   font-size: 0.85rem;
