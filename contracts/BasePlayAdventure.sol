@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 
 /**
  * @title BasePlayAdventure
- * @dev An ERC20 token ($BPLAY) combined with an idle mining and betting game.
+ * @dev An ERC20 token ($CPLAY) combined with an idle mining and betting game.
  * Designed for Base Sepolia Testnet.
  */
 contract BasePlayAdventure is ERC20, ERC20Burnable {
@@ -16,7 +16,7 @@ contract BasePlayAdventure is ERC20, ERC20Burnable {
     mapping(address => uint256) public lastFaucetClaim;
 
     // Idle Mining settings
-    // Base mining rate: 0.01 BPLAY per second per level
+    // Base mining rate: 0.01 CPLAY per second per level
     uint256 public constant BASE_MINING_RATE = 1 * 10**16; 
     
     struct MinerState {
@@ -42,13 +42,13 @@ contract BasePlayAdventure is ERC20, ERC20Burnable {
         uint256 seed
     );
 
-    constructor() ERC20("BasePlay Token", "BPLAY") {
-        // Mint initial supply of 1,000,000 BPLAY to the creator
+    constructor() ERC20("CirclePlay Token", "CPLAY") {
+        // Mint initial supply of 1,000,000 CPLAY to the creator
         _mint(msg.sender, 1000000 * 10**18);
     }
 
     /**
-     * @dev Claim free $BPLAY tokens from the faucet.
+     * @dev Claim free $CPLAY tokens from the faucet.
      */
     function claimFaucet() external {
         require(
@@ -64,7 +64,7 @@ contract BasePlayAdventure is ERC20, ERC20Burnable {
      * @dev Calculate cost to upgrade miner rig.
      */
     function getUpgradeCost(uint256 currentLevel) public pure returns (uint256) {
-        return (currentLevel + 1) * 100 * 10**18; // 100 BPLAY base * level
+        return (currentLevel + 1) * 100 * 10**18; // 100 CPLAY base * level
     }
 
     /**
@@ -74,7 +74,7 @@ contract BasePlayAdventure is ERC20, ERC20Burnable {
         uint256 currentLevel = minerStates[msg.sender].level;
         uint256 cost = getUpgradeCost(currentLevel);
         
-        require(balanceOf(msg.sender) >= cost, "Insufficient BPLAY balance for upgrade");
+        require(balanceOf(msg.sender) >= cost, "Insufficient CPLAY balance for upgrade");
         
         // Claim accumulated rewards before upgrading level
         _claimMiningInternal(msg.sender);
@@ -93,7 +93,7 @@ contract BasePlayAdventure is ERC20, ERC20Burnable {
      * @dev Calculate cost to upgrade click power.
      */
     function getClickUpgradeCost(uint256 currentLevel) public pure returns (uint256) {
-        return (currentLevel + 1) * 50 * 10**18; // 50 BPLAY base * level
+        return (currentLevel + 1) * 50 * 10**18; // 50 CPLAY base * level
     }
 
     /**
@@ -103,7 +103,7 @@ contract BasePlayAdventure is ERC20, ERC20Burnable {
         uint256 currentLevel = clickLevels[msg.sender];
         uint256 cost = getClickUpgradeCost(currentLevel);
         
-        require(balanceOf(msg.sender) >= cost, "Insufficient BPLAY balance for upgrade");
+        require(balanceOf(msg.sender) >= cost, "Insufficient CPLAY balance for upgrade");
         
         // Burn the tokens spent on upgrade
         _burn(msg.sender, cost);
@@ -158,12 +158,12 @@ contract BasePlayAdventure is ERC20, ERC20Burnable {
     }
 
     /**
-     * @dev Roll an on-chain coin flip bet using $BPLAY tokens.
+     * @dev Roll an on-chain coin flip bet using $CPLAY tokens.
      * @param betHeads true to bet Heads, false to bet Tails.
-     * @param betAmount quantity of $BPLAY to bet.
+     * @param betAmount quantity of $CPLAY to bet.
      */
     function coinFlip(bool betHeads, uint256 betAmount) external returns (bool) {
-        require(betAmount >= 10 * 10**18, "Minimum bet is 10 BPLAY");
+        require(betAmount >= 10 * 10**18, "Minimum bet is 10 CPLAY");
         require(balanceOf(msg.sender) >= betAmount, "Insufficient balance to place bet");
 
         // Burn the bet tokens upfront
@@ -213,3 +213,4 @@ contract BasePlayAdventure is ERC20, ERC20Burnable {
         pendingRewards = pendingMiningRewards(player);
     }
 }
+

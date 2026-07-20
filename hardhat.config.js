@@ -12,8 +12,9 @@ module.exports = {
     },
   },
   networks: {
-    "base-sepolia": {
-      url: "https://sepolia.base.org",
+    "arc-testnet": {
+      url: "https://rpc.testnet.arc.network",
+      chainId: 5042002,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
   },

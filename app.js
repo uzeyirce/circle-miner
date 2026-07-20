@@ -1,5 +1,5 @@
 /**
- * Base Cyber Miner & Lucky Flip
+ * Arc Cyber Miner & Lucky Flip
  * Web3 Client Logic using Ethers.js v6
  */
 
@@ -25,16 +25,16 @@ let profileState = {
 
 // Default deployed addresses for ease of use
 const DEFAULT_CONTRACTS = {
-  "84532": "0xf9ea420a32490b6efb46be167d4da0f796ad7a02", // Base Sepolia Contract (placeholder/deployed address)
+  "5042002": "0x660752Af87CAF590Bb08d46f041FDFf11d2b723C", // Arc Testnet Contract (deployed)
   "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"  // Hardhat Localhost default
 };
 
-// Get active contract address from LocalStorage or default to Base Sepolia
+// Get active contract address from LocalStorage or default to Arc Testnet
 function getContractAddress(chainId) {
   const chainStr = String(chainId);
   const cached = localStorage.getItem(`base_cyber_contract_${chainStr}`);
   if (cached) return cached;
-  return DEFAULT_CONTRACTS[chainStr] || DEFAULT_CONTRACTS["84532"];
+  return DEFAULT_CONTRACTS[chainStr] || DEFAULT_CONTRACTS["5042002"];
 }
 
 function saveContractAddress(chainId, address) {
@@ -163,14 +163,14 @@ async function connectWallet() {
     walletAddressAbbr.textContent = `${walletAddress.substring(0, 10)}...${walletAddress.substring(34)}`;
     tokenDisplay.classList.remove('hidden');
     
-    // Check if network is Base Sepolia (84532) or Local Hardhat (31337)
-    if (currentChainId === 84532n || currentChainId === 31337n) {
+    // Check if network is Arc Testnet (5042002) or Local Hardhat (31337)
+    if (currentChainId === 5042002n || currentChainId === 31337n) {
       networkWarning.classList.add('hidden');
       btnDeployBrowser.disabled = false;
       
       const contractAddress = getContractAddress(currentChainId);
       contractAddressInput.value = contractAddress;
-      defaultContractAddress.textContent = DEFAULT_CONTRACTS[String(currentChainId)] || DEFAULT_CONTRACTS["84532"];
+      defaultContractAddress.textContent = DEFAULT_CONTRACTS[String(currentChainId)] || DEFAULT_CONTRACTS["5042002"];
       
       // Instantiate contract
       contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
@@ -211,12 +211,12 @@ function disableGameControls() {
   btnRoll.disabled = true;
 }
 
-// Switch wallet network to Base Sepolia
+// Switch wallet network to Arc Testnet
 async function switchNetwork() {
   try {
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x14a34' }], // Base Sepolia 84532
+      params: [{ chainId: '0x4cef52' }], // Arc Testnet 5042002
     });
   } catch (switchError) {
     // If chain is not added, request to add it
@@ -226,11 +226,11 @@ async function switchNetwork() {
           method: 'wallet_addEthereumChain',
           params: [
             {
-              chainId: '0x14a34',
-              chainName: 'Base Sepolia Testnet',
-              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-              rpcUrls: ['https://sepolia.base.org'],
-              blockExplorerUrls: ['https://sepolia.basescan.org'],
+              chainId: '0x4cef52',
+              chainName: 'Arc Testnet',
+              nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
+              rpcUrls: ['https://rpc.testnet.arc.network'],
+              blockExplorerUrls: ['https://testnet.arcscan.app'],
             },
           ],
         });
@@ -275,9 +275,9 @@ async function fetchPlayerProfile() {
     const multiplier = 1n + profileState.clickLevel;
     clickMultiplierEl.textContent = `${multiplier}x`;
     
-    // Passive income: level * 0.01 BPLAY/sec
+    // Passive income: level * 0.01 CPLAY/sec
     const ratePerSec = Number(profileState.minerLevel) * 0.01;
-    passiveIncomeVal.textContent = `${ratePerSec.toFixed(2)} BPLAY/sec`;
+    passiveIncomeVal.textContent = `${ratePerSec.toFixed(2)} CPLAY/sec`;
     
     // Faucet button state
     if (profileState.faucetCooldown === 0n) {
@@ -298,7 +298,7 @@ async function fetchPlayerProfile() {
     btnUpgradeMiner.disabled = profileState.balance < minerCost;
     
     // Enable betting buttons if user has enough balance
-    btnRoll.disabled = profileState.balance < ethers.parseEther("10"); // Min bet 10 BPLAY
+    btnRoll.disabled = profileState.balance < ethers.parseEther("10"); // Min bet 10 CPLAY
     
     // Pending rewards visual
     pendingClaimLocal = parseFloat(ethers.formatEther(profileState.pendingRewards));
@@ -320,7 +320,7 @@ function startPassiveMiningTimer() {
   // Update local display counter every 100ms
   miningUpdateInterval = setInterval(() => {
     if (profileState.minerLevel > 0n) {
-      // 0.01 BPLAY per second per level
+      // 0.01 CPLAY per second per level
       const added = 0.01 * Number(profileState.minerLevel) * 0.1;
       pendingClaimLocal += added;
       updateMiningDisplay();
@@ -421,8 +421,8 @@ function logTransaction(actionName, txHash, status) {
     statusBadge = '<span class="tx-status-badge failed"><i class="fa-solid fa-circle-xmark"></i> Failed</span>';
   }
   
-  const explorerUrl = currentChainId === 84532n 
-    ? `https://sepolia.basescan.org/tx/${txHash}` 
+  const explorerUrl = currentChainId === 5042002n 
+    ? `https://testnet.arcscan.app/tx/${txHash}` 
     : `#`;
     
   const txLink = txHash !== 'N/A' 
@@ -464,7 +464,7 @@ btnFaucet.addEventListener('click', async () => {
   
   try {
     const tx = await contract.claimFaucet();
-    logRow.cells[4].innerHTML = `<a href="https://sepolia.basescan.org/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
+    logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
     
     const receipt = await tx.wait();
     updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
@@ -485,7 +485,7 @@ btnUpgradeClick.addEventListener('click', async () => {
   
   try {
     const tx = await contract.buyClickUpgrade();
-    logRow.cells[4].innerHTML = `<a href="https://sepolia.basescan.org/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
+    logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
     
     const receipt = await tx.wait();
     updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
@@ -502,11 +502,11 @@ btnUpgradeMiner.addEventListener('click', async () => {
   if (!contract) return;
   btnUpgradeMiner.disabled = true;
   
-  const logRow = logTransaction("Upgrade Cyber Mining Rig", "N/A", "pending");
+  const logRow = logTransaction("Upgrade Circle Mining Rig", "N/A", "pending");
   
   try {
     const tx = await contract.buyMinerUpgrade();
-    logRow.cells[4].innerHTML = `<a href="https://sepolia.basescan.org/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
+    logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
     
     const receipt = await tx.wait();
     updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
@@ -527,7 +527,7 @@ btnClaimMining.addEventListener('click', async () => {
   
   try {
     const tx = await contract.claimMining();
-    logRow.cells[4].innerHTML = `<a href="https://sepolia.basescan.org/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
+    logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
     
     const receipt = await tx.wait();
     updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
@@ -575,13 +575,13 @@ btnRoll.addEventListener('click', async () => {
   
   const betVal = parseFloat(betAmountInput.value);
   if (isNaN(betVal) || betVal < 10) {
-    alert("Minimum bet amount is 10 BPLAY");
+    alert("Minimum bet amount is 10 CPLAY");
     return;
   }
   
   const betWei = ethers.parseEther(betVal.toString());
   if (profileState.balance < betWei) {
-    alert("Insufficient BPLAY balance to cover bet.");
+    alert("Insufficient CPLAY balance to cover bet.");
     return;
   }
   
@@ -597,7 +597,7 @@ btnRoll.addEventListener('click', async () => {
   
   try {
     const tx = await contract.coinFlip(isHeadsBet, betWei);
-    logRow.cells[4].innerHTML = `<a href="https://sepolia.basescan.org/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
+    logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
     
     const receipt = await tx.wait();
     updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
@@ -636,7 +636,7 @@ btnRoll.addEventListener('click', async () => {
       
       if (won) {
         flipStatusMsg.className = "flip-status-message won";
-        flipStatusMsg.innerHTML = `<i class="fa-solid fa-trophy"></i> YOU WON! Received ${ethers.formatEther(payout)} $BPLAY!`;
+        flipStatusMsg.innerHTML = `<i class="fa-solid fa-trophy"></i> YOU WON! Received ${ethers.formatEther(payout)} $CPLAY!`;
       } else {
         flipStatusMsg.className = "flip-status-message lost";
         flipStatusMsg.innerHTML = `<i class="fa-solid fa-face-frown"></i> YOU LOST! Better luck next roll.`;
@@ -676,7 +676,7 @@ btnDeployBrowser.addEventListener('click', async () => {
     
     const tx = deployedContract.deploymentTransaction();
     if (tx) {
-      logRow.cells[4].innerHTML = `<a href="https://sepolia.basescan.org/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
+      logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
     }
     
     await deployedContract.waitForDeployment();
