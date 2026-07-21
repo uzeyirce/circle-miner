@@ -179,6 +179,109 @@ h1, h2, h3, h4 {
 }
 
 /* Network Warning Banner */
+/* Waitlist Banner */
+.waitlist-banner {
+  background: var(--panel-bg, rgba(15, 23, 42, 0.6));
+  border: 1px solid var(--border-color, rgba(148, 163, 184, 0.15));
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.waitlist-copy h2 {
+  font-size: 1.1rem;
+  margin: 0 0 4px 0;
+}
+
+.waitlist-copy p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.waitlist-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.waitlist-form input[type="email"] {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-family: inherit;
+  min-width: 220px;
+}
+
+.waitlist-status {
+  font-size: 0.85rem;
+  color: var(--neon-cyan);
+  width: 100%;
+}
+
+.waitlist-socials {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(255, 255, 255, 0.03);
+  transition: all 0.2s ease;
+}
+
+.social-link:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+}
+
+.social-link.soon {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.soon-badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(255, 140, 66, 0.15);
+  color: #FF8C42;
+  border: 1px solid rgba(255, 140, 66, 0.35);
+  border-radius: 999px;
+  padding: 2px 7px;
+  margin-left: 2px;
+}
+
+@media (max-width: 700px) {
+  .waitlist-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .waitlist-form {
+    width: 100%;
+  }
+  .waitlist-form input[type="email"] {
+    flex: 1;
+  }
+}
+
 .warning-banner {
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);

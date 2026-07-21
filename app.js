@@ -25,7 +25,7 @@ let profileState = {
 
 // Default deployed addresses for ease of use
 const DEFAULT_CONTRACTS = {
-  "5042002": "0x660752Af87CAF590Bb08d46f041FDFf11d2b723C", // Arc Testnet Contract (deployed)
+  "5042002": "0x82aeE02718030650104186ad384AB64AF1B20521", // Arc Testnet Contract (deployed)
   "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"  // Hardhat Localhost default
 };
 
@@ -76,13 +76,7 @@ const btnBetMax = document.getElementById('btn-bet-max');
 const btnRoll = document.getElementById('btn-roll');
 const flipStatusMsg = document.getElementById('flip-status-msg');
 
-// Dev Panel Elements
-const contractAddressInput = document.getElementById('contract-address-input');
-const btnSaveContract = document.getElementById('btn-save-contract');
-const btnDeployBrowser = document.getElementById('btn-deploy-browser');
-const defaultContractAddress = document.getElementById('default-contract-address');
-const deployLoader = document.getElementById('deploy-loader');
-const deployStatusTxt = document.getElementById('deploy-status-txt');
+// Dev Panel removed from public UI — no element refs needed
 
 // Tx Log Elements
 const txTbody = document.getElementById('tx-tbody');
@@ -168,12 +162,9 @@ async function connectWallet() {
     // Check if network is Arc Testnet (5042002) or Local Hardhat (31337)
     if (currentChainId === 5042002n || currentChainId === 31337n) {
       networkWarning.classList.add('hidden');
-      btnDeployBrowser.disabled = false;
-      
+
       const contractAddress = getContractAddress(currentChainId);
-      contractAddressInput.value = contractAddress;
-      defaultContractAddress.textContent = DEFAULT_CONTRACTS[String(currentChainId)] || DEFAULT_CONTRACTS["5042002"];
-      
+
       // Instantiate contract
       contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
       
@@ -182,7 +173,6 @@ async function connectWallet() {
       startPassiveMiningTimer();
     } else {
       networkWarning.classList.remove('hidden');
-      btnDeployBrowser.disabled = true;
       disableGameControls();
     }
   } catch (error) {
@@ -669,73 +659,10 @@ btnRoll.addEventListener('click', async () => {
 });
 
 /* ==========================================================================
-   Developer & Deployment Admin Center
+   Developer & Deployment Admin Center — removed from public UI.
+   The contract address is now fixed via DEFAULT_CONTRACTS; players can no
+   longer deploy new contract instances or repoint the app from the browser.
    ========================================================================== */
-
-// Direct browser compiler & deployer!
-btnDeployBrowser.addEventListener('click', async () => {
-  if (!signer) return;
-  
-  btnDeployBrowser.disabled = true;
-  deployLoader.classList.remove('hidden');
-  deployStatusTxt.textContent = "Waiting for signature in your wallet...";
-  
-  const logRow = logTransaction("Deploy Contract from Browser", "N/A", "pending");
-  
-  try {
-    const factory = new ethers.ContractFactory(CONTRACT_ABI, CONTRACT_BYTECODE, signer);
-    const deployedContract = await factory.deploy();
-    
-    deployStatusTxt.textContent = "Deploying contract. Waiting for block confirmation...";
-    
-    const tx = deployedContract.deploymentTransaction();
-    if (tx) {
-      logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-    }
-    
-    await deployedContract.waitForDeployment();
-    const newAddress = await deployedContract.getAddress();
-    
-    updateTransactionLog(logRow, "success", "Contract deployed successfully");
-    
-    deployStatusTxt.innerHTML = `<span style="color:var(--mint)"><i class="fa-solid fa-check"></i> Deployed to ${newAddress.substring(0,6)}...</span>`;
-    
-    // Save to local storage and update active contract instance
-    saveContractAddress(currentChainId, newAddress);
-    contractAddressInput.value = newAddress;
-    contract = new ethers.Contract(newAddress, CONTRACT_ABI, signer);
-    
-    setTimeout(() => {
-      deployLoader.classList.add('hidden');
-      btnDeployBrowser.disabled = false;
-    }, 4000);
-    
-    await fetchPlayerProfile();
-    
-  } catch (error) {
-    console.error("Browser deployment failed:", error);
-    updateTransactionLog(logRow, "failed", error.reason || "Deploy Failed");
-    deployStatusTxt.innerHTML = `<span style="color:var(--coral)"><i class="fa-solid fa-xmark"></i> Deployment failed</span>`;
-    
-    setTimeout(() => {
-      deployLoader.classList.add('hidden');
-      btnDeployBrowser.disabled = false;
-    }, 4000);
-  }
-});
-
-// Update Contract Address manually
-btnSaveContract.addEventListener('click', async () => {
-  const newAddr = contractAddressInput.value.trim();
-  if (ethers.isAddress(newAddr)) {
-    saveContractAddress(currentChainId, newAddr);
-    contract = new ethers.Contract(newAddr, CONTRACT_ABI, signer);
-    alert(`Contract address updated to: ${newAddr}`);
-    await fetchPlayerProfile();
-  } else {
-    alert("Please enter a valid Ethereum contract address.");
-  }
-});
 
 
 /* ==========================================================================

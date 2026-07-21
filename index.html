@@ -46,6 +46,32 @@
       </div>
     </header>
 
+    <!-- Waitlist / Socials -->
+    <section class="waitlist-banner">
+      <div class="waitlist-copy">
+        <h2>Join the $CPLAY Waitlist</h2>
+        <p>Get notified when Circle Miner heads to mainnet.</p>
+      </div>
+      <form class="waitlist-form" id="waitlist-form">
+        <input type="email" id="waitlist-email" placeholder="you@email.com" required>
+        <button type="submit" class="btn btn-connect" id="waitlist-submit">
+          <i class="fa-solid fa-paper-plane"></i> Join Waitlist
+        </button>
+      </form>
+      <div class="waitlist-status hidden" id="waitlist-status"></div>
+      <div class="waitlist-socials">
+        <a href="https://x.com/cplay__" target="_blank" rel="noopener" class="social-link">
+          <i class="fa-brands fa-x-twitter"></i> @cplay__
+        </a>
+        <span class="social-link soon">
+          <i class="fa-brands fa-telegram"></i> Telegram <span class="soon-badge">Soon</span>
+        </span>
+        <span class="social-link soon">
+          <i class="fa-solid fa-rocket"></i> Launch <span class="soon-badge">Soon</span>
+        </span>
+      </div>
+    </section>
+
     <!-- Network Warning Banner -->
     <div class="warning-banner hidden" id="network-warning">
       <i class="fa-solid fa-triangle-exclamation"></i> Please connect to the <span class="highlight">Arc Testnet</span>.
@@ -63,9 +89,6 @@
           </button>
           <button class="nav-tab" data-tab="flip-tab" id="tab-btn-flip">
             <i class="fa-solid fa-coins"></i> Lucky Flip
-          </button>
-          <button class="nav-tab" data-tab="admin-tab" id="tab-btn-admin">
-            <i class="fa-solid fa-gears"></i> Developer Panel
           </button>
         </nav>
 
@@ -226,47 +249,7 @@
           </div>
         </section>
 
-        <!-- Tab 3: Dev Panel -->
-        <section class="tab-panel" id="admin-tab">
-          <div class="glass-panel admin-panel-container">
-            <h2 class="section-title"><i class="fa-solid fa-terminal"></i> Developer Control Center</h2>
-            <p class="panel-desc">Deploy a new smart contract directly from your browser or change the active contract address.</p>
-            
-            <div class="admin-grid">
-              <!-- Active Contract Card -->
-              <div class="admin-card">
-                <h3>Active Smart Contract</h3>
-                <div class="input-group font-sans">
-                  <input type="text" id="contract-address-input" placeholder="0x..." class="monospace">
-                  <button class="btn btn-sm" id="btn-save-contract">Update Address</button>
-                </div>
-                <div class="admin-info-box">
-                  <div class="info-row">
-                    <span>Default Arc Testnet Address:</span>
-                    <span class="monospace text-glow-blue cursor-pointer" id="default-contract-address">0x5FbDB2315678afecb367f032d93F642f64180aa3</span>
-                  </div>
-                  <p class="help-text">Updating the address changes which contract the frontend communicates with. Values are persisted to your browser's local storage.</p>
-                </div>
-              </div>
-
-              <!-- Browser Compiler & Deployer -->
-              <div class="admin-card">
-                <h3>1-Click Contract Deployer</h3>
-                <p>Deploy a new instance of the game contract directly using MetaMask/Coinbase Wallet. Perfect for clean testing!</p>
-                
-                <div class="deploy-action">
-                  <button class="btn btn-deploy" id="btn-deploy-browser" disabled>
-                    <i class="fa-solid fa-rocket"></i> Deploy Contract via Wallet
-                  </button>
-                  <div class="deploy-progress hidden" id="deploy-loader">
-                    <div class="spinner"></div>
-                    <span id="deploy-status-txt">Waiting for MetaMask signature...</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <!-- Dev Panel removed from public UI -->
 
       </div>
     </main>
@@ -315,5 +298,50 @@
   
   <!-- Frontend Script -->
   <script src="app.js"></script>
+  <script>
+    // Waitlist form — collects emails independently of wallet/game logic.
+    // ⚠️ Wire this to a real backend before relying on it: sign up for a
+    // free form endpoint (e.g. https://web3forms.com or https://formspree.io),
+    // then replace WAITLIST_ENDPOINT below with your real endpoint URL.
+    // Until then, submissions are only saved to this browser's localStorage
+    // as a fallback so nothing is silently lost during testing.
+    const WAITLIST_ENDPOINT = ""; // <-- put your Formspree/Web3Forms endpoint here
+
+    document.getElementById('waitlist-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const emailInput = document.getElementById('waitlist-email');
+      const statusEl = document.getElementById('waitlist-status');
+      const submitBtn = document.getElementById('waitlist-submit');
+      const email = emailInput.value.trim();
+      if (!email) return;
+
+      submitBtn.disabled = true;
+      statusEl.classList.remove('hidden');
+      statusEl.textContent = "Joining...";
+
+      // Local fallback so no submission is lost even without a backend wired up
+      try {
+        const saved = JSON.parse(localStorage.getItem('cplay_waitlist') || '[]');
+        saved.push({ email, ts: Date.now() });
+        localStorage.setItem('cplay_waitlist', JSON.stringify(saved));
+      } catch (err) { /* ignore storage errors */ }
+
+      if (WAITLIST_ENDPOINT) {
+        try {
+          await fetch(WAITLIST_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+          });
+        } catch (err) {
+          console.error('Waitlist submit failed:', err);
+        }
+      }
+
+      statusEl.textContent = "✅ You're on the list!";
+      emailInput.value = '';
+      submitBtn.disabled = false;
+    });
+  </script>
 </body>
 </html>
