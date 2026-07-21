@@ -25,7 +25,7 @@ let profileState = {
 
 // Default deployed addresses for ease of use
 const DEFAULT_CONTRACTS = {
-  "5042002": "0x82aeE02718030650104186ad384AB64AF1B20521", // Arc Testnet Contract (deployed)
+  "5042002": "0x82aeE02718030650104186ad384AB64AF1B20521", // Arc Testnet Contract (fixed 1B supply, deployed)
   "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"  // Hardhat Localhost default
 };
 
