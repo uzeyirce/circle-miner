@@ -32,8 +32,11 @@ const DEFAULT_CONTRACTS = {
 // Get active contract address from LocalStorage or default to Arc Testnet
 function getContractAddress(chainId) {
   const chainStr = String(chainId);
-  const cached = localStorage.getItem(`base_cyber_contract_${chainStr}`);
-  if (cached) return cached;
+  // Dev Panel removed — no more UI writes to this key, and any leftover
+  // value from before (e.g. an old dev-deployed test contract) must not
+  // silently override the real, fixed-supply contract. Clear it defensively
+  // and always use the current default.
+  localStorage.removeItem(`base_cyber_contract_${chainStr}`);
   return DEFAULT_CONTRACTS[chainStr] || DEFAULT_CONTRACTS["5042002"];
 }
 
