@@ -16,7 +16,7 @@ let miningUpdateInterval = null;
 // Game Profile State from On-chain
 let profileState = {
   balance: 0n,
-  faucetCooldown: 0n,
+  faucetClaimed: false,
   minerLevel: 0n,
   clickLevel: 0n,
   pendingRewards: 0n,
@@ -25,7 +25,7 @@ let profileState = {
 
 // Default deployed addresses for ease of use
 const DEFAULT_CONTRACTS = {
-  "5042002": "0x82aeE02718030650104186ad384AB64AF1B20521", // Arc Testnet Contract (fixed 1B supply, deployed)
+  "5042002": "0x07C51Ce2A9C1FBd957d3bb84F197e8d518263f7A", // Arc Testnet Contract (bonding curve + dual pool economy)
   "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"  // Hardhat Localhost default
 };
 
@@ -78,6 +78,15 @@ const betAmountInput = document.getElementById('bet-amount');
 const btnBetMax = document.getElementById('btn-bet-max');
 const btnRoll = document.getElementById('btn-roll');
 const flipStatusMsg = document.getElementById('flip-status-msg');
+
+// Curve (Buy/Sell) Elements
+const curvePriceEl = document.getElementById('curve-price');
+const buyUsdcInput = document.getElementById('buy-usdc-input');
+const buyPreviewEl = document.getElementById('buy-preview');
+const btnBuy = document.getElementById('btn-buy');
+const sellCplayInput = document.getElementById('sell-cplay-input');
+const sellPreviewEl = document.getElementById('sell-preview');
+const btnSell = document.getElementById('btn-sell');
 
 // Dev Panel removed from public UI — no element refs needed
 
@@ -216,6 +225,8 @@ function disableGameControls() {
   btnUpgradeClick.disabled = true;
   btnUpgradeMiner.disabled = true;
   btnRoll.disabled = true;
+  btnBuy.disabled = true;
+  btnSell.disabled = true;
 }
 
 // Switch wallet network to Arc Testnet
@@ -264,7 +275,7 @@ async function fetchPlayerProfile() {
     const result = await contract.getPlayerProfile(walletAddress);
     
     profileState.balance = result[0];
-    profileState.faucetCooldown = result[1];
+    profileState.faucetClaimed = result[1];
     profileState.minerLevel = result[2];
     profileState.clickLevel = result[3];
     profileState.pendingRewards = result[4];
@@ -278,21 +289,24 @@ async function fetchPlayerProfile() {
     minerLevelLbl.textContent = profileState.minerLevel.toString();
     minerLevelVal.textContent = `Level ${profileState.minerLevel}`;
     
-    // Click Multiplier = 1 + clickLevel
+    // Click Multiplier = 1 + clickLevel (now genuinely boosts on-chain mining reward too)
     const multiplier = 1n + profileState.clickLevel;
     clickMultiplierEl.textContent = `${multiplier}x`;
     
-    // Passive income: level * 0.01 CPLAY/sec
-    const ratePerSec = Number(profileState.minerLevel) * 0.01;
-    passiveIncomeVal.textContent = `${ratePerSec.toFixed(2)} CPLAY/sec`;
+    // Passive income: 0.001 CPLAY/sec/level, +10% per click level (matches contract exactly)
+    const baseRatePerSec = Number(profileState.minerLevel) * 0.001;
+    const ratePerSec = baseRatePerSec * (1 + Number(profileState.clickLevel) * 0.1);
+    passiveIncomeVal.textContent = `${ratePerSec.toFixed(4)} CPLAY/sec`;
     
-    // Faucet button state
-    if (profileState.faucetCooldown === 0n) {
-      btnFaucet.disabled = false;
+    // Faucet button state — one-time welcome grant now, no cooldown
+    if (profileState.faucetClaimed) {
+      btnFaucet.disabled = true;
+      btnFaucet.innerHTML = `<i class="fa-solid fa-check"></i> Welcome Grant Claimed`;
       faucetCooldownEl.textContent = "";
     } else {
-      btnFaucet.disabled = true;
-      startFaucetCooldownTimer(Number(profileState.faucetCooldown));
+      btnFaucet.disabled = false;
+      btnFaucet.innerHTML = `<i class="fa-solid fa-faucet"></i> Claim 10 CPLAY (one-time)`;
+      faucetCooldownEl.textContent = "";
     }
     
     // Upgrades Cost Updates
@@ -307,58 +321,43 @@ async function fetchPlayerProfile() {
     // Enable betting buttons if user has enough balance
     btnRoll.disabled = profileState.balance < ethers.parseEther("10"); // Min bet 10 CPLAY
     
-    // Pending rewards visual
+    // Pending rewards — real on-chain accrued amount only (no fake click bonus added)
     pendingClaimLocal = parseFloat(ethers.formatEther(profileState.pendingRewards));
     updateMiningDisplay();
+
+    // Curve price + sell button state
+    await refreshCurvePrice();
+    btnSell.disabled = profileState.balance <= 0n;
     
   } catch (error) {
     console.error("Error reading profile stats:", error);
-    // Display helpful suggestion in dev panel
     flipStatusMsg.textContent = "Contract read failed. Check if address is correct.";
   }
 }
 
-// Simulated counter to make the game feel alive and responsive
+// Ticks the pending-claim display between profile refreshes, mirroring the
+// contract's exact formula so the number shown is what you'll actually get.
 function startPassiveMiningTimer() {
   if (miningUpdateInterval) {
     clearInterval(miningUpdateInterval);
   }
   
-  // Update local display counter every 100ms
   miningUpdateInterval = setInterval(() => {
     if (profileState.minerLevel > 0n) {
-      // 0.01 CPLAY per second per level
-      const added = 0.01 * Number(profileState.minerLevel) * 0.1;
-      pendingClaimLocal += added;
+      const baseRatePerSec = 0.001 * Number(profileState.minerLevel); // matches BASE_MINING_RATE
+      const ratePerSec = baseRatePerSec * (1 + Number(profileState.clickLevel) * 0.1);
+      pendingClaimLocal += ratePerSec * 0.1; // ticking every 100ms
       updateMiningDisplay();
     }
   }, 100);
 }
 
 function updateMiningDisplay() {
-  const combined = pendingClaimLocal + (localClicks * (1 + Number(profileState.clickLevel)) * 0.05); // local clicks add pending points
-  miningPendingEl.textContent = combined.toFixed(3);
-  btnClaimMining.disabled = combined <= 0;
-}
-
-// Custom faucet timer
-let faucetTimer = null;
-function startFaucetCooldownTimer(cooldownSeconds) {
-  if (faucetTimer) clearInterval(faucetTimer);
-  
-  let remaining = cooldownSeconds;
-  faucetCooldownEl.textContent = `(Cooldown: ${formatTime(remaining)})`;
-  
-  faucetTimer = setInterval(() => {
-    remaining--;
-    if (remaining <= 0) {
-      clearInterval(faucetTimer);
-      btnFaucet.disabled = false;
-      faucetCooldownEl.textContent = "";
-    } else {
-      faucetCooldownEl.textContent = `(Cooldown: ${formatTime(remaining)})`;
-    }
-  }, 1000);
+  // Real, on-chain-accruing amount only — clicking the crystal is a fun
+  // cosmetic counter and does NOT add anything here, so this number always
+  // matches what claimMining() will actually pay out.
+  miningPendingEl.textContent = pendingClaimLocal.toFixed(4);
+  btnClaimMining.disabled = pendingClaimLocal <= 0;
 }
 
 function formatTime(sec) {
@@ -658,6 +657,135 @@ btnRoll.addEventListener('click', async () => {
     updateTransactionLog(logRow, "failed", error.reason || "Rejected");
     flipStatusMsg.textContent = "Transaction failed or rejected.";
     btnRoll.disabled = false;
+  }
+});
+
+/* ==========================================================================
+   Bonding Curve — Buy / Sell $CPLAY with native USDC
+   ========================================================================== */
+
+async function refreshCurvePrice() {
+  if (!contract) return;
+  try {
+    const price = await contract.getCurrentPrice();
+    curvePriceEl.textContent = `${parseFloat(ethers.formatEther(price)).toFixed(8)} USDC`;
+  } catch (error) {
+    console.error("Error reading curve price:", error);
+  }
+}
+
+// Live preview: USDC in -> CPLAY out
+let buyPreviewDebounce = null;
+buyUsdcInput.addEventListener('input', () => {
+  clearTimeout(buyPreviewDebounce);
+  buyPreviewDebounce = setTimeout(async () => {
+    if (!contract) return;
+    const val = parseFloat(buyUsdcInput.value);
+    if (isNaN(val) || val <= 0) {
+      buyPreviewEl.textContent = "";
+      return;
+    }
+    try {
+      const usdcWei = ethers.parseEther(val.toString());
+      const tokensOut = await contract.previewBuy(usdcWei);
+      buyPreviewEl.textContent = `≈ ${parseFloat(ethers.formatEther(tokensOut)).toLocaleString(undefined, { maximumFractionDigits: 2 })} CPLAY`;
+    } catch (error) {
+      buyPreviewEl.textContent = "";
+    }
+  }, 300);
+});
+
+// Live preview: CPLAY in -> USDC out
+let sellPreviewDebounce = null;
+sellCplayInput.addEventListener('input', () => {
+  clearTimeout(sellPreviewDebounce);
+  sellPreviewDebounce = setTimeout(async () => {
+    if (!contract) return;
+    const val = parseFloat(sellCplayInput.value);
+    if (isNaN(val) || val <= 0) {
+      sellPreviewEl.textContent = "";
+      return;
+    }
+    try {
+      const cplayWei = ethers.parseEther(val.toString());
+      const usdcOut = await contract.previewSell(cplayWei);
+      sellPreviewEl.textContent = `≈ ${parseFloat(ethers.formatEther(usdcOut)).toFixed(6)} USDC`;
+    } catch (error) {
+      sellPreviewEl.textContent = "";
+    }
+  }, 300);
+});
+
+btnBuy.addEventListener('click', async () => {
+  if (!contract) return;
+  const val = parseFloat(buyUsdcInput.value);
+  if (isNaN(val) || val <= 0) {
+    alert("Enter a valid USDC amount to buy with.");
+    return;
+  }
+
+  btnBuy.disabled = true;
+  const logRow = logTransaction("Buy $CPLAY (Curve)", "N/A", "pending");
+
+  try {
+    const usdcWei = ethers.parseEther(val.toString());
+    const expectedTokens = await contract.previewBuy(usdcWei);
+    // 3% slippage tolerance
+    const minTokensOut = (expectedTokens * 97n) / 100n;
+
+    const tx = await contract.buy(minTokensOut, { value: usdcWei });
+    logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
+
+    const receipt = await tx.wait();
+    updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
+
+    buyUsdcInput.value = "";
+    buyPreviewEl.textContent = "";
+    await fetchPlayerProfile();
+  } catch (error) {
+    console.error("Buy error:", error);
+    updateTransactionLog(logRow, "failed", error.reason || "Rejected");
+  } finally {
+    btnBuy.disabled = false;
+  }
+});
+
+btnSell.addEventListener('click', async () => {
+  if (!contract) return;
+  const val = parseFloat(sellCplayInput.value);
+  if (isNaN(val) || val <= 0) {
+    alert("Enter a valid CPLAY amount to sell.");
+    return;
+  }
+
+  const cplayWei = ethers.parseEther(val.toString());
+  if (profileState.balance < cplayWei) {
+    alert("Insufficient CPLAY balance.");
+    return;
+  }
+
+  btnSell.disabled = true;
+  const logRow = logTransaction("Sell $CPLAY (Curve)", "N/A", "pending");
+
+  try {
+    const expectedUsdc = await contract.previewSell(cplayWei);
+    // 3% slippage tolerance
+    const minUsdcOut = (expectedUsdc * 97n) / 100n;
+
+    const tx = await contract.sell(cplayWei, minUsdcOut);
+    logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
+
+    const receipt = await tx.wait();
+    updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
+
+    sellCplayInput.value = "";
+    sellPreviewEl.textContent = "";
+    await fetchPlayerProfile();
+  } catch (error) {
+    console.error("Sell error:", error);
+    updateTransactionLog(logRow, "failed", error.reason || "Rejected");
+  } finally {
+    btnSell.disabled = false;
   }
 });
 

@@ -2,145 +2,248 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 
 /**
- * @title BasePlayAdventure
- * @dev An ERC20 token ($CPLAY) combined with an idle mining and betting game.
- * Deployed on Arc Testnet.
+ * @title BasePlayAdventure ($CPLAY)
+ * @dev Bonding-curve token + idle mining / coin-flip game, deployed on Arc Testnet.
  *
- * TOKENOMICS: Fixed supply of 1,000,000,000 CPLAY, minted once at deployment
- * directly to this contract (acts as the reward pool / treasury). No _mint()
- * calls exist anywhere else in this contract — faucet claims, mining rewards,
- * and coin-flip payouts are all paid OUT of this pool via _transfer(), and
- * upgrade costs / losing bets are paid INTO this pool. Total supply never
- * changes after deployment.
+ * TOKENOMICS OVERVIEW
+ * --------------------
+ * - Hard cap: 1,000,000,000 CPLAY. The ONLY way new tokens are ever minted is
+ *   through buy() on the bonding curve. There is no other _mint() call in
+ *   this contract, anywhere, ever.
+ * - The bonding curve uses a constant-product virtual-reserve model (the
+ *   same mechanism popularized by pump.fun): price starts low and rises
+ *   automatically as people buy, and falls as people sell. The curve is
+ *   funded in Arc's native currency, which is USDC (18 decimals) on Arc.
+ * - Two SEPARATE internal pools, both funded by the owner transferring their
+ *   own (curve-bought) tokens in — never freshly minted:
+ *     1) faucetPoolBalance — funds the one-time 10 CPLAY welcome grant per
+ *        wallet. Exhaustible; once empty, claimFaucet() reverts.
+ *     2) gamePoolBalance — funds mining rewards and coin-flip payouts.
+ *        90% of every upgrade purchase and every bet placed flows INTO this
+ *        pool; 10% flows immediately to the owner (protocol fee). Coin-flip
+ *        wins pay out at 1.8x the bet from this pool, sized so the pool is
+ *        sustainable on average over many plays (not a guaranteed-loss
+ *        mint-on-win design like the old version).
  */
-contract BasePlayAdventure is ERC20, ERC20Burnable, Ownable {
-    // Faucet settings
-    uint256 public constant FAUCET_AMOUNT = 1000 * 10**18;
-    uint256 public constant FAUCET_COOLDOWN = 1 hours;
-    mapping(address => uint256) public lastFaucetClaim;
+contract BasePlayAdventure is ERC20, Ownable {
+    uint256 public constant MAX_SUPPLY = 1_000_000_000 * 10**18;
 
-    // Idle Mining settings
-    // Base mining rate: 0.01 CPLAY per second per level
-    uint256 public constant BASE_MINING_RATE = 1 * 10**16;
+    // ---- Bonding curve state (constant product, pump.fun-style virtual reserves) ----
+    uint256 public constant VIRTUAL_USDC_OFFSET = 3_000 * 10**18; // phantom starting depth
+    uint256 public virtualUsdcReserve; // = real USDC held for the curve + VIRTUAL_USDC_OFFSET
+    uint256 public virtualTokenReserve; // starts at MAX_SUPPLY, decreases as tokens are bought
 
+    // ---- Faucet: one-time welcome grant, paid from its own separate pool ----
+    uint256 public constant FAUCET_AMOUNT = 10 * 10**18;
+    mapping(address => bool) public hasClaimedFaucet;
+    uint256 public faucetPoolBalance;
+
+    // ---- Game reward pool (mining + coin-flip), fully separate from faucet pool ----
+    uint256 public gamePoolBalance;
+    uint256 public constant PROTOCOL_FEE_BPS = 1000;   // 10.00% to owner
+    uint256 public constant BPS_DENOMINATOR = 10000;
+
+    // ---- Idle mining ----
+    uint256 public constant BASE_MINING_RATE = 1 * 10**15; // 0.001 CPLAY/sec/level (1/10th of the original rate)
     struct MinerState {
         uint256 level;
         uint256 lastClaimTime;
     }
     mapping(address => MinerState) public minerStates;
 
-    // Click Upgrade settings
+    // ---- Click upgrade: now genuinely boosts on-chain mining reward (+10% per level) ----
     mapping(address => uint256) public clickLevels;
 
-    // Total fixed supply, minted once to this contract at deploy time.
-    uint256 public constant TOTAL_SUPPLY = 1_000_000_000 * 10**18;
+    // ---- Coin flip ----
+    uint256 public constant COINFLIP_PAYOUT_BPS = 18000; // 1.8x payout
+    uint256 public constant MIN_BET = 10 * 10**18;
 
     // Events
+    event Bought(address indexed buyer, uint256 usdcIn, uint256 tokensOut, uint256 newPrice);
+    event Sold(address indexed seller, uint256 tokensIn, uint256 usdcOut, uint256 newPrice);
     event FaucetClaimed(address indexed player, uint256 amount);
-    event MinerUpgraded(address indexed player, uint256 newLevel, uint256 cost);
-    event ClickUpgraded(address indexed player, uint256 newLevel, uint256 cost);
+    event FaucetPoolFunded(uint256 amount, uint256 newBalance);
+    event GamePoolFunded(uint256 amount, uint256 newBalance);
+    event MinerUpgraded(address indexed player, uint256 newLevel, uint256 cost, uint256 devFee, uint256 poolShare);
+    event ClickUpgraded(address indexed player, uint256 newLevel, uint256 cost, uint256 devFee, uint256 poolShare);
     event MiningClaimed(address indexed player, uint256 amount);
     event CoinFlipResult(
         address indexed player,
         bool betHeads,
         bool won,
         uint256 betAmount,
+        uint256 devFee,
         uint256 payout,
         uint256 seed
     );
-    event PoolWithdraw(address indexed to, uint256 amount);
 
     constructor() ERC20("CirclePlay Token", "CPLAY") Ownable(msg.sender) {
-        // Mint the entire fixed supply to the contract itself. This is the
-        // ONLY _mint() call that will ever happen. The contract acts as the
-        // reward pool that faucet / mining / coin-flip payouts draw from.
-        _mint(address(this), TOTAL_SUPPLY);
+        virtualUsdcReserve = VIRTUAL_USDC_OFFSET;
+        virtualTokenReserve = MAX_SUPPLY;
+    }
+
+    // ==========================================================================
+    // BONDING CURVE — buy / sell against Arc's native USDC
+    // ==========================================================================
+
+    /**
+     * @dev Buy CPLAY with native USDC at the current curve price. Send USDC
+     * as msg.value. Slippage protection via minTokensOut.
+     */
+    function buy(uint256 minTokensOut) external payable returns (uint256 tokensOut) {
+        require(msg.value > 0, "Send USDC to buy");
+
+        uint256 newVirtualUsdcReserve = virtualUsdcReserve + msg.value;
+        uint256 newVirtualTokenReserve = Math.mulDiv(virtualUsdcReserve, virtualTokenReserve, newVirtualUsdcReserve);
+        tokensOut = virtualTokenReserve - newVirtualTokenReserve;
+
+        require(tokensOut >= minTokensOut, "Slippage: tokensOut below minimum");
+        require(totalSupply() + tokensOut <= MAX_SUPPLY, "Exceeds max supply");
+
+        virtualUsdcReserve = newVirtualUsdcReserve;
+        virtualTokenReserve = newVirtualTokenReserve;
+
+        _mint(msg.sender, tokensOut);
+
+        emit Bought(msg.sender, msg.value, tokensOut, getCurrentPrice());
     }
 
     /**
-     * @dev Claim free $CPLAY tokens from the faucet (paid from the pool).
+     * @dev Sell CPLAY back into the curve for native USDC. Slippage
+     * protection via minUsdcOut.
      */
-    function claimFaucet() external {
-        require(
-            block.timestamp >= lastFaucetClaim[msg.sender] + FAUCET_COOLDOWN,
-            "Faucet cooldown active. Wait 1 hour."
-        );
-        require(balanceOf(address(this)) >= FAUCET_AMOUNT, "Faucet pool is empty");
+    function sell(uint256 tokensIn, uint256 minUsdcOut) external returns (uint256 usdcOut) {
+        require(tokensIn > 0, "Amount must be > 0");
+        require(balanceOf(msg.sender) >= tokensIn, "Insufficient CPLAY balance");
 
-        lastFaucetClaim[msg.sender] = block.timestamp;
+        uint256 newVirtualTokenReserve = virtualTokenReserve + tokensIn;
+        uint256 newVirtualUsdcReserve = Math.mulDiv(virtualUsdcReserve, virtualTokenReserve, newVirtualTokenReserve);
+        usdcOut = virtualUsdcReserve - newVirtualUsdcReserve;
+
+        require(usdcOut >= minUsdcOut, "Slippage: usdcOut below minimum");
+        require(address(this).balance >= usdcOut, "Curve reserve insufficient");
+
+        virtualUsdcReserve = newVirtualUsdcReserve;
+        virtualTokenReserve = newVirtualTokenReserve;
+
+        _burn(msg.sender, tokensIn);
+
+        (bool success, ) = msg.sender.call{value: usdcOut}("");
+        require(success, "USDC transfer failed");
+
+        emit Sold(msg.sender, tokensIn, usdcOut, getCurrentPrice());
+    }
+
+    /// @dev Current spot price of 1 whole CPLAY in native USDC (18 decimals).
+    function getCurrentPrice() public view returns (uint256) {
+        return Math.mulDiv(virtualUsdcReserve, 10**18, virtualTokenReserve);
+    }
+
+    /// @dev Preview how many tokens a given USDC input would currently buy.
+    function previewBuy(uint256 usdcIn) external view returns (uint256 tokensOut) {
+        uint256 newVirtualUsdcReserve = virtualUsdcReserve + usdcIn;
+        uint256 newVirtualTokenReserve = Math.mulDiv(virtualUsdcReserve, virtualTokenReserve, newVirtualUsdcReserve);
+        tokensOut = virtualTokenReserve - newVirtualTokenReserve;
+    }
+
+    /// @dev Preview how much USDC a given token input would currently return.
+    function previewSell(uint256 tokensIn) external view returns (uint256 usdcOut) {
+        uint256 newVirtualTokenReserve = virtualTokenReserve + tokensIn;
+        uint256 newVirtualUsdcReserve = Math.mulDiv(virtualUsdcReserve, virtualTokenReserve, newVirtualTokenReserve);
+        usdcOut = virtualUsdcReserve - newVirtualUsdcReserve;
+    }
+
+    // ==========================================================================
+    // OWNER: fund the two separate pools from the owner's own (curve-bought) balance
+    // ==========================================================================
+
+    function fundFaucetPool(uint256 amount) external onlyOwner {
+        _transfer(msg.sender, address(this), amount);
+        faucetPoolBalance += amount;
+        emit FaucetPoolFunded(amount, faucetPoolBalance);
+    }
+
+    function fundGamePool(uint256 amount) external onlyOwner {
+        _transfer(msg.sender, address(this), amount);
+        gamePoolBalance += amount;
+        emit GamePoolFunded(amount, gamePoolBalance);
+    }
+
+    // ==========================================================================
+    // FAUCET — one-time welcome grant, paid ONLY from faucetPoolBalance
+    // ==========================================================================
+
+    function claimFaucet() external {
+        require(!hasClaimedFaucet[msg.sender], "Welcome grant already claimed");
+        require(faucetPoolBalance >= FAUCET_AMOUNT, "Faucet pool is empty");
+
+        hasClaimedFaucet[msg.sender] = true;
+        faucetPoolBalance -= FAUCET_AMOUNT;
         _transfer(address(this), msg.sender, FAUCET_AMOUNT);
         emit FaucetClaimed(msg.sender, FAUCET_AMOUNT);
     }
 
-    /**
-     * @dev Calculate cost to upgrade miner rig.
-     */
+    // ==========================================================================
+    // UPGRADES — cost split 10% owner / 90% game pool
+    // ==========================================================================
+
     function getUpgradeCost(uint256 currentLevel) public pure returns (uint256) {
-        return (currentLevel + 1) * 100 * 10**18; // 100 CPLAY base * level
+        return (currentLevel + 1) * 100 * 10**18;
     }
 
-    /**
-     * @dev Buy passive miner upgrade. Cost is paid INTO the pool (not burned).
-     */
+    function getClickUpgradeCost(uint256 currentLevel) public pure returns (uint256) {
+        return (currentLevel + 1) * 50 * 10**18;
+    }
+
+    function _splitIntoPool(uint256 cost) internal returns (uint256 devFee, uint256 poolShare) {
+        devFee = (cost * PROTOCOL_FEE_BPS) / BPS_DENOMINATOR;
+        poolShare = cost - devFee;
+        _transfer(msg.sender, owner(), devFee);
+        _transfer(msg.sender, address(this), poolShare);
+        gamePoolBalance += poolShare;
+    }
+
     function buyMinerUpgrade() external {
         uint256 currentLevel = minerStates[msg.sender].level;
         uint256 cost = getUpgradeCost(currentLevel);
-
         require(balanceOf(msg.sender) >= cost, "Insufficient CPLAY balance for upgrade");
 
-        // Claim accumulated rewards before upgrading level
         _claimMiningInternal(msg.sender);
 
-        // Send the upgrade cost into the reward pool (no burn — fixed supply)
-        _transfer(msg.sender, address(this), cost);
+        (uint256 devFee, uint256 poolShare) = _splitIntoPool(cost);
 
-        // Increment miner level and reset timer
         minerStates[msg.sender].level += 1;
         minerStates[msg.sender].lastClaimTime = block.timestamp;
 
-        emit MinerUpgraded(msg.sender, minerStates[msg.sender].level, cost);
+        emit MinerUpgraded(msg.sender, minerStates[msg.sender].level, cost, devFee, poolShare);
     }
 
-    /**
-     * @dev Calculate cost to upgrade click power.
-     */
-    function getClickUpgradeCost(uint256 currentLevel) public pure returns (uint256) {
-        return (currentLevel + 1) * 50 * 10**18; // 50 CPLAY base * level
-    }
-
-    /**
-     * @dev Buy click multiplier upgrade. Cost is paid INTO the pool (not burned).
-     */
     function buyClickUpgrade() external {
         uint256 currentLevel = clickLevels[msg.sender];
         uint256 cost = getClickUpgradeCost(currentLevel);
-
         require(balanceOf(msg.sender) >= cost, "Insufficient CPLAY balance for upgrade");
 
-        _transfer(msg.sender, address(this), cost);
+        (uint256 devFee, uint256 poolShare) = _splitIntoPool(cost);
 
         clickLevels[msg.sender] += 1;
 
-        emit ClickUpgraded(msg.sender, clickLevels[msg.sender], cost);
+        emit ClickUpgraded(msg.sender, clickLevels[msg.sender], cost, devFee, poolShare);
     }
 
-    /**
-     * @dev Claim accumulated mining rewards.
-     */
+    // ==========================================================================
+    // IDLE MINING — paid ONLY from gamePoolBalance. Click level now genuinely
+    // boosts the reward (+10% per click level), fixing the old version where
+    // the click upgrade had no real on-chain effect.
+    // ==========================================================================
+
     function claimMining() external {
         _claimMiningInternal(msg.sender);
     }
 
-    /**
-     * @dev Internal function to handle mining rewards claiming, paid from the pool.
-     * If the pool has less than the accrued reward, pays out whatever is
-     * available rather than reverting (graceful degradation instead of
-     * locking players out entirely if the pool runs low).
-     */
     function _claimMiningInternal(address player) internal {
         MinerState storage state = minerStates[player];
         if (state.level == 0) {
@@ -149,123 +252,79 @@ contract BasePlayAdventure is ERC20, ERC20Burnable, Ownable {
         }
 
         uint256 timeElapsed = block.timestamp - state.lastClaimTime;
-        if (timeElapsed == 0) {
-            return;
-        }
+        if (timeElapsed == 0) return;
 
-        uint256 reward = timeElapsed * state.level * BASE_MINING_RATE;
+        uint256 baseReward = timeElapsed * state.level * BASE_MINING_RATE;
+        uint256 clickBonus = (baseReward * clickLevels[player] * 10) / 100; // +10% per click level
+        uint256 reward = baseReward + clickBonus;
+
         state.lastClaimTime = block.timestamp;
+        if (reward == 0) return;
 
-        if (reward == 0) {
-            return;
-        }
-
-        uint256 poolBalance = balanceOf(address(this));
-        uint256 payoutAmount = reward > poolBalance ? poolBalance : reward;
-
+        uint256 payoutAmount = reward > gamePoolBalance ? gamePoolBalance : reward;
         if (payoutAmount > 0) {
+            gamePoolBalance -= payoutAmount;
             _transfer(address(this), player, payoutAmount);
             emit MiningClaimed(player, payoutAmount);
         }
     }
 
-    /**
-     * @dev Get accumulated rewards pending claim.
-     */
     function pendingMiningRewards(address player) public view returns (uint256) {
         MinerState memory state = minerStates[player];
-        if (state.level == 0 || state.lastClaimTime == 0) {
-            return 0;
-        }
+        if (state.level == 0 || state.lastClaimTime == 0) return 0;
         uint256 timeElapsed = block.timestamp - state.lastClaimTime;
-        return timeElapsed * state.level * BASE_MINING_RATE;
+        uint256 baseReward = timeElapsed * state.level * BASE_MINING_RATE;
+        uint256 clickBonus = (baseReward * clickLevels[player] * 10) / 100;
+        return baseReward + clickBonus;
     }
 
-    /**
-     * @dev Roll an on-chain coin flip bet using $CPLAY tokens.
-     * The bet is moved into the pool up front; if the player wins, the pool
-     * pays out 2x the bet. The pool must already hold at least `betAmount`
-     * BEFORE the bet is accepted, guaranteeing it can always cover a win
-     * without ever needing to mint new tokens.
-     * @param betHeads true to bet Heads, false to bet Tails.
-     * @param betAmount quantity of $CPLAY to bet.
-     */
+    // ==========================================================================
+    // COIN FLIP — bet split 10% owner / 90% game pool up front; wins pay 1.8x
+    // from the game pool. Pool depth is checked BEFORE accepting the bet so a
+    // win can always be paid without ever minting new tokens.
+    // ==========================================================================
+
     function coinFlip(bool betHeads, uint256 betAmount) external returns (bool) {
-        require(betAmount >= 10 * 10**18, "Minimum bet is 10 CPLAY");
+        require(betAmount >= MIN_BET, "Minimum bet is 10 CPLAY");
         require(balanceOf(msg.sender) >= betAmount, "Insufficient balance to place bet");
-        require(
-            balanceOf(address(this)) >= betAmount,
-            "Pool cannot safely cover this bet right now, try a smaller amount"
-        );
 
-        // Move the bet into the pool up front (no burn — fixed supply)
-        _transfer(msg.sender, address(this), betAmount);
+        uint256 payout = (betAmount * COINFLIP_PAYOUT_BPS) / BPS_DENOMINATOR;
+        require(gamePoolBalance >= payout, "Pool cannot safely cover this bet right now, try a smaller amount");
 
-        // Generate pseudo-random result on-chain using block properties.
-        // NOTE: this is NOT secure randomness (manipulable by validators/
-        // sequencers) — fine for testnet play money, must be replaced with
-        // a verifiable randomness source (e.g. Chainlink VRF) before any
-        // mainnet deployment that carries real value.
+        (uint256 devFee, uint256 poolShare) = _splitIntoPool(betAmount);
+
         uint256 seed = uint256(
-            keccak256(
-                abi.encodePacked(
-                    block.timestamp,
-                    block.prevrandao,
-                    msg.sender,
-                    block.number
-                )
-            )
+            keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, block.number))
         );
         bool resultIsHeads = (seed % 2 == 0);
         bool won = (betHeads == resultIsHeads);
 
-        uint256 payout = 0;
+        uint256 actualPayout = 0;
         if (won) {
-            payout = betAmount * 2;
-            _transfer(address(this), msg.sender, payout);
+            actualPayout = payout;
+            gamePoolBalance -= actualPayout;
+            _transfer(address(this), msg.sender, actualPayout);
         }
 
-        emit CoinFlipResult(msg.sender, betHeads, won, betAmount, payout, seed);
+        emit CoinFlipResult(msg.sender, betHeads, won, betAmount, devFee, actualPayout, seed);
         return won;
     }
 
-    /**
-     * @dev Owner-only: withdraw from the pool (e.g. to seed DEX liquidity or
-     * cover operational costs). Cannot exceed the pool's current balance —
-     * this can only move existing supply around, it can never create new
-     * tokens.
-     */
-    function ownerWithdrawPool(uint256 amount) external onlyOwner {
-        require(balanceOf(address(this)) >= amount, "Insufficient pool balance");
-        _transfer(address(this), owner(), amount);
-        emit PoolWithdraw(owner(), amount);
-    }
+    // ==========================================================================
+    // VIEW HELPERS
+    // ==========================================================================
 
-    /**
-     * @dev Helper function for the web app to check a player's full profile state in 1 call.
-     */
     function getPlayerProfile(address player) external view returns (
         uint256 balance,
-        uint256 faucetCooldownLeft,
+        bool faucetClaimed,
         uint256 minerLevel,
         uint256 clickLevel,
         uint256 pendingRewards
     ) {
         balance = balanceOf(player);
-
-        uint256 nextFaucet = lastFaucetClaim[player] + FAUCET_COOLDOWN;
-        faucetCooldownLeft = block.timestamp >= nextFaucet ? 0 : nextFaucet - block.timestamp;
-
+        faucetClaimed = hasClaimedFaucet[player];
         minerLevel = minerStates[player].level;
         clickLevel = clickLevels[player];
         pendingRewards = pendingMiningRewards(player);
     }
-
-    /**
-     * @dev Current pool balance — how much CPLAY is left to pay out.
-     */
-    function poolBalance() external view returns (uint256) {
-        return balanceOf(address(this));
-    }
 }
-

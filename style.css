@@ -313,6 +313,81 @@ h1, h2, h3, h4 {
   transform: translateY(-2px);
 }
 
+.curve-price-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.curve-price-val {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--neon-cyan);
+  font-weight: 700;
+}
+
+.curve-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.curve-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.curve-card h3 {
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.curve-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: 6px;
+}
+
+.curve-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-family: inherit;
+  margin-bottom: 10px;
+}
+
+.curve-preview {
+  min-height: 18px;
+  font-size: 0.85rem;
+  color: var(--neon-cyan);
+  margin-bottom: 12px;
+}
+
+.curve-card .btn {
+  width: 100%;
+}
+
+@media (max-width: 700px) {
+  .curve-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .warning-banner {
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);
