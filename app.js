@@ -20,14 +20,33 @@ let profileState = {
   minerLevel: 0n,
   clickLevel: 0n,
   pendingRewards: 0n,
+  allowance: 0n,
   lastUpdated: 0
 };
 
 // Default deployed addresses for ease of use
+// GAME contract — the contract with faucet/mining/coinflip logic (this repo's contract)
 const DEFAULT_CONTRACTS = {
-  "5042002": "0x07C51Ce2A9C1FBd957d3bb84F197e8d518263f7A", // Arc Testnet Contract (bonding curve + dual pool economy)
+  "5042002": "0xPASTE_YOUR_NEW_GAME_CONTRACT_ADDRESS_HERE", // Arc Testnet — game engine contract
   "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"  // Hardhat Localhost default
 };
+
+// TOKEN contract — the EXTERNAL $CPLAY ERC20 token (deployed elsewhere, e.g. via a launcher)
+const CPLAY_TOKEN_ADDRESS = {
+  "5042002": "0x8613155fF713c13F6C177275Af9bF195e69dEd34",
+  "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+};
+
+// Minimal standard ERC20 ABI — enough to read balance/allowance and approve spending.
+const ERC20_ABI = [
+  "function balanceOf(address account) view returns (uint256)",
+  "function allowance(address owner, address spender) view returns (uint256)",
+  "function approve(address spender, uint256 amount) returns (bool)",
+  "function decimals() view returns (uint8)",
+  "function symbol() view returns (string)"
+];
+
+let tokenContract = null; // set alongside `contract` once connected
 
 // Get active contract address from LocalStorage or default to Arc Testnet
 function getContractAddress(chainId) {
@@ -78,15 +97,6 @@ const betAmountInput = document.getElementById('bet-amount');
 const btnBetMax = document.getElementById('btn-bet-max');
 const btnRoll = document.getElementById('btn-roll');
 const flipStatusMsg = document.getElementById('flip-status-msg');
-
-// Curve (Buy/Sell) Elements
-const curvePriceEl = document.getElementById('curve-price');
-const buyUsdcInput = document.getElementById('buy-usdc-input');
-const buyPreviewEl = document.getElementById('buy-preview');
-const btnBuy = document.getElementById('btn-buy');
-const sellCplayInput = document.getElementById('sell-cplay-input');
-const sellPreviewEl = document.getElementById('sell-preview');
-const btnSell = document.getElementById('btn-sell');
 
 // Dev Panel removed from public UI — no element refs needed
 
@@ -176,9 +186,11 @@ async function connectWallet() {
       networkWarning.classList.add('hidden');
 
       const contractAddress = getContractAddress(currentChainId);
+      const tokenAddress = CPLAY_TOKEN_ADDRESS[String(currentChainId)];
 
-      // Instantiate contract
+      // Instantiate contracts
       contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
+      tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
       
       // Fetch profile
       await fetchPlayerProfile();
@@ -225,8 +237,6 @@ function disableGameControls() {
   btnUpgradeClick.disabled = true;
   btnUpgradeMiner.disabled = true;
   btnRoll.disabled = true;
-  btnBuy.disabled = true;
-  btnSell.disabled = true;
 }
 
 // Switch wallet network to Arc Testnet
@@ -279,6 +289,7 @@ async function fetchPlayerProfile() {
     profileState.minerLevel = result[2];
     profileState.clickLevel = result[3];
     profileState.pendingRewards = result[4];
+    profileState.allowance = result[5];
     profileState.lastUpdated = Date.now();
     
     // Update UI Elements
@@ -324,10 +335,6 @@ async function fetchPlayerProfile() {
     // Pending rewards — real on-chain accrued amount only (no fake click bonus added)
     pendingClaimLocal = parseFloat(ethers.formatEther(profileState.pendingRewards));
     updateMiningDisplay();
-
-    // Curve price + sell button state
-    await refreshCurvePrice();
-    btnSell.disabled = profileState.balance <= 0n;
     
   } catch (error) {
     console.error("Error reading profile stats:", error);
@@ -486,10 +493,13 @@ btnFaucet.addEventListener('click', async () => {
 btnUpgradeClick.addEventListener('click', async () => {
   if (!contract) return;
   btnUpgradeClick.disabled = true;
-  
-  const logRow = logTransaction("Upgrade Super-Click Mult", "N/A", "pending");
-  
+
   try {
+    const cost = await contract.getClickUpgradeCost(profileState.clickLevel);
+    const approved = await ensureApproval(cost);
+    if (!approved) { btnUpgradeClick.disabled = false; return; }
+
+    const logRow = logTransaction("Upgrade Super-Click Mult", "N/A", "pending");
     const tx = await contract.buyClickUpgrade();
     logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
     
@@ -498,7 +508,6 @@ btnUpgradeClick.addEventListener('click', async () => {
     await fetchPlayerProfile();
   } catch (error) {
     console.error("Upgrade click error:", error);
-    updateTransactionLog(logRow, "failed", error.reason || "Rejected");
     btnUpgradeClick.disabled = false;
   }
 });
@@ -507,10 +516,13 @@ btnUpgradeClick.addEventListener('click', async () => {
 btnUpgradeMiner.addEventListener('click', async () => {
   if (!contract) return;
   btnUpgradeMiner.disabled = true;
-  
-  const logRow = logTransaction("Upgrade Circle Mining Rig", "N/A", "pending");
-  
+
   try {
+    const cost = await contract.getUpgradeCost(profileState.minerLevel);
+    const approved = await ensureApproval(cost);
+    if (!approved) { btnUpgradeMiner.disabled = false; return; }
+
+    const logRow = logTransaction("Upgrade Circle Mining Rig", "N/A", "pending");
     const tx = await contract.buyMinerUpgrade();
     logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
     
@@ -519,7 +531,6 @@ btnUpgradeMiner.addEventListener('click', async () => {
     await fetchPlayerProfile();
   } catch (error) {
     console.error("Upgrade miner error:", error);
-    updateTransactionLog(logRow, "failed", error.reason || "Rejected");
     btnUpgradeMiner.disabled = false;
   }
 });
@@ -592,6 +603,10 @@ btnRoll.addEventListener('click', async () => {
   }
   
   btnRoll.disabled = true;
+
+  const approved = await ensureApproval(betWei);
+  if (!approved) { btnRoll.disabled = false; return; }
+
   flipStatusMsg.className = "flip-status-message";
   flipStatusMsg.textContent = "Submitting bet to the blockchain...";
   
@@ -661,133 +676,32 @@ btnRoll.addEventListener('click', async () => {
 });
 
 /* ==========================================================================
-   Bonding Curve — Buy / Sell $CPLAY with native USDC
+   ERC20 Approval Helper — $CPLAY is an external token now, so any function
+   that pulls tokens FROM the player (upgrades, bets) needs prior approval.
+   This checks current allowance and, if insufficient, sends one infinite
+   approve() so the player only ever sees this extra step once.
    ========================================================================== */
+async function ensureApproval(requiredAmount) {
+  if (!tokenContract || !contract) return false;
 
-async function refreshCurvePrice() {
-  if (!contract) return;
+  const contractAddress = await contract.getAddress();
+  const currentAllowance = await tokenContract.allowance(walletAddress, contractAddress);
+
+  if (currentAllowance >= requiredAmount) return true;
+
+  const logRow = logTransaction("Approve $CPLAY Spend", "N/A", "pending");
   try {
-    const price = await contract.getCurrentPrice();
-    curvePriceEl.textContent = `${parseFloat(ethers.formatEther(price)).toFixed(8)} USDC`;
+    const tx = await tokenContract.approve(contractAddress, ethers.MaxUint256);
+    logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
+    const receipt = await tx.wait();
+    updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
+    return true;
   } catch (error) {
-    console.error("Error reading curve price:", error);
+    console.error("Approval failed:", error);
+    updateTransactionLog(logRow, "failed", error.reason || "Rejected");
+    return false;
   }
 }
-
-// Live preview: USDC in -> CPLAY out
-let buyPreviewDebounce = null;
-buyUsdcInput.addEventListener('input', () => {
-  clearTimeout(buyPreviewDebounce);
-  buyPreviewDebounce = setTimeout(async () => {
-    if (!contract) return;
-    const val = parseFloat(buyUsdcInput.value);
-    if (isNaN(val) || val <= 0) {
-      buyPreviewEl.textContent = "";
-      return;
-    }
-    try {
-      const usdcWei = ethers.parseEther(val.toString());
-      const tokensOut = await contract.previewBuy(usdcWei);
-      buyPreviewEl.textContent = `≈ ${parseFloat(ethers.formatEther(tokensOut)).toLocaleString(undefined, { maximumFractionDigits: 2 })} CPLAY`;
-    } catch (error) {
-      buyPreviewEl.textContent = "";
-    }
-  }, 300);
-});
-
-// Live preview: CPLAY in -> USDC out
-let sellPreviewDebounce = null;
-sellCplayInput.addEventListener('input', () => {
-  clearTimeout(sellPreviewDebounce);
-  sellPreviewDebounce = setTimeout(async () => {
-    if (!contract) return;
-    const val = parseFloat(sellCplayInput.value);
-    if (isNaN(val) || val <= 0) {
-      sellPreviewEl.textContent = "";
-      return;
-    }
-    try {
-      const cplayWei = ethers.parseEther(val.toString());
-      const usdcOut = await contract.previewSell(cplayWei);
-      sellPreviewEl.textContent = `≈ ${parseFloat(ethers.formatEther(usdcOut)).toFixed(6)} USDC`;
-    } catch (error) {
-      sellPreviewEl.textContent = "";
-    }
-  }, 300);
-});
-
-btnBuy.addEventListener('click', async () => {
-  if (!contract) return;
-  const val = parseFloat(buyUsdcInput.value);
-  if (isNaN(val) || val <= 0) {
-    alert("Enter a valid USDC amount to buy with.");
-    return;
-  }
-
-  btnBuy.disabled = true;
-  const logRow = logTransaction("Buy $CPLAY (Curve)", "N/A", "pending");
-
-  try {
-    const usdcWei = ethers.parseEther(val.toString());
-    const expectedTokens = await contract.previewBuy(usdcWei);
-    // 3% slippage tolerance
-    const minTokensOut = (expectedTokens * 97n) / 100n;
-
-    const tx = await contract.buy(minTokensOut, { value: usdcWei });
-    logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-
-    const receipt = await tx.wait();
-    updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
-
-    buyUsdcInput.value = "";
-    buyPreviewEl.textContent = "";
-    await fetchPlayerProfile();
-  } catch (error) {
-    console.error("Buy error:", error);
-    updateTransactionLog(logRow, "failed", error.reason || "Rejected");
-  } finally {
-    btnBuy.disabled = false;
-  }
-});
-
-btnSell.addEventListener('click', async () => {
-  if (!contract) return;
-  const val = parseFloat(sellCplayInput.value);
-  if (isNaN(val) || val <= 0) {
-    alert("Enter a valid CPLAY amount to sell.");
-    return;
-  }
-
-  const cplayWei = ethers.parseEther(val.toString());
-  if (profileState.balance < cplayWei) {
-    alert("Insufficient CPLAY balance.");
-    return;
-  }
-
-  btnSell.disabled = true;
-  const logRow = logTransaction("Sell $CPLAY (Curve)", "N/A", "pending");
-
-  try {
-    const expectedUsdc = await contract.previewSell(cplayWei);
-    // 3% slippage tolerance
-    const minUsdcOut = (expectedUsdc * 97n) / 100n;
-
-    const tx = await contract.sell(cplayWei, minUsdcOut);
-    logRow.cells[4].innerHTML = `<a href="https://testnet.arcscan.app/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-
-    const receipt = await tx.wait();
-    updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
-
-    sellCplayInput.value = "";
-    sellPreviewEl.textContent = "";
-    await fetchPlayerProfile();
-  } catch (error) {
-    console.error("Sell error:", error);
-    updateTransactionLog(logRow, "failed", error.reason || "Rejected");
-  } finally {
-    btnSell.disabled = false;
-  }
-});
 
 /* ==========================================================================
    Developer & Deployment Admin Center — removed from public UI.
