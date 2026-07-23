@@ -1271,6 +1271,13 @@ h1, h2, h3, h4 {
   color: var(--neon-cyan);
 }
 
+.footer-socials {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .cyber-main {
