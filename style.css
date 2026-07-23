@@ -388,6 +388,71 @@ h1, h2, h3, h4 {
   }
 }
 
+.btn-buy {
+  background: linear-gradient(135deg, var(--neon-orange, #FF8C42), #FF6B35);
+  color: #1a0e05;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-buy:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(255, 140, 66, 0.5);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: var(--panel, #0E1424);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  max-width: 520px;
+  width: 100%;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.modal-icon {
+  font-size: 32px;
+  color: var(--neon-cyan);
+  margin-bottom: 14px;
+}
+
+.modal-box h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  margin-bottom: 16px;
+}
+
+.modal-box p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.modal-box .btn {
+  margin-top: 8px;
+}
+
 .warning-banner {
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);
