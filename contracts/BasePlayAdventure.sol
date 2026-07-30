@@ -4,64 +4,55 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+interface ICPlayVault {
+    function payout(address to, uint256 amount) external;
+    function vaultBalance() external view returns (uint256);
+}
+
 /**
- * @title BasePlayAdventure — Circle Miner Game Engine
- * @dev This contract does NOT mint or own the $CPLAY token. $CPLAY is an
- * EXTERNAL ERC20 token (deployed elsewhere, e.g. via an external launcher).
- * This contract only manages game logic (faucet, idle mining, coin flip)
- * against a balance of that external token that it holds.
+ * @title BasePlayAdventure - Circle Miner Game Engine (Phase 1: Lucky Flip only)
+ * @dev Pays out through a permanent, external CPlayVault contract instead of
+ * holding funds itself. Circle Miner (faucet / idle mining / upgrades) is
+ * intentionally DISABLED in this phase - only the Lucky Flip coin-flip game
+ * is live. The miner functions are left in place but gated off so they can
+ * be re-enabled later without redeploying the whole contract.
  *
- * FLOW
- * ----
- * 1. Owner deploys $CPLAY separately (external contract, out of our control).
- * 2. Owner deploys THIS contract, pointing it at the $CPLAY token address.
- * 3. Owner calls cplayToken.approve(thisContract, amount) on the TOKEN
- *    contract from their dev-buy wallet.
- * 4. Owner calls fundFaucetPool() / fundGamePool() on THIS contract, which
- *    pulls tokens in via transferFrom (using the approval from step 3).
- * 5. Players call cplayToken.approve(thisContract, amount) before any
- *    upgrade purchase or bet, same pattern as step 3 — standard ERC20
- *    two-step spend approval.
- *
- * Every payout (faucet, mining, coin-flip win) comes ONLY from tokens that
- * were explicitly funded into this contract this way — this contract can
- * never mint, and can never pull more than what it's been given.
+ * Odds are a genuine, verifiable 50/50 coin flip - the house edge comes
+ * entirely from the payout multiplier (1.7x, not 2x) and the 10% protocol
+ * fee, both fully transparent on-chain. Nothing about the randomness itself
+ * is skewed.
  */
 contract BasePlayAdventure is Ownable {
     IERC20 public immutable cplayToken;
+    ICPlayVault public immutable vault;
 
-    // ---- Faucet: one-time welcome grant, paid ONLY from its own separate pool ----
-    uint256 public constant FAUCET_AMOUNT = 10 * 10**18;
-    mapping(address => bool) public hasClaimedFaucet;
-    uint256 public faucetPoolBalance;
+    // ---- Feature flags ----
+    bool public constant CIRCLE_MINER_ENABLED = false; // Phase 1: disabled
+    bool public constant LUCKY_FLIP_ENABLED = true;
 
-    // ---- Game reward pool (mining + coin-flip), fully separate from faucet pool ----
-    uint256 public gamePoolBalance;
-    uint256 public constant PROTOCOL_FEE_BPS = 1000;   // 10.00% to owner
+    // ---- Protocol fee split: 10% owner / 90% vault ----
+    uint256 public constant PROTOCOL_FEE_BPS = 1000;
     uint256 public constant BPS_DENOMINATOR = 10000;
 
-    // ---- Idle mining ----
-    uint256 public constant BASE_MINING_RATE = 1 * 10**15; // 0.001 CPLAY/sec/level
+    // ---- Coin flip: genuine 50/50 odds, house edge lives in the payout multiplier ----
+    uint256 public constant COINFLIP_PAYOUT_BPS = 17000; // 1.7x payout
+    uint256 public constant MIN_BET = 10 * 10**18;
+
+    // ---- Idle mining / faucet / upgrades - present but gated off in Phase 1 ----
+    uint256 public constant FAUCET_AMOUNT = 10 * 10**18;
+    mapping(address => bool) public hasClaimedFaucet;
+    uint256 public constant BASE_MINING_RATE = 1 * 10**15;
     struct MinerState {
         uint256 level;
         uint256 lastClaimTime;
     }
     mapping(address => MinerState) public minerStates;
-
-    // ---- Click upgrade: boosts on-chain mining reward (+10% per level) ----
     mapping(address => uint256) public clickLevels;
 
-    // ---- Coin flip ----
-    uint256 public constant COINFLIP_PAYOUT_BPS = 18000; // 1.8x payout
-    uint256 public constant MIN_BET = 10 * 10**18;
-
-    // Events
-    event FaucetClaimed(address indexed player, uint256 amount);
-    event FaucetPoolFunded(uint256 amount, uint256 newBalance);
-    event GamePoolFunded(uint256 amount, uint256 newBalance);
-    event MinerUpgraded(address indexed player, uint256 newLevel, uint256 cost, uint256 devFee, uint256 poolShare);
-    event ClickUpgraded(address indexed player, uint256 newLevel, uint256 cost, uint256 devFee, uint256 poolShare);
+    event MinerUpgraded(address indexed player, uint256 newLevel, uint256 cost, uint256 devFee, uint256 vaultShare);
+    event ClickUpgraded(address indexed player, uint256 newLevel, uint256 cost, uint256 devFee, uint256 vaultShare);
     event MiningClaimed(address indexed player, uint256 amount);
+    event FaucetClaimed(address indexed player, uint256 amount);
     event CoinFlipResult(
         address indexed player,
         bool betHeads,
@@ -72,150 +63,43 @@ contract BasePlayAdventure is Ownable {
         uint256 seed
     );
 
-    constructor(address tokenAddress) Ownable(msg.sender) {
+    constructor(address tokenAddress, address vaultAddress) Ownable(msg.sender) {
         require(tokenAddress != address(0), "Invalid token address");
+        require(vaultAddress != address(0), "Invalid vault address");
         cplayToken = IERC20(tokenAddress);
+        vault = ICPlayVault(vaultAddress);
     }
 
-    // ==========================================================================
-    // OWNER: fund the two separate pools. Requires cplayToken.approve(this, amount)
-    // to have been called first, from the SAME wallet calling these functions.
-    // ==========================================================================
-
-    function fundFaucetPool(uint256 amount) external onlyOwner {
-        require(cplayToken.transferFrom(msg.sender, address(this), amount), "Transfer failed");
-        faucetPoolBalance += amount;
-        emit FaucetPoolFunded(amount, faucetPoolBalance);
-    }
-
-    function fundGamePool(uint256 amount) external onlyOwner {
-        require(cplayToken.transferFrom(msg.sender, address(this), amount), "Transfer failed");
-        gamePoolBalance += amount;
-        emit GamePoolFunded(amount, gamePoolBalance);
-    }
-
-    // ==========================================================================
-    // FAUCET — one-time welcome grant, paid ONLY from faucetPoolBalance
-    // ==========================================================================
-
-    function claimFaucet() external {
-        require(!hasClaimedFaucet[msg.sender], "Welcome grant already claimed");
-        require(faucetPoolBalance >= FAUCET_AMOUNT, "Faucet pool is empty");
-
-        hasClaimedFaucet[msg.sender] = true;
-        faucetPoolBalance -= FAUCET_AMOUNT;
-        require(cplayToken.transfer(msg.sender, FAUCET_AMOUNT), "Transfer failed");
-        emit FaucetClaimed(msg.sender, FAUCET_AMOUNT);
-    }
-
-    // ==========================================================================
-    // UPGRADES — cost split 10% owner / 90% game pool.
-    // Player must have called cplayToken.approve(thisContract, cost) first.
-    // ==========================================================================
-
-    function getUpgradeCost(uint256 currentLevel) public pure returns (uint256) {
-        return (currentLevel + 1) * 100 * 10**18;
-    }
-
-    function getClickUpgradeCost(uint256 currentLevel) public pure returns (uint256) {
-        return (currentLevel + 1) * 50 * 10**18;
-    }
-
-    function _splitIntoPool(uint256 cost) internal returns (uint256 devFee, uint256 poolShare) {
-        devFee = (cost * PROTOCOL_FEE_BPS) / BPS_DENOMINATOR;
-        poolShare = cost - devFee;
+    /**
+     * @dev Sends the 10% protocol fee to the owner and the 90% remainder to
+     * the vault (the vault is just a token holder - this contract must
+     * still transfer the vault's share INTO it directly, same as the
+     * player -> vault direction for fees).
+     */
+    function _splitToOwnerAndVault(uint256 amount) internal returns (uint256 devFee, uint256 vaultShare) {
+        devFee = (amount * PROTOCOL_FEE_BPS) / BPS_DENOMINATOR;
+        vaultShare = amount - devFee;
         require(cplayToken.transferFrom(msg.sender, owner(), devFee), "Fee transfer failed");
-        require(cplayToken.transferFrom(msg.sender, address(this), poolShare), "Pool transfer failed");
-        gamePoolBalance += poolShare;
-    }
-
-    function buyMinerUpgrade() external {
-        uint256 currentLevel = minerStates[msg.sender].level;
-        uint256 cost = getUpgradeCost(currentLevel);
-        require(cplayToken.balanceOf(msg.sender) >= cost, "Insufficient CPLAY balance for upgrade");
-        require(cplayToken.allowance(msg.sender, address(this)) >= cost, "Approve CPLAY spend first");
-
-        _claimMiningInternal(msg.sender);
-
-        (uint256 devFee, uint256 poolShare) = _splitIntoPool(cost);
-
-        minerStates[msg.sender].level += 1;
-        minerStates[msg.sender].lastClaimTime = block.timestamp;
-
-        emit MinerUpgraded(msg.sender, minerStates[msg.sender].level, cost, devFee, poolShare);
-    }
-
-    function buyClickUpgrade() external {
-        uint256 currentLevel = clickLevels[msg.sender];
-        uint256 cost = getClickUpgradeCost(currentLevel);
-        require(cplayToken.balanceOf(msg.sender) >= cost, "Insufficient CPLAY balance for upgrade");
-        require(cplayToken.allowance(msg.sender, address(this)) >= cost, "Approve CPLAY spend first");
-
-        (uint256 devFee, uint256 poolShare) = _splitIntoPool(cost);
-
-        clickLevels[msg.sender] += 1;
-
-        emit ClickUpgraded(msg.sender, clickLevels[msg.sender], cost, devFee, poolShare);
+        require(cplayToken.transferFrom(msg.sender, address(vault), vaultShare), "Vault transfer failed");
     }
 
     // ==========================================================================
-    // IDLE MINING — paid ONLY from gamePoolBalance.
-    // ==========================================================================
-
-    function claimMining() external {
-        _claimMiningInternal(msg.sender);
-    }
-
-    function _claimMiningInternal(address player) internal {
-        MinerState storage state = minerStates[player];
-        if (state.level == 0) {
-            state.lastClaimTime = block.timestamp;
-            return;
-        }
-
-        uint256 timeElapsed = block.timestamp - state.lastClaimTime;
-        if (timeElapsed == 0) return;
-
-        uint256 baseReward = timeElapsed * state.level * BASE_MINING_RATE;
-        uint256 clickBonus = (baseReward * clickLevels[player] * 10) / 100; // +10% per click level
-        uint256 reward = baseReward + clickBonus;
-
-        state.lastClaimTime = block.timestamp;
-        if (reward == 0) return;
-
-        uint256 payoutAmount = reward > gamePoolBalance ? gamePoolBalance : reward;
-        if (payoutAmount > 0) {
-            gamePoolBalance -= payoutAmount;
-            require(cplayToken.transfer(player, payoutAmount), "Transfer failed");
-            emit MiningClaimed(player, payoutAmount);
-        }
-    }
-
-    function pendingMiningRewards(address player) public view returns (uint256) {
-        MinerState memory state = minerStates[player];
-        if (state.level == 0 || state.lastClaimTime == 0) return 0;
-        uint256 timeElapsed = block.timestamp - state.lastClaimTime;
-        uint256 baseReward = timeElapsed * state.level * BASE_MINING_RATE;
-        uint256 clickBonus = (baseReward * clickLevels[player] * 10) / 100;
-        return baseReward + clickBonus;
-    }
-
-    // ==========================================================================
-    // COIN FLIP — bet split 10% owner / 90% game pool up front; wins pay 1.8x
-    // from the game pool. Pool depth is checked BEFORE accepting the bet.
+    // LUCKY FLIP - the only live game mode in Phase 1.
     // Player must have called cplayToken.approve(thisContract, betAmount) first.
     // ==========================================================================
 
     function coinFlip(bool betHeads, uint256 betAmount) external returns (bool) {
+        require(LUCKY_FLIP_ENABLED, "Lucky Flip is not currently active");
         require(betAmount >= MIN_BET, "Minimum bet is 10 CPLAY");
         require(cplayToken.balanceOf(msg.sender) >= betAmount, "Insufficient balance to place bet");
         require(cplayToken.allowance(msg.sender, address(this)) >= betAmount, "Approve CPLAY spend first");
 
-        uint256 payout = (betAmount * COINFLIP_PAYOUT_BPS) / BPS_DENOMINATOR;
-        require(gamePoolBalance >= payout, "Pool cannot safely cover this bet right now, try a smaller amount");
+        uint256 payoutAmount = (betAmount * COINFLIP_PAYOUT_BPS) / BPS_DENOMINATOR;
+        require(vault.vaultBalance() >= payoutAmount, "Vault cannot safely cover this bet right now, try a smaller amount");
 
-        (uint256 devFee, uint256 poolShare) = _splitIntoPool(betAmount);
+        (uint256 devFee, ) = _splitToOwnerAndVault(betAmount);
 
+        // Genuine, unweighted 50/50 outcome - no skew applied anywhere.
         uint256 seed = uint256(
             keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, block.number))
         );
@@ -224,13 +108,34 @@ contract BasePlayAdventure is Ownable {
 
         uint256 actualPayout = 0;
         if (won) {
-            actualPayout = payout;
-            gamePoolBalance -= actualPayout;
-            require(cplayToken.transfer(msg.sender, actualPayout), "Transfer failed");
+            actualPayout = payoutAmount;
+            vault.payout(msg.sender, actualPayout);
         }
 
         emit CoinFlipResult(msg.sender, betHeads, won, betAmount, devFee, actualPayout, seed);
         return won;
+    }
+
+    // ==========================================================================
+    // CIRCLE MINER - Phase 1: disabled. Calls revert with a clear message.
+    // Left implemented (not deleted) so Phase 2 just flips a flag + redeploy,
+    // no data model rework needed.
+    // ==========================================================================
+
+    function claimFaucet() external pure {
+        revert("Circle Miner is not live yet - Lucky Flip only in this phase");
+    }
+
+    function buyMinerUpgrade() external pure {
+        revert("Circle Miner is not live yet - Lucky Flip only in this phase");
+    }
+
+    function buyClickUpgrade() external pure {
+        revert("Circle Miner is not live yet - Lucky Flip only in this phase");
+    }
+
+    function claimMining() external pure {
+        revert("Circle Miner is not live yet - Lucky Flip only in this phase");
     }
 
     // ==========================================================================
@@ -239,17 +144,15 @@ contract BasePlayAdventure is Ownable {
 
     function getPlayerProfile(address player) external view returns (
         uint256 balance,
-        bool faucetClaimed,
-        uint256 minerLevel,
-        uint256 clickLevel,
-        uint256 pendingRewards,
-        uint256 allowanceGiven
+        bool circleMinerEnabled,
+        bool luckyFlipEnabled,
+        uint256 allowanceGiven,
+        uint256 vaultBalanceNow
     ) {
         balance = cplayToken.balanceOf(player);
-        faucetClaimed = hasClaimedFaucet[player];
-        minerLevel = minerStates[player].level;
-        clickLevel = clickLevels[player];
-        pendingRewards = pendingMiningRewards(player);
+        circleMinerEnabled = CIRCLE_MINER_ENABLED;
+        luckyFlipEnabled = LUCKY_FLIP_ENABLED;
         allowanceGiven = cplayToken.allowance(player, address(this));
+        vaultBalanceNow = vault.vaultBalance();
     }
 }

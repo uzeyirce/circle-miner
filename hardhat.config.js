@@ -1,4 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -13,7 +14,7 @@ module.exports = {
   },
   networks: {
     "arc-mainnet": {
-      url: process.env.ARC_MAINNET_RPC || "https://arc-mainnet.infura.io/v3/de58e8647ba54873a65e6b8d2d7bade7",
+      url: "https://rpc.blockdaemon.mainnet.arc.io",   // Şu an en kolay denenecek
       chainId: 5042,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
@@ -22,5 +23,13 @@ module.exports = {
       chainId: 5042002,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
+    base: {
+      url: "https://mainnet.base.org",
+      chainId: 8453,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
   },
+  mocha: {
+    timeout: 120000
+  }
 };
