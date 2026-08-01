@@ -28,7 +28,7 @@ let profileState = {
 // Default deployed addresses for ease of use
 // GAME contract — the contract with faucet/mining/coinflip logic (this repo's contract)
 const DEFAULT_CONTRACTS = {
-  "5042": "0x7848091C91E50182202168c1821525fBa0b62595", // Arc Mainnet — game engine contract (Vault-backed, username + leaderboard)
+  "5042": "0x2f1f6021De02BAD010808aaa37e3d8C38A78cC6c", // Arc Mainnet — game engine contract (correctly wired to funded Vault)
   "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"  // Hardhat Localhost default
 };
 
