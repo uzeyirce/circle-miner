@@ -668,6 +668,12 @@ h1, h2, h3, h4 {
   padding-left: 24px;
 }
 
+.nav-tab.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* Player Profile Card */
 .profile-panel {
   display: flex;
@@ -1258,6 +1264,67 @@ h1, h2, h3, h4 {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  font-size: 0.85rem;
+}
+
+.leaderboard-panel {
+  margin-top: 24px;
+}
+
+.leaderboard-table-wrap {
+  overflow-x: auto;
+  margin-top: 14px;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.leaderboard-table th {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.leaderboard-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.leaderboard-table tbody tr:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.leaderboard-table td:first-child {
+  color: var(--neon-cyan);
+  font-weight: 700;
+  width: 40px;
+}
+
+.leaderboard-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 24px !important;
+}
+
+.username-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.username-form input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-family: inherit;
   font-size: 0.85rem;
 }
 

@@ -14,7 +14,7 @@ module.exports = {
   },
   networks: {
     "arc-mainnet": {
-      url: "https://rpc.blockdaemon.mainnet.arc.io",   // Şu an en kolay denenecek
+      url: "https://arc-mainnet.g.alchemy.com/v2/alch-demo",
       chainId: 5042,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },

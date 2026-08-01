@@ -16,18 +16,19 @@ let miningUpdateInterval = null;
 // Game Profile State from On-chain
 let profileState = {
   balance: 0n,
-  faucetClaimed: false,
-  minerLevel: 0n,
-  clickLevel: 0n,
-  pendingRewards: 0n,
+  circleMinerEnabled: false,
+  luckyFlipEnabled: true,
   allowance: 0n,
+  vaultBalance: 0n,
+  username: "",
+  totalWinnings: 0n,
   lastUpdated: 0
 };
 
 // Default deployed addresses for ease of use
 // GAME contract — the contract with faucet/mining/coinflip logic (this repo's contract)
 const DEFAULT_CONTRACTS = {
-  "5042": "0x23fd57d26BaE0A18145f71D0F66c1A1f5e54Cfab", // Arc Mainnet — game engine contract (Vault-backed, Lucky Flip only)
+  "5042": "0x7848091C91E50182202168c1821525fBa0b62595", // Arc Mainnet — game engine contract (Vault-backed, username + leaderboard)
   "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"  // Hardhat Localhost default
 };
 
@@ -71,11 +72,12 @@ const playerBalanceEl = document.getElementById('player-balance');
 const networkWarning = document.getElementById('network-warning');
 const btnSwitchNetwork = document.getElementById('btn-switch-network');
 const walletAddressAbbr = document.getElementById('wallet-address-abbr');
-const clickMultiplierEl = document.getElementById('click-multiplier');
-const minerLevelVal = document.getElementById('miner-level-val');
-const passiveIncomeVal = document.getElementById('passive-income-val');
-const btnFaucet = document.getElementById('btn-faucet');
-const faucetCooldownEl = document.getElementById('faucet-cooldown');
+const usernameDisplay = document.getElementById('username-display');
+const vaultBalanceValEl = document.getElementById('vault-balance-val');
+const totalWinningsValEl = document.getElementById('total-winnings-val');
+const usernameInput = document.getElementById('username-input');
+const btnSetUsername = document.getElementById('btn-set-username');
+const leaderboardTbody = document.getElementById('leaderboard-tbody');
 
 // Miner Elements
 const clickCrystal = document.getElementById('click-crystal');
@@ -194,7 +196,7 @@ async function connectWallet() {
       
       // Fetch profile
       await fetchPlayerProfile();
-      startPassiveMiningTimer();
+      await loadLeaderboard();
     } else {
       networkWarning.classList.remove('hidden');
       disableGameControls();
@@ -232,11 +234,11 @@ function disconnectWallet() {
 btnDisconnect.addEventListener('click', disconnectWallet);
 
 function disableGameControls() {
-  btnFaucet.disabled = true;
   btnClaimMining.disabled = true;
   btnUpgradeClick.disabled = true;
   btnUpgradeMiner.disabled = true;
   btnRoll.disabled = true;
+  btnSetUsername.disabled = true;
 }
 
 // Switch wallet network to Arc Mainnet
@@ -277,11 +279,62 @@ btnConnect.addEventListener('click', connectWallet);
    Game Operations & UI Sync
    ========================================================================== */
 
+// Builds the Top 25 leaderboard by scanning CoinFlipResult events for unique
+// players, then reading each one's authoritative on-chain totalWinnings.
+async function loadLeaderboard() {
+  if (!contract) return;
+  try {
+    leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">Loading leaderboard…</td></tr>';
+
+    const filter = contract.filters.CoinFlipResult();
+    const events = await contract.queryFilter(filter, 0, 'latest');
+    const uniquePlayers = [...new Set(events.map(e => e.args.player))];
+
+    if (uniquePlayers.length === 0) {
+      leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">No plays yet — be the first!</td></tr>';
+      return;
+    }
+
+    const playerData = await Promise.all(uniquePlayers.map(async (addr) => {
+      const [winnings, name] = await Promise.all([
+        contract.totalWinnings(addr),
+        contract.usernames(addr)
+      ]);
+      return { address: addr, winnings, name };
+    }));
+
+    const ranked = playerData
+      .filter(p => p.winnings > 0n)
+      .sort((a, b) => (b.winnings > a.winnings ? 1 : a.winnings > b.winnings ? -1 : 0))
+      .slice(0, 25);
+
+    if (ranked.length === 0) {
+      leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">No winners yet — be the first!</td></tr>';
+      return;
+    }
+
+    leaderboardTbody.innerHTML = ranked.map((p, i) => {
+      const displayName = p.name && p.name.length > 0
+        ? p.name
+        : `${p.address.slice(0, 6)}...${p.address.slice(-4)}`;
+      const winningsFormatted = Number(parseFloat(ethers.formatEther(p.winnings)).toFixed(2)).toLocaleString();
+      return `<tr>
+        <td>${i + 1}</td>
+        <td class="monospace">${displayName}</td>
+        <td>${winningsFormatted} CPLAY</td>
+      </tr>`;
+    }).join('');
+  } catch (error) {
+    console.error("Leaderboard load error:", error);
+    leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">Could not load leaderboard.</td></tr>';
+  }
+}
+
 async function fetchPlayerProfile() {
   if (!contract || !walletAddress) return;
   
   try {
-    // New profile shape: (balance, circleMinerEnabled, luckyFlipEnabled, allowanceGiven, vaultBalanceNow)
+    // Profile shape: (balance, circleMinerEnabled, luckyFlipEnabled, allowanceGiven, vaultBalanceNow, username, playerTotalWinnings)
     const result = await contract.getPlayerProfile(walletAddress);
     
     profileState.balance = result[0];
@@ -289,14 +342,30 @@ async function fetchPlayerProfile() {
     profileState.luckyFlipEnabled = result[2];
     profileState.allowance = result[3];
     profileState.vaultBalance = result[4];
+    profileState.username = result[5];
+    profileState.totalWinnings = result[6];
     profileState.lastUpdated = Date.now();
     
     // Update UI Elements
     const formattedBalance = parseFloat(ethers.formatEther(profileState.balance)).toFixed(2);
     playerBalanceEl.textContent = Number(formattedBalance).toLocaleString();
 
-    // Circle Miner is Phase-1-disabled — its tab is already non-interactive
-    // in the HTML/CSS, nothing to wire up here.
+    // Vault balance — visible to everyone as a transparency signal
+    vaultBalanceValEl.textContent = `${Number(parseFloat(ethers.formatEther(profileState.vaultBalance)).toFixed(2)).toLocaleString()} CPLAY`;
+
+    // Username
+    if (profileState.username && profileState.username.length > 0) {
+      usernameDisplay.textContent = profileState.username;
+      usernameInput.placeholder = "Change username";
+    } else {
+      usernameDisplay.textContent = "— not set —";
+      usernameInput.placeholder = "Set a username";
+    }
+    usernameInput.value = "";
+    btnSetUsername.disabled = true;
+
+    // Total winnings
+    totalWinningsValEl.textContent = `${Number(parseFloat(ethers.formatEther(profileState.totalWinnings)).toFixed(2)).toLocaleString()} CPLAY`;
 
     // Enable betting buttons if user has enough balance and Lucky Flip is live
     btnRoll.disabled = !profileState.luckyFlipEnabled || profileState.balance < ethers.parseEther("10");
@@ -433,24 +502,35 @@ function updateTransactionLog(row, status, gasDetails) {
   gasTd.textContent = gasDetails || 'N/A';
 }
 
-// 1. Claim Faucet
-btnFaucet.addEventListener('click', async () => {
+// 1. Set Username
+usernameInput.addEventListener('input', () => {
+  btnSetUsername.disabled = !contract || usernameInput.value.trim().length === 0;
+});
+
+btnSetUsername.addEventListener('click', async () => {
   if (!contract) return;
-  btnFaucet.disabled = true;
-  
-  const logRow = logTransaction("Claim Free Faucet Tokens", "N/A", "pending");
-  
+  const name = usernameInput.value.trim();
+  if (!name || name.length > 20) {
+    alert("Username must be 1-20 characters.");
+    return;
+  }
+
+  btnSetUsername.disabled = true;
+  const logRow = logTransaction("Set Username", "N/A", "pending");
+
   try {
-    const tx = await contract.claimFaucet();
+    const tx = await contract.setUsername(name);
     logRow.cells[4].innerHTML = `<a href="https://arc.exploreme.pro/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-    
+
     const receipt = await tx.wait();
     updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
+    usernameInput.value = "";
     await fetchPlayerProfile();
+    await loadLeaderboard();
   } catch (error) {
-    console.error("Faucet transaction error:", error);
+    console.error("Set username error:", error);
     updateTransactionLog(logRow, "failed", error.reason || "Rejected");
-    btnFaucet.disabled = false;
+    btnSetUsername.disabled = false;
   }
 });
 
@@ -629,6 +709,7 @@ btnRoll.addEventListener('click', async () => {
       }
       
       await fetchPlayerProfile();
+      await loadLeaderboard();
     }, 3200);
     
   } catch (error) {

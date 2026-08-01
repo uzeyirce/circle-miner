@@ -10,14 +10,14 @@ interface ICPlayVault {
 }
 
 /**
- * @title BasePlayAdventure - Circle Miner Game Engine (Phase 1: Lucky Flip only)
+ * @title BasePlayAdventure — Circle Miner Game Engine (Phase 1: Lucky Flip only)
  * @dev Pays out through a permanent, external CPlayVault contract instead of
  * holding funds itself. Circle Miner (faucet / idle mining / upgrades) is
- * intentionally DISABLED in this phase - only the Lucky Flip coin-flip game
+ * intentionally DISABLED in this phase — only the Lucky Flip coin-flip game
  * is live. The miner functions are left in place but gated off so they can
  * be re-enabled later without redeploying the whole contract.
  *
- * Odds are a genuine, verifiable 50/50 coin flip - the house edge comes
+ * Odds are a genuine, verifiable 50/50 coin flip — the house edge comes
  * entirely from the payout multiplier (1.7x, not 2x) and the 10% protocol
  * fee, both fully transparent on-chain. Nothing about the randomness itself
  * is skewed.
@@ -38,7 +38,7 @@ contract BasePlayAdventure is Ownable {
     uint256 public constant COINFLIP_PAYOUT_BPS = 17000; // 1.7x payout
     uint256 public constant MIN_BET = 10 * 10**18;
 
-    // ---- Idle mining / faucet / upgrades - present but gated off in Phase 1 ----
+    // ---- Idle mining / faucet / upgrades — present but gated off in Phase 1 ----
     uint256 public constant FAUCET_AMOUNT = 10 * 10**18;
     mapping(address => bool) public hasClaimedFaucet;
     uint256 public constant BASE_MINING_RATE = 1 * 10**15;
@@ -49,10 +49,15 @@ contract BasePlayAdventure is Ownable {
     mapping(address => MinerState) public minerStates;
     mapping(address => uint256) public clickLevels;
 
+    // ---- Usernames + cumulative winnings (for the on-chain leaderboard) ----
+    mapping(address => string) public usernames;
+    mapping(address => uint256) public totalWinnings;
+
     event MinerUpgraded(address indexed player, uint256 newLevel, uint256 cost, uint256 devFee, uint256 vaultShare);
     event ClickUpgraded(address indexed player, uint256 newLevel, uint256 cost, uint256 devFee, uint256 vaultShare);
     event MiningClaimed(address indexed player, uint256 amount);
     event FaucetClaimed(address indexed player, uint256 amount);
+    event UsernameSet(address indexed player, string username);
     event CoinFlipResult(
         address indexed player,
         bool betHeads,
@@ -72,7 +77,7 @@ contract BasePlayAdventure is Ownable {
 
     /**
      * @dev Sends the 10% protocol fee to the owner and the 90% remainder to
-     * the vault (the vault is just a token holder - this contract must
+     * the vault (the vault is just a token holder — this contract must
      * still transfer the vault's share INTO it directly, same as the
      * player -> vault direction for fees).
      */
@@ -84,7 +89,7 @@ contract BasePlayAdventure is Ownable {
     }
 
     // ==========================================================================
-    // LUCKY FLIP - the only live game mode in Phase 1.
+    // LUCKY FLIP — the only live game mode in Phase 1.
     // Player must have called cplayToken.approve(thisContract, betAmount) first.
     // ==========================================================================
 
@@ -99,7 +104,7 @@ contract BasePlayAdventure is Ownable {
 
         (uint256 devFee, ) = _splitToOwnerAndVault(betAmount);
 
-        // Genuine, unweighted 50/50 outcome - no skew applied anywhere.
+        // Genuine, unweighted 50/50 outcome — no skew applied anywhere.
         uint256 seed = uint256(
             keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, block.number))
         );
@@ -110,6 +115,7 @@ contract BasePlayAdventure is Ownable {
         if (won) {
             actualPayout = payoutAmount;
             vault.payout(msg.sender, actualPayout);
+            totalWinnings[msg.sender] += actualPayout;
         }
 
         emit CoinFlipResult(msg.sender, betHeads, won, betAmount, devFee, actualPayout, seed);
@@ -117,7 +123,18 @@ contract BasePlayAdventure is Ownable {
     }
 
     // ==========================================================================
-    // CIRCLE MINER - Phase 1: disabled. Calls revert with a clear message.
+    // USERNAME — simple on-chain registry, purely cosmetic (no impact on game logic).
+    // ==========================================================================
+
+    function setUsername(string calldata newUsername) external {
+        bytes memory nameBytes = bytes(newUsername);
+        require(nameBytes.length > 0 && nameBytes.length <= 20, "Username must be 1-20 characters");
+        usernames[msg.sender] = newUsername;
+        emit UsernameSet(msg.sender, newUsername);
+    }
+
+    // ==========================================================================
+    // CIRCLE MINER — Phase 1: disabled. Calls revert with a clear message.
     // Left implemented (not deleted) so Phase 2 just flips a flag + redeploy,
     // no data model rework needed.
     // ==========================================================================
@@ -147,12 +164,16 @@ contract BasePlayAdventure is Ownable {
         bool circleMinerEnabled,
         bool luckyFlipEnabled,
         uint256 allowanceGiven,
-        uint256 vaultBalanceNow
+        uint256 vaultBalanceNow,
+        string memory username,
+        uint256 playerTotalWinnings
     ) {
         balance = cplayToken.balanceOf(player);
         circleMinerEnabled = CIRCLE_MINER_ENABLED;
         luckyFlipEnabled = LUCKY_FLIP_ENABLED;
         allowanceGiven = cplayToken.allowance(player, address(this));
         vaultBalanceNow = vault.vaultBalance();
+        username = usernames[player];
+        playerTotalWinnings = totalWinnings[player];
     }
 }

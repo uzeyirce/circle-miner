@@ -61,7 +61,7 @@
           <span class="token-balance" id="player-balance">0.00</span>
         </div>
 
-        <a href="https://radardex.io/#0x8613155ff713c13f6c177275af9bf195e69ded34" target="_blank" rel="noopener" class="btn btn-buy">
+        <a href="https://radardex.app/#0x8613155ff713c13f6c177275af9bf195e69ded34" target="_blank" rel="noopener" class="btn btn-buy">
           <i class="fa-solid fa-cart-shopping"></i> Buy $CPLAY
         </a>
         
@@ -103,23 +103,23 @@
               <span class="stat-value monospace" id="wallet-address-abbr">Not Connected</span>
             </div>
             <div class="stat-row">
-              <span class="stat-label">Click Power:</span>
-              <span class="stat-value" id="click-multiplier">1x</span>
+              <span class="stat-label">Username:</span>
+              <span class="stat-value" id="username-display">—</span>
             </div>
             <div class="stat-row">
-              <span class="stat-label">Mining Rig:</span>
-              <span class="stat-value" id="miner-level-val">Level 0</span>
+              <span class="stat-label">Vault Balance:</span>
+              <span class="stat-value" id="vault-balance-val">—</span>
             </div>
             <div class="stat-row">
-              <span class="stat-label">Passive Income:</span>
-              <span class="stat-value" id="passive-income-val">0.00 CPLAY/sec</span>
+              <span class="stat-label">Total Winnings:</span>
+              <span class="stat-value" id="total-winnings-val">0.00 CPLAY</span>
             </div>
           </div>
-          
-          <button class="btn btn-faucet full-width" id="btn-faucet" disabled>
-            <i class="fa-solid fa-faucet-drip"></i> Claim 1,000 Faucet Tokens
-            <span class="cooldown-timer" id="faucet-cooldown"></span>
-          </button>
+
+          <div class="username-form">
+            <input type="text" id="username-input" placeholder="Set a username" maxlength="20">
+            <button class="btn btn-sm" id="btn-set-username" disabled>Save</button>
+          </div>
         </div>
       </aside>
 
@@ -282,6 +282,26 @@
       </div>
     </section>
 
+    <!-- Leaderboard -->
+    <section class="glass-panel leaderboard-panel">
+      <h2 class="section-title"><i class="fa-solid fa-trophy"></i> Top 25 Winners</h2>
+      <p class="panel-desc">Ranked by total Lucky Flip winnings, read directly from the chain.</p>
+      <div class="leaderboard-table-wrap">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Player</th>
+              <th>Total Winnings</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-tbody">
+            <tr><td colspan="3" class="leaderboard-empty">Loading leaderboard…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- Footer -->
     <footer class="cyber-footer">
       <p>Built for the Arc Ecosystem. Connected to Arc Mainnet.</p>
@@ -309,8 +329,17 @@
   <!-- Frontend Script -->
   <script src="app.js"></script>
   <script>
+    const BRIDGE_NOTICE_KEY = 'cplay_bridge_notice_seen';
+    const bridgeOverlay = document.getElementById('bridgeNoticeOverlay');
+    try {
+      if (localStorage.getItem(BRIDGE_NOTICE_KEY)) {
+        bridgeOverlay.classList.add('hidden');
+      }
+    } catch (e) { /* ignore storage errors */ }
+
     document.getElementById('btnCloseBridgeNotice').addEventListener('click', () => {
-      document.getElementById('bridgeNoticeOverlay').classList.add('hidden');
+      bridgeOverlay.classList.add('hidden');
+      try { localStorage.setItem(BRIDGE_NOTICE_KEY, '1'); } catch (e) { /* ignore */ }
     });
   </script>
 </body>
