@@ -14,17 +14,17 @@ module.exports = {
   },
   networks: {
     "arc-mainnet": {
-      url: "https://arc-mainnet.g.alchemy.com/v2/alch-demo",
+      url: "https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8",
       chainId: 5042,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     "arc-testnet": {
-      url: "https://rpc.testnet.arc.network",
+      url: "https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8",
       chainId: 5042002,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     base: {
-      url: "https://mainnet.base.org",
+      url: "https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8",
       chainId: 8453,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
