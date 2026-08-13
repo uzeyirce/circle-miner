@@ -16,19 +16,23 @@ let miningUpdateInterval = null;
 // Game Profile State from On-chain
 let profileState = {
   balance: 0n,
-  circleMinerEnabled: false,
+  circleMinerEnabled: true,
   luckyFlipEnabled: true,
   allowance: 0n,
   vaultBalance: 0n,
   username: "",
   totalWinnings: 0n,
+  faucetClaimed: false,
+  minerLevel: 0n,
+  clickLevel: 0n,
+  pendingRewards: 0n,
   lastUpdated: 0
 };
 
 // Default deployed addresses for ease of use
 // GAME contract — the contract with faucet/mining/coinflip logic (this repo's contract)
 const DEFAULT_CONTRACTS = {
-  "5042": "0x2f1f6021De02BAD010808aaa37e3d8C38A78cC6c", // Arc Mainnet — game engine contract (correctly wired to funded Vault)
+  "5042": "0xd67d5a4559d07e8154E0B0dd2DB72597f727e748", // Arc Mainnet — game engine contract (correctly wired to funded Vault)
   "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"  // Hardhat Localhost default
 };
 
@@ -78,6 +82,7 @@ const totalWinningsValEl = document.getElementById('total-winnings-val');
 const usernameInput = document.getElementById('username-input');
 const btnSetUsername = document.getElementById('btn-set-username');
 const leaderboardTbody = document.getElementById('leaderboard-tbody');
+const btnFaucet = document.getElementById('btn-faucet');
 
 // Miner Elements
 const clickCrystal = document.getElementById('click-crystal');
@@ -197,6 +202,7 @@ async function connectWallet() {
       // Fetch profile
       await fetchPlayerProfile();
       await loadLeaderboard();
+      startPassiveMiningTimer();
     } else {
       networkWarning.classList.remove('hidden');
       disableGameControls();
@@ -334,7 +340,9 @@ async function fetchPlayerProfile() {
   if (!contract || !walletAddress) return;
   
   try {
-    // Profile shape: (balance, circleMinerEnabled, luckyFlipEnabled, allowanceGiven, vaultBalanceNow, username, playerTotalWinnings)
+    // Profile shape: (balance, circleMinerEnabled, luckyFlipEnabled, allowanceGiven,
+    //   vaultBalanceNow, username, playerTotalWinnings, faucetClaimed, minerLevel,
+    //   clickLevel, pendingRewards)
     const result = await contract.getPlayerProfile(walletAddress);
     
     profileState.balance = result[0];
@@ -344,6 +352,10 @@ async function fetchPlayerProfile() {
     profileState.vaultBalance = result[4];
     profileState.username = result[5];
     profileState.totalWinnings = result[6];
+    profileState.faucetClaimed = result[7];
+    profileState.minerLevel = result[8];
+    profileState.clickLevel = result[9];
+    profileState.pendingRewards = result[10];
     profileState.lastUpdated = Date.now();
     
     // Update UI Elements
@@ -369,6 +381,26 @@ async function fetchPlayerProfile() {
 
     // Enable betting buttons if user has enough balance and Lucky Flip is live
     btnRoll.disabled = !profileState.luckyFlipEnabled || profileState.balance < ethers.parseEther("10");
+
+    // Circle Miner UI
+    if (profileState.circleMinerEnabled) {
+      // Faucet stays disabled ("Coming Soon") for now — not wired to a live
+      // contract call yet, left as static UI on purpose.
+
+      clickLevelLbl.textContent = profileState.clickLevel.toString();
+      minerLevelLbl.textContent = profileState.minerLevel.toString();
+
+      const clickCost = await contract.getClickUpgradeCost(profileState.clickLevel);
+      clickUpgradeCost.textContent = parseFloat(ethers.formatEther(clickCost)).toFixed(0);
+      btnUpgradeClick.disabled = profileState.balance < clickCost;
+
+      const minerCost = await contract.getUpgradeCost(profileState.minerLevel);
+      minerUpgradeCost.textContent = parseFloat(ethers.formatEther(minerCost)).toFixed(0);
+      btnUpgradeMiner.disabled = profileState.balance < minerCost;
+
+      pendingClaimLocal = parseFloat(ethers.formatEther(profileState.pendingRewards));
+      updateMiningDisplay();
+    }
 
   } catch (error) {
     console.error("Error reading profile stats:", error);
