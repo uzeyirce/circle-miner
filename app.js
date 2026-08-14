@@ -265,7 +265,7 @@ async function switchNetwork() {
               chainId: '0x13b2',
               chainName: 'Arc Mainnet',
               nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
-              rpcUrls: ['https://arc-mainnet.infura.io/v3/de58e8647ba54873a65e6b8d2d7bade7'],
+              rpcUrls: ['https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8'],
               blockExplorerUrls: ['https://arc.exploreme.pro'], // ⚠️ verify this is the correct mainnet explorer URL
             },
           ],
