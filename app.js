@@ -32,7 +32,7 @@ let profileState = {
 // Default deployed addresses for ease of use
 // GAME contract — the contract with faucet/mining/coinflip logic (this repo's contract)
 const DEFAULT_CONTRACTS = {
-  "5042": "0xd67d5a4559d07e8154E0B0dd2DB72597f727e748", // Arc Mainnet — game engine contract (correctly wired to funded Vault)
+  "5042": "0x2f1f6021De02BAD010808aaa37e3d8C38A78cC6c", // Arc Mainnet — game engine contract (correctly wired to funded Vault)
   "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"  // Hardhat Localhost default
 };
 
@@ -265,7 +265,7 @@ async function switchNetwork() {
               chainId: '0x13b2',
               chainName: 'Arc Mainnet',
               nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
-              rpcUrls: ['https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8'],
+              rpcUrls: ['https://arc-mainnet.infura.io/v3/de58e8647ba54873a65e6b8d2d7bade7'],
               blockExplorerUrls: ['https://arc.exploreme.pro'], // ⚠️ verify this is the correct mainnet explorer URL
             },
           ],
@@ -338,31 +338,34 @@ async function loadLeaderboard() {
 
 async function fetchPlayerProfile() {
   if (!contract || !walletAddress) return;
-
+  
   try {
+    // Profile shape: (balance, circleMinerEnabled, luckyFlipEnabled, allowanceGiven,
+    //   vaultBalanceNow, username, playerTotalWinnings, faucetClaimed, minerLevel,
+    //   clickLevel, pendingRewards)
     const result = await contract.getPlayerProfile(walletAddress);
-    console.log('✅ Profile result:', result);
-
-    // İsimli alanlarla oku (indeks yok)
-    profileState.balance = result.balance ?? 0n;
-    profileState.circleMinerEnabled = result.circleMinerEnabled ?? false;
-    profileState.luckyFlipEnabled = result.luckyFlipEnabled ?? false;
-    profileState.allowance = result.allowanceGiven ?? 0n;
-    profileState.vaultBalance = result.vaultBalanceNow ?? 0n;
-    profileState.username = result.username ?? '';
-    profileState.totalWinnings = result.playerTotalWinnings ?? 0n;
-    profileState.faucetClaimed = result.faucetClaimed ?? false;
-    profileState.minerLevel = result.minerLevel ?? 0n;
-    profileState.clickLevel = result.clickLevel ?? 0n;
-    profileState.pendingRewards = result.pendingRewards ?? 0n;
+    
+    profileState.balance = result[0];
+    profileState.circleMinerEnabled = result[1];
+    profileState.luckyFlipEnabled = result[2];
+    profileState.allowance = result[3];
+    profileState.vaultBalance = result[4];
+    profileState.username = result[5];
+    profileState.totalWinnings = result[6];
+    profileState.faucetClaimed = result[7];
+    profileState.minerLevel = result[8];
+    profileState.clickLevel = result[9];
+    profileState.pendingRewards = result[10];
     profileState.lastUpdated = Date.now();
-
-    // UI güncelleme kısmı (aynı, değişmedi)
+    
+    // Update UI Elements
     const formattedBalance = parseFloat(ethers.formatEther(profileState.balance)).toFixed(2);
     playerBalanceEl.textContent = Number(formattedBalance).toLocaleString();
 
+    // Vault balance — visible to everyone as a transparency signal
     vaultBalanceValEl.textContent = `${Number(parseFloat(ethers.formatEther(profileState.vaultBalance)).toFixed(2)).toLocaleString()} CPLAY`;
 
+    // Username
     if (profileState.username && profileState.username.length > 0) {
       usernameDisplay.textContent = profileState.username;
       usernameInput.placeholder = "Change username";
@@ -373,11 +376,17 @@ async function fetchPlayerProfile() {
     usernameInput.value = "";
     btnSetUsername.disabled = true;
 
+    // Total winnings
     totalWinningsValEl.textContent = `${Number(parseFloat(ethers.formatEther(profileState.totalWinnings)).toFixed(2)).toLocaleString()} CPLAY`;
 
+    // Enable betting buttons if user has enough balance and Lucky Flip is live
     btnRoll.disabled = !profileState.luckyFlipEnabled || profileState.balance < ethers.parseEther("10");
 
+    // Circle Miner UI
     if (profileState.circleMinerEnabled) {
+      // Faucet stays disabled ("Coming Soon") for now — not wired to a live
+      // contract call yet, left as static UI on purpose.
+
       clickLevelLbl.textContent = profileState.clickLevel.toString();
       minerLevelLbl.textContent = profileState.minerLevel.toString();
 
@@ -395,9 +404,7 @@ async function fetchPlayerProfile() {
 
   } catch (error) {
     console.error("Error reading profile stats:", error);
-    if (typeof flipStatusMsg !== "undefined") {
-      flipStatusMsg.textContent = "Contract read failed. Check if address is correct.";
-    }
+    flipStatusMsg.textContent = "Contract read failed. Check if address is correct.";
   }
 }
 
