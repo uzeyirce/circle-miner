@@ -1,7 +1,7 @@
 /**
  * Arc Cyber Miner & Lucky Flip
  * Web3 Client Logic using Ethers.js v6
- * Cleaned & fixed version
+ * Fixed version - New Game Contract
  */
 
 // ====================== Application State ======================
@@ -33,10 +33,10 @@ let profileState = {
   lastUpdated: 0
 };
 
-// ====================== Contract Addresses ======================
+// ====================== Addresses ======================
 const DEFAULT_CONTRACTS = {
-  "5042": "0xd67d5a4559d07e8154E0B0dd2DB72597f727e748", // Arc Mainnet
-  "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"  // Hardhat
+  "5042": "0xd67d5a4559d07e8154E0B0dd2DB72597f727e748", // ← Yeni doğru Game Contract
+  "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
 };
 
 const CPLAY_TOKEN_ADDRESS = {
@@ -54,15 +54,26 @@ const ERC20_ABI = [
 ];
 
 const CONTRACT_ABI = [
+  // Profile
   "function getPlayerProfile(address) view returns (uint256,bool,bool,uint256,uint256,string,uint256,bool,uint256,uint256,uint256)",
+  
+  // Username
   "function setUsername(string)",
+  "function usernames(address) view returns (string)",
+  
+  // Mining
   "function getClickUpgradeCost(uint256) view returns (uint256)",
   "function buyClickUpgrade()",
   "function getUpgradeCost(uint256) view returns (uint256)",
   "function buyMinerUpgrade()",
   "function claimMining()",
+  
+  // Lucky Flip
   "function coinFlip(bool,uint256)",
-  "event CoinFlipResult(address indexed player, bool won, uint256 payout)"
+  "event CoinFlipResult(address indexed player, bool won, uint256 payout)",
+  
+  // Leaderboard helpers
+  "function totalWinnings(address) view returns (uint256)"
 ];
 
 // ====================== DOM Elements ======================
@@ -79,7 +90,6 @@ const totalWinningsValEl = document.getElementById('total-winnings-val');
 const usernameInput = document.getElementById('username-input');
 const btnSetUsername = document.getElementById('btn-set-username');
 const leaderboardTbody = document.getElementById('leaderboard-tbody');
-const btnFaucet = document.getElementById('btn-faucet');
 
 const clickCrystal = document.getElementById('click-crystal');
 const localClicksEl = document.getElementById('local-clicks');
@@ -104,6 +114,13 @@ const txTbody = document.getElementById('tx-tbody');
 const txCountEl = document.getElementById('tx-count');
 const txEmptyRow = document.getElementById('tx-empty-row');
 
+// ====================== Helpers ======================
+function getContractAddress(chainId) {
+  const chainStr = String(chainId);
+  localStorage.removeItem(`base_cyber_contract_${chainStr}`);
+  return DEFAULT_CONTRACTS[chainStr] || DEFAULT_CONTRACTS["5042"];
+}
+
 // ====================== Tab Navigation ======================
 document.querySelectorAll('.nav-tab').forEach(button => {
   button.addEventListener('click', () => {
@@ -115,7 +132,7 @@ document.querySelectorAll('.nav-tab').forEach(button => {
   });
 });
 
-// ====================== Web3 Init ======================
+// ====================== Web3 ======================
 async function initWeb3() {
   if (typeof window.ethereum === 'undefined') {
     btnConnect?.addEventListener('click', () => {
@@ -160,13 +177,14 @@ async function connectWallet() {
     if (currentChainId === 5042n || currentChainId === 31337n) {
       networkWarning?.classList.add('hidden');
 
-      const contractAddress = DEFAULT_CONTRACTS[String(currentChainId)];
+      const contractAddress = getContractAddress(currentChainId);
       const tokenAddress = CPLAY_TOKEN_ADDRESS[String(currentChainId)];
 
       contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
       tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
 
       await fetchPlayerProfile();
+      await loadLeaderboard();
       startPassiveMiningTimer();
     } else {
       networkWarning?.classList.remove('hidden');
@@ -197,8 +215,8 @@ function disconnectWallet() {
 }
 
 function disableGameControls() {
-  [btnClaimMining, btnUpgradeClick, btnUpgradeMiner, btnRoll, btnSetUsername].forEach(btn => {
-    if (btn) btn.disabled = true;
+  [btnClaimMining, btnUpgradeClick, btnUpgradeMiner, btnRoll, btnSetUsername].forEach(el => {
+    if (el) el.disabled = true;
   });
 }
 
@@ -228,7 +246,58 @@ async function switchNetwork() {
   }
 }
 
-// ====================== Profile Fetch ======================
+// ====================== Leaderboard ======================
+async function loadLeaderboard() {
+  if (!contract || !leaderboardTbody) return;
+
+  try {
+    leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">Loading leaderboard…</td></tr>';
+
+    const filter = contract.filters.CoinFlipResult();
+    const events = await contract.queryFilter(filter, 0, 'latest');
+    const uniquePlayers = [...new Set(events.map(e => e.args.player))];
+
+    if (uniquePlayers.length === 0) {
+      leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">No plays yet — be the first!</td></tr>';
+      return;
+    }
+
+    const playerData = await Promise.all(uniquePlayers.map(async (addr) => {
+      const [winnings, name] = await Promise.all([
+        contract.totalWinnings(addr),
+        contract.usernames(addr)
+      ]);
+      return { address: addr, winnings, name };
+    }));
+
+    const ranked = playerData
+      .filter(p => p.winnings > 0n)
+      .sort((a, b) => (b.winnings > a.winnings ? 1 : -1))
+      .slice(0, 25);
+
+    if (ranked.length === 0) {
+      leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">No winners yet — be the first!</td></tr>';
+      return;
+    }
+
+    leaderboardTbody.innerHTML = ranked.map((p, i) => {
+      const displayName = p.name && p.name.length > 0
+        ? p.name
+        : `${p.address.slice(0, 6)}...${p.address.slice(-4)}`;
+      const winningsFormatted = Number(parseFloat(ethers.formatEther(p.winnings)).toFixed(2)).toLocaleString();
+      return `<tr>
+        <td>${i + 1}</td>
+        <td class="monospace">${displayName}</td>
+        <td>${winningsFormatted} CPLAY</td>
+      </tr>`;
+    }).join('');
+  } catch (error) {
+    console.error("Leaderboard load error:", error);
+    leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">Could not load leaderboard.</td></tr>';
+  }
+}
+
+// ====================== Profile ======================
 async function fetchPlayerProfile() {
   if (!contract || !walletAddress) return;
 
@@ -248,7 +317,6 @@ async function fetchPlayerProfile() {
     profileState.pendingRewards = result[10];
     profileState.lastUpdated = Date.now();
 
-    // UI Updates
     if (playerBalanceEl) {
       playerBalanceEl.textContent = Number(parseFloat(ethers.formatEther(profileState.balance)).toFixed(2)).toLocaleString();
     }
@@ -385,6 +453,7 @@ btnSetUsername?.addEventListener('click', async () => {
     updateTransactionLog(logRow, "success", `Gas: ${receipt.gasUsed}`);
     usernameInput.value = "";
     await fetchPlayerProfile();
+    await loadLeaderboard();
   } catch (error) {
     updateTransactionLog(logRow, "failed", error.reason || "Rejected");
     btnSetUsername.disabled = false;
@@ -462,9 +531,9 @@ btnBetTails?.addEventListener('click', () => {
 });
 
 btnBetMax?.addEventListener('click', () => {
-  if (profileState.balance > 0n) {
+  if (profileState.balance > 0n && betAmountInput) {
     const val = Math.floor(parseFloat(ethers.formatEther(profileState.balance)) / 10) * 10;
-    if (betAmountInput) betAmountInput.value = Math.max(10, val);
+    betAmountInput.value = Math.max(10, val);
   }
 });
 
@@ -517,6 +586,7 @@ btnRoll?.addEventListener('click', async () => {
         }
       }
       await fetchPlayerProfile();
+      await loadLeaderboard();
     }, 3200);
 
   } catch (error) {
@@ -528,7 +598,7 @@ btnRoll?.addEventListener('click', async () => {
   }
 });
 
-// ====================== Approval Helper ======================
+// ====================== Approval ======================
 async function ensureApproval(requiredAmount) {
   if (!tokenContract || !contract) return false;
 
@@ -553,7 +623,7 @@ btnConnect?.addEventListener('click', connectWallet);
 btnDisconnect?.addEventListener('click', disconnectWallet);
 btnSwitchNetwork?.addEventListener('click', switchNetwork);
 
-// ====================== Background Particles (optional) ======================
+// ====================== Background Particles ======================
 const canvas = document.getElementById('bg-canvas');
 if (canvas) {
   const ctx = canvas.getContext('2d');
@@ -600,10 +670,7 @@ if (canvas) {
 
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => {
-      p.update();
-      p.draw();
-    });
+    particles.forEach(p => { p.update(); p.draw(); });
     requestAnimationFrame(animate);
   }
 
