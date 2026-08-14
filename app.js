@@ -340,10 +340,10 @@ async function fetchPlayerProfile() {
   if (!contract || !walletAddress) return;
 
   try {
-    // ✅ İsimli alanları kullan (indeks yok!)
     const result = await contract.getPlayerProfile(walletAddress);
-    
-    // Büyük sayıları (BigInt) güvenle al, boşsa 0 ata
+    console.log('✅ Profile result:', result);
+
+    // İsimli alanlarla oku (indeks yok)
     profileState.balance = result.balance ?? 0n;
     profileState.circleMinerEnabled = result.circleMinerEnabled ?? false;
     profileState.luckyFlipEnabled = result.luckyFlipEnabled ?? false;
@@ -357,7 +357,7 @@ async function fetchPlayerProfile() {
     profileState.pendingRewards = result.pendingRewards ?? 0n;
     profileState.lastUpdated = Date.now();
 
-    // --- AŞAĞIDAKİ UI GÜNCELLEME KODLARI AYNEN KALIYOR ---
+    // UI güncelleme kısmı (aynı, değişmedi)
     const formattedBalance = parseFloat(ethers.formatEther(profileState.balance)).toFixed(2);
     playerBalanceEl.textContent = Number(formattedBalance).toLocaleString();
 
