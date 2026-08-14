@@ -32,7 +32,7 @@ let profileState = {
 // Default deployed addresses for ease of use
 // GAME contract — the contract with faucet/mining/coinflip logic (this repo's contract)
 const DEFAULT_CONTRACTS = {
-  "5042": "0xd67d5a4559d07e8154E0B0dd2DB72597f727e748", // Arc Mainnet — game engine contract (correctly wired to funded Vault)
+  "5042": "0xd67d5a4559d07e8154E0B0dd2DB72597f727e748", // Arc Mainnet — updated game engine
   "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"  // Hardhat Localhost default
 };
 
@@ -56,10 +56,6 @@ let tokenContract = null; // set alongside `contract` once connected
 // Get active contract address from LocalStorage or default to Arc Testnet
 function getContractAddress(chainId) {
   const chainStr = String(chainId);
-  // Dev Panel removed — no more UI writes to this key, and any leftover
-  // value from before (e.g. an old dev-deployed test contract) must not
-  // silently override the real, fixed-supply contract. Clear it defensively
-  // and always use the current default.
   localStorage.removeItem(`base_cyber_contract_${chainStr}`);
   return DEFAULT_CONTRACTS[chainStr] || DEFAULT_CONTRACTS["5042"];
 }
@@ -105,8 +101,6 @@ const btnBetMax = document.getElementById('btn-bet-max');
 const btnRoll = document.getElementById('btn-roll');
 const flipStatusMsg = document.getElementById('flip-status-msg');
 
-// Dev Panel removed from public UI — no element refs needed
-
 // Tx Log Elements
 const txTbody = document.getElementById('tx-tbody');
 const txCountEl = document.getElementById('tx-count');
@@ -124,10 +118,8 @@ const tabPanels = document.querySelectorAll('.tab-panel');
 tabButtons.forEach(button => {
   button.addEventListener('click', () => {
     const tabId = button.getAttribute('data-tab');
-    
     tabButtons.forEach(btn => btn.classList.remove('active'));
     tabPanels.forEach(panel => panel.classList.remove('active'));
-    
     button.classList.add('active');
     document.getElementById(tabId).classList.add('active');
   });
@@ -141,12 +133,10 @@ async function initWeb3() {
     try {
       provider = new ethers.BrowserProvider(window.ethereum);
       
-      // Detect network changes
       window.ethereum.on('chainChanged', () => {
         window.location.reload();
       });
       
-      // Detect account changes
       window.ethereum.on('accountsChanged', (accounts) => {
         if (accounts.length === 0) {
           disconnectWallet();
@@ -155,7 +145,6 @@ async function initWeb3() {
         }
       });
       
-      // Auto connect if authorized
       const accounts = await provider.listAccounts();
       if (accounts.length > 0) {
         await connectWallet();
@@ -172,7 +161,6 @@ async function initWeb3() {
 
 async function connectWallet() {
   try {
-    // Request account access
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     walletAddress = accounts[0];
     
@@ -188,20 +176,17 @@ async function connectWallet() {
     walletAddressAbbr.textContent = `${walletAddress.substring(0, 10)}...${walletAddress.substring(34)}`;
     tokenDisplay.classList.remove('hidden');
     
-    // Check if network is Arc Mainnet (5042) or Local Hardhat (31337)
     if (currentChainId === 5042n || currentChainId === 31337n) {
       networkWarning.classList.add('hidden');
 
       const contractAddress = getContractAddress(currentChainId);
       const tokenAddress = CPLAY_TOKEN_ADDRESS[String(currentChainId)];
 
-      // Instantiate contracts
       contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
       tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
       
-      // Fetch profile
       await fetchPlayerProfile();
-      // Liderlik tablosu geçici olarak devre dışı (eth_getLogs 10.000 blok sorunu)
+      // Leaderboard devre dışı (eth_getLogs 10.000 blok sorunu)
       // await loadLeaderboard();
       startPassiveMiningTimer();
     } else {
@@ -227,14 +212,11 @@ function disconnectWallet() {
   if (miningUpdateInterval) {
     clearInterval(miningUpdateInterval);
   }
-
-  // Best-effort: ask the wallet to revoke its own connection permission too
-  // (supported by newer MetaMask versions; silently ignored if unsupported).
   if (window.ethereum && window.ethereum.request) {
     window.ethereum.request({
       method: 'wallet_revokePermissions',
       params: [{ eth_accounts: {} }],
-    }).catch(() => { /* not supported by this wallet, that's fine */ });
+    }).catch(() => {});
   }
 }
 
@@ -248,15 +230,13 @@ function disableGameControls() {
   btnSetUsername.disabled = true;
 }
 
-// Switch wallet network to Arc Mainnet
 async function switchNetwork() {
   try {
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x13b2' }], // Arc Mainnet 5042
+      params: [{ chainId: '0x13b2' }],
     });
   } catch (switchError) {
-    // If chain is not added, request to add it
     if (switchError.code === 4902) {
       try {
         await window.ethereum.request({
@@ -286,62 +266,22 @@ btnConnect.addEventListener('click', connectWallet);
    Game Operations & UI Sync
    ========================================================================== */
 
-// Builds the Top 25 leaderboard by scanning CoinFlipResult events for unique
-// players, then reading each one's authoritative on-chain totalWinnings.
+// Leaderboard devre dışı (RPC 10.000 blok limiti nedeniyle)
 async function loadLeaderboard() {
-  if (!contract) return;
-  try {
-    leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">Loading leaderboard…</td></tr>';
-
-    const filter = contract.filters.CoinFlipResult();
-    const events = await contract.queryFilter(filter, 0, 'latest');
-    const uniquePlayers = [...new Set(events.map(e => e.args.player))];
-
-    if (uniquePlayers.length === 0) {
-      leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">No plays yet — be the first!</td></tr>';
-      return;
-    }
-
-    const playerData = await Promise.all(uniquePlayers.map(async (addr) => {
-      const [winnings, name] = await Promise.all([
-        contract.totalWinnings(addr),
-        contract.usernames(addr)
-      ]);
-      return { address: addr, winnings, name };
-    }));
-
-    const ranked = playerData
-      .filter(p => p.winnings > 0n)
-      .sort((a, b) => (b.winnings > a.winnings ? 1 : a.winnings > b.winnings ? -1 : 0))
-      .slice(0, 25);
-
-    if (ranked.length === 0) {
-      leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">No winners yet — be the first!</td></tr>';
-      return;
-    }
-
-    leaderboardTbody.innerHTML = ranked.map((p, i) => {
-      const displayName = p.name && p.name.length > 0
-        ? p.name
-        : `${p.address.slice(0, 6)}...${p.address.slice(-4)}`;
-      const winningsFormatted = Number(parseFloat(ethers.formatEther(p.winnings)).toFixed(2)).toLocaleString();
-      return `<tr>
-        <td>${i + 1}</td>
-        <td class="monospace">${displayName}</td>
-        <td>${winningsFormatted} CPLAY</td>
-      </tr>`;
-    }).join('');
-  } catch (error) {
-    console.error("Leaderboard load error:", error);
-    leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">Could not load leaderboard.</td></tr>';
-  }
+  // Geçici olarak devre dışı
+  console.log("Leaderboard disabled due to RPC block range limit.");
+  leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">Leaderboard temporarily disabled.</td></tr>';
 }
 
+// ==========================================================================
+// FIXED fetchPlayerProfile — uses manual eth_call + Array.from(decoded)
+// to avoid Proxy/Result indexing issues and RangeError.
+// ==========================================================================
 async function fetchPlayerProfile() {
   if (!contract || !walletAddress) return;
 
   try {
-    // Manuel eth_call ile doğrudan sorgula (Infura kotasından bağımsız)
+    // Manual eth_call using the wallet's own RPC (bypasses Infura quotas)
     const profileIface = new ethers.Interface([
       "function getPlayerProfile(address) view returns (uint256,bool,bool,uint256,uint256,string,uint256,bool,uint256,uint256,uint256)"
     ]);
@@ -354,7 +294,7 @@ async function fetchPlayerProfile() {
     const rawResult = await window.ethereum.request({
       method: "eth_call",
       params: [{
-        to: contract.target,
+        to: contract.target, // or contract.address
         data: callData
       }, "latest"]
     });
@@ -364,15 +304,16 @@ async function fetchPlayerProfile() {
       rawResult
     );
 
-    // Proxy'yi normal diziye çevir (RangeError çözümü)
+    // Convert Proxy/Result to a plain Array (solves RangeError)
     const result = Array.from(decoded);
 
-    console.log("✅ Player profile:", result);
+    console.log("✅ Player profile (decoded):", result);
 
     if (result.length !== 11) {
-      throw new Error(`Beklenmeyen sonuç uzunluğu: ${result.length}`);
+      throw new Error(`Unexpected result length: ${result.length}`);
     }
 
+    // Assign using indexes (now safe because it's a plain array)
     profileState.balance = result[0];
     profileState.circleMinerEnabled = result[1];
     profileState.luckyFlipEnabled = result[2];
@@ -386,7 +327,7 @@ async function fetchPlayerProfile() {
     profileState.pendingRewards = result[10];
     profileState.lastUpdated = Date.now();
 
-    // --- UI güncelleme ---
+    // --- UI Updates (unchanged) ---
     const formattedBalance = parseFloat(ethers.formatEther(profileState.balance)).toFixed(2);
     playerBalanceEl.textContent = Number(formattedBalance).toLocaleString();
 
@@ -423,7 +364,7 @@ async function fetchPlayerProfile() {
     }
 
   } catch (error) {
-    console.error("Error reading profile stats:", error);
+    console.error("❌ Error reading profile stats:", error);
     if (typeof flipStatusMsg !== "undefined") {
       flipStatusMsg.textContent = "Contract read failed. Check if address is correct.";
     }
@@ -439,18 +380,15 @@ function startPassiveMiningTimer() {
   
   miningUpdateInterval = setInterval(() => {
     if (profileState.minerLevel > 0n) {
-      const baseRatePerSec = 0.001 * Number(profileState.minerLevel); // matches BASE_MINING_RATE
+      const baseRatePerSec = 0.001 * Number(profileState.minerLevel);
       const ratePerSec = baseRatePerSec * (1 + Number(profileState.clickLevel) * 0.1);
-      pendingClaimLocal += ratePerSec * 0.1; // ticking every 100ms
+      pendingClaimLocal += ratePerSec * 0.1;
       updateMiningDisplay();
     }
   }, 100);
 }
 
 function updateMiningDisplay() {
-  // Real, on-chain-accruing amount only — clicking the crystal is a fun
-  // cosmetic counter and does NOT add anything here, so this number always
-  // matches what claimMining() will actually pay out.
   miningPendingEl.textContent = pendingClaimLocal.toFixed(4);
   btnClaimMining.disabled = pendingClaimLocal <= 0;
 }
@@ -465,19 +403,13 @@ function formatTime(sec) {
    Clicker Energy Mining
    ========================================================================== */
 clickCrystal.addEventListener('click', (e) => {
-  // Multiply local click power
   const mult = 1 + Number(profileState.clickLevel);
   localClicks += 1;
   localClicksEl.textContent = localClicks;
-  
-  // Update mining pending rewards instantly
   updateMiningDisplay();
-  
-  // Trigger premium micro-animation particles
   createClickParticle(e);
 });
 
-// Click Particle Burst Animation
 function createClickParticle(e) {
   const rect = clickCrystal.getBoundingClientRect();
   const x = e.clientX || (rect.left + rect.width / 2);
@@ -493,7 +425,6 @@ function createClickParticle(e) {
   
   document.body.appendChild(floating);
   
-  // Clean up element after animation
   setTimeout(() => {
     floating.remove();
   }, 800);
@@ -503,7 +434,6 @@ function createClickParticle(e) {
    On-chain Blockchain Transactions
    ========================================================================== */
 
-// Log Transaction to UI Logs
 function logTransaction(actionName, txHash, status) {
   txEmptyRow.classList.add('hidden');
   transactionsCount++;
@@ -538,9 +468,7 @@ function logTransaction(actionName, txHash, status) {
     <td>${txLink}</td>
   `;
   
-  // Insert at top of log table
   txTbody.insertBefore(tr, txTbody.firstChild);
-  
   return tr;
 }
 
@@ -575,12 +503,11 @@ btnSetUsername.addEventListener('click', async () => {
   try {
     const tx = await contract.setUsername(name);
     logRow.cells[4].innerHTML = `<a href="https://arc.exploreme.pro/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-
     const receipt = await tx.wait();
     updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
     usernameInput.value = "";
     await fetchPlayerProfile();
-    // await loadLeaderboard(); // geçici olarak kapalı
+    // leaderboard call removed
   } catch (error) {
     console.error("Set username error:", error);
     updateTransactionLog(logRow, "failed", error.reason || "Rejected");
@@ -601,7 +528,6 @@ btnUpgradeClick.addEventListener('click', async () => {
     const logRow = logTransaction("Upgrade Super-Click Mult", "N/A", "pending");
     const tx = await contract.buyClickUpgrade();
     logRow.cells[4].innerHTML = `<a href="https://arc.exploreme.pro/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-    
     const receipt = await tx.wait();
     updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
     await fetchPlayerProfile();
@@ -624,7 +550,6 @@ btnUpgradeMiner.addEventListener('click', async () => {
     const logRow = logTransaction("Upgrade Circle Mining Rig", "N/A", "pending");
     const tx = await contract.buyMinerUpgrade();
     logRow.cells[4].innerHTML = `<a href="https://arc.exploreme.pro/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-    
     const receipt = await tx.wait();
     updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
     await fetchPlayerProfile();
@@ -644,14 +569,10 @@ btnClaimMining.addEventListener('click', async () => {
   try {
     const tx = await contract.claimMining();
     logRow.cells[4].innerHTML = `<a href="https://arc.exploreme.pro/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-    
     const receipt = await tx.wait();
     updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
-    
-    // Reset local clicks on successful claim
     localClicks = 0;
     localClicksEl.textContent = 0;
-    
     await fetchPlayerProfile();
   } catch (error) {
     console.error("Claim mining error:", error);
@@ -675,17 +596,14 @@ btnBetTails.addEventListener('click', () => {
   btnBetHeads.classList.remove('active');
 });
 
-// Bet max balance
 btnBetMax.addEventListener('click', () => {
   if (profileState.balance > 0n) {
     const etherVal = parseFloat(ethers.formatEther(profileState.balance));
-    // Keep it as integer multiples of 10
     const rounded = Math.floor(etherVal / 10) * 10;
     betAmountInput.value = Math.max(10, rounded);
   }
 });
 
-// Roll On-Chain Coin Flip
 btnRoll.addEventListener('click', async () => {
   if (!contract) return;
   
@@ -709,7 +627,6 @@ btnRoll.addEventListener('click', async () => {
   flipStatusMsg.className = "flip-status-message";
   flipStatusMsg.textContent = "Submitting bet to the blockchain...";
   
-  // Coin flip initial spin animation
   coinVisual.classList.add('spin-animation');
   
   const isHeadsBet = (betChoice === "heads");
@@ -722,11 +639,9 @@ btnRoll.addEventListener('click', async () => {
     const receipt = await tx.wait();
     updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
     
-    // Parse result from CoinFlipResult event
     let won = false;
     let payout = 0n;
     
-    // Query event logs
     for (const log of receipt.logs) {
       try {
         const parsedLog = contract.interface.parseLog(log);
@@ -734,23 +649,13 @@ btnRoll.addEventListener('click', async () => {
           won = parsedLog.args.won;
           payout = parsedLog.args.payout;
         }
-      } catch (e) {
-        // ignore logs from other contracts or unparseable logs
-      }
+      } catch (e) {}
     }
     
-    // Determine the coin outcome
-    // If player bet Heads and won, coin lands on Heads (rotate to 0 or 360 * N)
-    // If player bet Tails and won, coin lands on Tails (rotate to 180 or 180 + 360 * N)
-    // If player bet Heads and lost, coin lands on Tails
-    // If player bet Tails and lost, coin lands on Heads
     const landedHeads = (isHeadsBet && won) || (!isHeadsBet && !won);
-    
-    // Set custom visual target for coin flip animation end
-    const spinTarget = landedHeads ? '1800deg' : '1980deg'; // 1800 is heads, 1980 is tails
+    const spinTarget = landedHeads ? '1800deg' : '1980deg';
     coinVisual.style.setProperty('--coin-spin-target', spinTarget);
     
-    // Wait for the visual flip animation to reach its peak before updating status (approx 3s)
     setTimeout(async () => {
       coinVisual.classList.remove('spin-animation');
       
@@ -763,7 +668,7 @@ btnRoll.addEventListener('click', async () => {
       }
       
       await fetchPlayerProfile();
-      // await loadLeaderboard(); // geçici olarak kapalı
+      // leaderboard call removed
     }, 3200);
     
   } catch (error) {
@@ -776,10 +681,7 @@ btnRoll.addEventListener('click', async () => {
 });
 
 /* ==========================================================================
-   ERC20 Approval Helper — $CPLAY is an external token now, so any function
-   that pulls tokens FROM the player (upgrades, bets) needs prior approval.
-   This checks current allowance and, if insufficient, sends one infinite
-   approve() so the player only ever sees this extra step once.
+   ERC20 Approval Helper
    ========================================================================== */
 async function ensureApproval(requiredAmount) {
   if (!tokenContract || !contract) return false;
@@ -804,13 +706,6 @@ async function ensureApproval(requiredAmount) {
 }
 
 /* ==========================================================================
-   Developer & Deployment Admin Center — removed from public UI.
-   The contract address is now fixed via DEFAULT_CONTRACTS; players can no
-   longer deploy new contract instances or repoint the app from the browser.
-   ========================================================================== */
-
-
-/* ==========================================================================
    Premium Particle Space Background
    ========================================================================== */
 const canvas = document.getElementById('bg-canvas');
@@ -830,7 +725,7 @@ class Particle {
     this.y = Math.random() * canvas.height;
     this.size = Math.random() * 1.5 + 0.5;
     this.speedX = Math.random() * 0.15 - 0.075;
-    this.speedY = Math.random() * -0.2 - 0.05; // float upwards
+    this.speedY = Math.random() * -0.2 - 0.05;
     this.color = Math.random() > 0.5 ? 'rgba(6, 182, 212, ' : 'rgba(139, 92, 246, ';
     this.alpha = Math.random() * 0.5 + 0.2;
   }
@@ -838,8 +733,6 @@ class Particle {
   update() {
     this.x += this.speedX;
     this.y += this.speedY;
-    
-    // Reset if offscreen
     if (this.y < 0) {
       this.y = canvas.height;
       this.x = Math.random() * canvas.width;
