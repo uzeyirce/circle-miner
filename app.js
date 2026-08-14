@@ -201,7 +201,8 @@ async function connectWallet() {
       
       // Fetch profile
       await fetchPlayerProfile();
-      await loadLeaderboard();
+      // Liderlik tablosu geçici olarak devre dışı (eth_getLogs 10.000 blok sorunu)
+      // await loadLeaderboard();
       startPassiveMiningTimer();
     } else {
       networkWarning.classList.remove('hidden');
@@ -266,7 +267,7 @@ async function switchNetwork() {
               chainName: 'Arc Mainnet',
               nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
               rpcUrls: ['https://arc-mainnet.infura.io/v3/de58e8647ba54873a65e6b8d2d7bade7'],
-              blockExplorerUrls: ['https://arc.exploreme.pro'], // ⚠️ verify this is the correct mainnet explorer URL
+              blockExplorerUrls: ['https://arc.exploreme.pro'],
             },
           ],
         });
@@ -338,13 +339,40 @@ async function loadLeaderboard() {
 
 async function fetchPlayerProfile() {
   if (!contract || !walletAddress) return;
-  
+
   try {
-    // Profile shape: (balance, circleMinerEnabled, luckyFlipEnabled, allowanceGiven,
-    //   vaultBalanceNow, username, playerTotalWinnings, faucetClaimed, minerLevel,
-    //   clickLevel, pendingRewards)
-    const result = await contract.getPlayerProfile(walletAddress);
-    
+    // Manuel eth_call ile doğrudan sorgula (Infura kotasından bağımsız)
+    const profileIface = new ethers.Interface([
+      "function getPlayerProfile(address) view returns (uint256,bool,bool,uint256,uint256,string,uint256,bool,uint256,uint256,uint256)"
+    ]);
+
+    const callData = profileIface.encodeFunctionData(
+      "getPlayerProfile",
+      [walletAddress]
+    );
+
+    const rawResult = await window.ethereum.request({
+      method: "eth_call",
+      params: [{
+        to: contract.target,
+        data: callData
+      }, "latest"]
+    });
+
+    const decoded = profileIface.decodeFunctionResult(
+      "getPlayerProfile",
+      rawResult
+    );
+
+    // Proxy'yi normal diziye çevir (RangeError çözümü)
+    const result = Array.from(decoded);
+
+    console.log("✅ Player profile:", result);
+
+    if (result.length !== 11) {
+      throw new Error(`Beklenmeyen sonuç uzunluğu: ${result.length}`);
+    }
+
     profileState.balance = result[0];
     profileState.circleMinerEnabled = result[1];
     profileState.luckyFlipEnabled = result[2];
@@ -357,15 +385,13 @@ async function fetchPlayerProfile() {
     profileState.clickLevel = result[9];
     profileState.pendingRewards = result[10];
     profileState.lastUpdated = Date.now();
-    
-    // Update UI Elements
+
+    // --- UI güncelleme ---
     const formattedBalance = parseFloat(ethers.formatEther(profileState.balance)).toFixed(2);
     playerBalanceEl.textContent = Number(formattedBalance).toLocaleString();
 
-    // Vault balance — visible to everyone as a transparency signal
     vaultBalanceValEl.textContent = `${Number(parseFloat(ethers.formatEther(profileState.vaultBalance)).toFixed(2)).toLocaleString()} CPLAY`;
 
-    // Username
     if (profileState.username && profileState.username.length > 0) {
       usernameDisplay.textContent = profileState.username;
       usernameInput.placeholder = "Change username";
@@ -376,17 +402,11 @@ async function fetchPlayerProfile() {
     usernameInput.value = "";
     btnSetUsername.disabled = true;
 
-    // Total winnings
     totalWinningsValEl.textContent = `${Number(parseFloat(ethers.formatEther(profileState.totalWinnings)).toFixed(2)).toLocaleString()} CPLAY`;
 
-    // Enable betting buttons if user has enough balance and Lucky Flip is live
     btnRoll.disabled = !profileState.luckyFlipEnabled || profileState.balance < ethers.parseEther("10");
 
-    // Circle Miner UI
     if (profileState.circleMinerEnabled) {
-      // Faucet stays disabled ("Coming Soon") for now — not wired to a live
-      // contract call yet, left as static UI on purpose.
-
       clickLevelLbl.textContent = profileState.clickLevel.toString();
       minerLevelLbl.textContent = profileState.minerLevel.toString();
 
@@ -404,7 +424,9 @@ async function fetchPlayerProfile() {
 
   } catch (error) {
     console.error("Error reading profile stats:", error);
-    flipStatusMsg.textContent = "Contract read failed. Check if address is correct.";
+    if (typeof flipStatusMsg !== "undefined") {
+      flipStatusMsg.textContent = "Contract read failed. Check if address is correct.";
+    }
   }
 }
 
@@ -558,7 +580,7 @@ btnSetUsername.addEventListener('click', async () => {
     updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
     usernameInput.value = "";
     await fetchPlayerProfile();
-    await loadLeaderboard();
+    // await loadLeaderboard(); // geçici olarak kapalı
   } catch (error) {
     console.error("Set username error:", error);
     updateTransactionLog(logRow, "failed", error.reason || "Rejected");
@@ -741,7 +763,7 @@ btnRoll.addEventListener('click', async () => {
       }
       
       await fetchPlayerProfile();
-      await loadLeaderboard();
+      // await loadLeaderboard(); // geçici olarak kapalı
     }, 3200);
     
   } catch (error) {
