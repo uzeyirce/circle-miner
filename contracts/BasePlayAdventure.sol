@@ -27,7 +27,7 @@ contract BasePlayAdventure is Ownable {
     ICPlayVault public immutable vault;
 
     // ---- Feature flags ----
-    bool public constant CIRCLE_MINER_ENABLED = false; // Phase 1: disabled
+    bool public constant CIRCLE_MINER_ENABLED = true; // Phase 2: live
     bool public constant LUCKY_FLIP_ENABLED = true;
 
     // ---- Protocol fee split: 10% owner / 90% vault ----
@@ -134,25 +134,108 @@ contract BasePlayAdventure is Ownable {
     }
 
     // ==========================================================================
-    // CIRCLE MINER — Phase 1: disabled. Calls revert with a clear message.
-    // Left implemented (not deleted) so Phase 2 just flips a flag + redeploy,
-    // no data model rework needed.
+    // CIRCLE MINER — Phase 2: live. Shares the SAME Vault as Lucky Flip —
+    // upgrade spending feeds the Vault (10% owner / 90% Vault, same split as
+    // Lucky Flip bets), mining rewards are paid OUT of the Vault, capped by
+    // whatever balance is actually available (never mints, never locks up).
     // ==========================================================================
 
+    function getUpgradeCost(uint256 currentLevel) public pure returns (uint256) {
+        return (currentLevel + 1) * 100 * 10**18;
+    }
+
+    function getClickUpgradeCost(uint256 currentLevel) public pure returns (uint256) {
+        return (currentLevel + 1) * 50 * 10**18;
+    }
+
+    /**
+     * @dev One-time welcome grant, paid from the Vault. Same Vault Lucky Flip uses.
+     */
     function claimFaucet() external pure {
-        revert("Circle Miner is not live yet - Lucky Flip only in this phase");
+        revert("Faucet is not live yet - use Circle Miner or Lucky Flip to earn CPLAY");
     }
 
-    function buyMinerUpgrade() external pure {
-        revert("Circle Miner is not live yet - Lucky Flip only in this phase");
+    /**
+     * @dev Buy a passive mining rig level. Cost is split 10% owner / 90% Vault.
+     */
+    function buyMinerUpgrade() external {
+        require(CIRCLE_MINER_ENABLED, "Circle Miner is not currently active");
+        uint256 currentLevel = minerStates[msg.sender].level;
+        uint256 cost = getUpgradeCost(currentLevel);
+        require(cplayToken.balanceOf(msg.sender) >= cost, "Insufficient CPLAY balance for upgrade");
+        require(cplayToken.allowance(msg.sender, address(this)) >= cost, "Approve CPLAY spend first");
+
+        _claimMiningInternal(msg.sender);
+
+        (uint256 devFee, uint256 vaultShare) = _splitToOwnerAndVault(cost);
+
+        minerStates[msg.sender].level += 1;
+        minerStates[msg.sender].lastClaimTime = block.timestamp;
+
+        emit MinerUpgraded(msg.sender, minerStates[msg.sender].level, cost, devFee, vaultShare);
     }
 
-    function buyClickUpgrade() external pure {
-        revert("Circle Miner is not live yet - Lucky Flip only in this phase");
+    /**
+     * @dev Buy a click-power level — genuinely boosts mining reward by +10%
+     * per level (not just cosmetic).
+     */
+    function buyClickUpgrade() external {
+        require(CIRCLE_MINER_ENABLED, "Circle Miner is not currently active");
+        uint256 currentLevel = clickLevels[msg.sender];
+        uint256 cost = getClickUpgradeCost(currentLevel);
+        require(cplayToken.balanceOf(msg.sender) >= cost, "Insufficient CPLAY balance for upgrade");
+        require(cplayToken.allowance(msg.sender, address(this)) >= cost, "Approve CPLAY spend first");
+
+        (uint256 devFee, uint256 vaultShare) = _splitToOwnerAndVault(cost);
+
+        clickLevels[msg.sender] += 1;
+
+        emit ClickUpgraded(msg.sender, clickLevels[msg.sender], cost, devFee, vaultShare);
     }
 
-    function claimMining() external pure {
-        revert("Circle Miner is not live yet - Lucky Flip only in this phase");
+    function claimMining() external {
+        require(CIRCLE_MINER_ENABLED, "Circle Miner is not currently active");
+        _claimMiningInternal(msg.sender);
+    }
+
+    /**
+     * @dev Pays from the Vault, capped by whatever the Vault currently holds
+     * rather than reverting — mining gracefully slows down instead of
+     * locking up if the Vault runs low.
+     */
+    function _claimMiningInternal(address player) internal {
+        MinerState storage state = minerStates[player];
+        if (state.level == 0) {
+            state.lastClaimTime = block.timestamp;
+            return;
+        }
+
+        uint256 timeElapsed = block.timestamp - state.lastClaimTime;
+        if (timeElapsed == 0) return;
+
+        uint256 baseReward = timeElapsed * state.level * BASE_MINING_RATE;
+        uint256 clickBonus = (baseReward * clickLevels[player] * 10) / 100; // +10% per click level
+        uint256 reward = baseReward + clickBonus;
+
+        state.lastClaimTime = block.timestamp;
+        if (reward == 0) return;
+
+        uint256 vaultBal = vault.vaultBalance();
+        uint256 payoutAmount = reward > vaultBal ? vaultBal : reward;
+
+        if (payoutAmount > 0) {
+            vault.payout(player, payoutAmount);
+            emit MiningClaimed(player, payoutAmount);
+        }
+    }
+
+    function pendingMiningRewards(address player) public view returns (uint256) {
+        MinerState memory state = minerStates[player];
+        if (state.level == 0 || state.lastClaimTime == 0) return 0;
+        uint256 timeElapsed = block.timestamp - state.lastClaimTime;
+        uint256 baseReward = timeElapsed * state.level * BASE_MINING_RATE;
+        uint256 clickBonus = (baseReward * clickLevels[player] * 10) / 100;
+        return baseReward + clickBonus;
     }
 
     // ==========================================================================
@@ -166,7 +249,11 @@ contract BasePlayAdventure is Ownable {
         uint256 allowanceGiven,
         uint256 vaultBalanceNow,
         string memory username,
-        uint256 playerTotalWinnings
+        uint256 playerTotalWinnings,
+        bool faucetClaimed,
+        uint256 minerLevel,
+        uint256 clickLevel,
+        uint256 pendingRewards
     ) {
         balance = cplayToken.balanceOf(player);
         circleMinerEnabled = CIRCLE_MINER_ENABLED;
@@ -175,5 +262,9 @@ contract BasePlayAdventure is Ownable {
         vaultBalanceNow = vault.vaultBalance();
         username = usernames[player];
         playerTotalWinnings = totalWinnings[player];
+        faucetClaimed = hasClaimedFaucet[player];
+        minerLevel = minerStates[player].level;
+        clickLevel = clickLevels[player];
+        pendingRewards = pendingMiningRewards(player);
     }
 }
