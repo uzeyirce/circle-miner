@@ -1,303 +1,208 @@
-/**
- * Arc Cyber Miner & Lucky Flip
- * Web3 Client Logic using Ethers.js v6
- */
+/** Arc Cyber Miner & Lucky Flip — fixed app.js (Ethers v6) */
+(() => {
+'use strict';
 
-// Application State
-let provider = null;
-let signer = null;
-let contract = null;
-let walletAddress = null;
-let currentChainId = null;
-let localClicks = 0;
-let pendingClaimLocal = 0.0;
-let miningUpdateInterval = null;
+const ARC_CHAIN_ID = 5042n;
+const HARDHAT_CHAIN_ID = 31337n;
+const ARC_CHAIN_HEX = '0x13B3'; // DÜZELTİLDİ (büyük harf)
 
-// Game Profile State from On-chain
-let profileState = {
-  balance: 0n,
-  circleMinerEnabled: true,
-  luckyFlipEnabled: true,
-  allowance: 0n,
-  vaultBalance: 0n,
-  username: "",
-  totalWinnings: 0n,
-  faucetClaimed: false,
-  minerLevel: 0n,
-  clickLevel: 0n,
-  pendingRewards: 0n,
-  lastUpdated: 0
+const GAME_ADDRESS = {
+  '5042': '0xd67d5a4559d07e8154E0B0dd2DB72597f727e748',
+  '31337': '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+};
+const CPLAY_ADDRESS = {
+  '5042': '0x8613155fF713c13F6C177275Af9bF195e69dEd34',
+  '31337': '0x5FbDB2315678afecb367f032d93F642f64180aa3'
 };
 
-// Default deployed addresses for ease of use
-// GAME contract — the contract with faucet/mining/coinflip logic (this repo's contract)
-const DEFAULT_CONTRACTS = {
-  "5042": "0xd67d5a4559d07e8154E0B0dd2DB72597f727e748", // Arc Mainnet — game engine contract (Circle Miner + Lucky Flip, Vault-backed)
-  "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"  // Hardhat Localhost default
-};
-
-// TOKEN contract — the EXTERNAL $CPLAY ERC20 token (deployed separately, already live on Arc Mainnet)
-const CPLAY_TOKEN_ADDRESS = {
-  "5042": "0x8613155fF713c13F6C177275Af9bF195e69dEd34",
-  "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-};
-
-// Minimal standard ERC20 ABI — enough to read balance/allowance and approve spending.
-const ERC20_ABI = [
-  "function balanceOf(address account) view returns (uint256)",
-  "function allowance(address owner, address spender) view returns (uint256)",
-  "function approve(address spender, uint256 amount) returns (bool)",
-  "function decimals() view returns (uint8)",
-  "function symbol() view returns (string)"
+// GAME_ABI — artifacts.js ile çakışmayı önler
+const GAME_ABI = [
+  'function getPlayerProfile(address) view returns (uint256,bool,bool,uint256,uint256,string,uint256,bool,uint256,uint256,uint256)',
+  'function getClickUpgradeCost(uint256) view returns (uint256)',
+  'function getUpgradeCost(uint256) view returns (uint256)',
+  'function buyClickUpgrade()',
+  'function buyMinerUpgrade()',
+  'function claimMining()',
+  'function setUsername(string)',
+  'function coinFlip(bool,uint256)',
+  'function totalWinnings(address) view returns (uint256)',
+  'function usernames(address) view returns (string)',
+  'event CoinFlipResult(address indexed player,uint256 bet,bool won,uint256 payout)'
 ];
 
-let tokenContract = null; // set alongside `contract` once connected
+const ERC20_ABI = [
+  'function balanceOf(address) view returns (uint256)',
+  'function allowance(address,address) view returns (uint256)',
+  'function approve(address,uint256) returns (bool)',
+  'function decimals() view returns (uint8)',
+  'function symbol() view returns (string)'
+];
 
-// Get active contract address from LocalStorage or default to Arc Testnet
-function getContractAddress(chainId) {
-  const chainStr = String(chainId);
-  localStorage.removeItem(`base_cyber_contract_${chainStr}`);
-  return DEFAULT_CONTRACTS[chainStr] || DEFAULT_CONTRACTS["5042"];
+let provider = null, signer = null, contract = null, tokenContract = null;
+let walletAddress = null, currentChainId = null;
+let localClicks = 0, pendingClaimLocal = 0, miningUpdateInterval = null;
+let transactionsCount = 0, betChoice = 'heads', connecting = false;
+
+const profileState = {
+  balance: 0n, circleMinerEnabled: true, luckyFlipEnabled: true,
+  allowance: 0n, vaultBalance: 0n, username: '', totalWinnings: 0n,
+  faucetClaimed: false, minerLevel: 0n, clickLevel: 0n,
+  pendingRewards: 0n, lastUpdated: 0
+};
+
+const $ = id => document.getElementById(id);
+const el = {
+  connect: $('btn-connect'), disconnect: $('btn-disconnect'), token: $('token-display'),
+  balance: $('player-balance'), warning: $('network-warning'), switch: $('btn-switch-network'),
+  address: $('wallet-address-abbr'), username: $('username-display'), vault: $('vault-balance-val'),
+  winnings: $('total-winnings-val'), usernameInput: $('username-input'), setUsername: $('btn-set-username'),
+  leaderboard: $('leaderboard-tbody'), clickCrystal: $('click-crystal'), localClicks: $('local-clicks'),
+  pending: $('mining-pending'), claim: $('btn-claim-mining'), clickLevel: $('click-level-lbl'),
+  clickCost: $('click-upgrade-cost'), upgradeClick: $('btn-upgrade-click'), minerLevel: $('miner-level-lbl'),
+  minerCost: $('miner-upgrade-cost'), upgradeMiner: $('btn-upgrade-miner'), coin: $('coin-visual'),
+  heads: $('btn-bet-heads'), tails: $('btn-bet-tails'), bet: $('bet-amount'), max: $('btn-bet-max'),
+  roll: $('btn-roll'), status: $('flip-status-msg'), txBody: $('tx-tbody'), txCount: $('tx-count'),
+  emptyTx: $('tx-empty-row'), canvas: $('bg-canvas')
+};
+
+function disableGame() {
+  [el.claim, el.upgradeClick, el.upgradeMiner, el.roll, el.setUsername].forEach(x => { if (x) x.disabled = true; });
 }
+function errMsg(e) { return e?.reason || e?.shortMessage || e?.info?.error?.message || e?.error?.message || e?.message || 'Unknown error'; }
+function fmt(v, d = 2) { try { return Number(parseFloat(ethers.formatEther(v)).toFixed(d)).toLocaleString(); } catch { return '0'; } }
+function gameAddress() { return GAME_ADDRESS[String(currentChainId)]; }
+function tokenAddress() { return CPLAY_ADDRESS[String(currentChainId)]; }
+function txLink(hash) { return `https://arc.exploreme.pro/tx/${hash}`; }
 
-function saveContractAddress(chainId, address) {
-  localStorage.setItem(`base_cyber_contract_${String(chainId)}`, address);
-}
-
-// Page Elements
-const btnConnect = document.getElementById('btn-connect');
-const btnDisconnect = document.getElementById('btn-disconnect');
-const tokenDisplay = document.getElementById('token-display');
-const playerBalanceEl = document.getElementById('player-balance');
-const networkWarning = document.getElementById('network-warning');
-const btnSwitchNetwork = document.getElementById('btn-switch-network');
-const walletAddressAbbr = document.getElementById('wallet-address-abbr');
-const usernameDisplay = document.getElementById('username-display');
-const vaultBalanceValEl = document.getElementById('vault-balance-val');
-const totalWinningsValEl = document.getElementById('total-winnings-val');
-const usernameInput = document.getElementById('username-input');
-const btnSetUsername = document.getElementById('btn-set-username');
-const leaderboardTbody = document.getElementById('leaderboard-tbody');
-const btnFaucet = document.getElementById('btn-faucet');
-
-// Miner Elements
-const clickCrystal = document.getElementById('click-crystal');
-const localClicksEl = document.getElementById('local-clicks');
-const miningPendingEl = document.getElementById('mining-pending');
-const btnClaimMining = document.getElementById('btn-claim-mining');
-const clickLevelLbl = document.getElementById('click-level-lbl');
-const clickUpgradeCost = document.getElementById('click-upgrade-cost');
-const btnUpgradeClick = document.getElementById('btn-upgrade-click');
-const minerLevelLbl = document.getElementById('miner-level-lbl');
-const minerUpgradeCost = document.getElementById('miner-upgrade-cost');
-const btnUpgradeMiner = document.getElementById('btn-upgrade-miner');
-
-// Flip Elements
-const coinVisual = document.getElementById('coin-visual');
-const btnBetHeads = document.getElementById('btn-bet-heads');
-const btnBetTails = document.getElementById('btn-bet-tails');
-const betAmountInput = document.getElementById('bet-amount');
-const btnBetMax = document.getElementById('btn-bet-max');
-const btnRoll = document.getElementById('btn-roll');
-const flipStatusMsg = document.getElementById('flip-status-msg');
-
-// Tx Log Elements
-const txTbody = document.getElementById('tx-tbody');
-const txCountEl = document.getElementById('tx-count');
-const txEmptyRow = document.getElementById('tx-empty-row');
-
-let transactionsCount = 0;
-let betChoice = "heads"; // default choice
-
-/* ==========================================================================
-   Tab Navigation Logic
-   ========================================================================== */
-const tabButtons = document.querySelectorAll('.nav-tab');
-const tabPanels = document.querySelectorAll('.tab-panel');
-
-tabButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const tabId = button.getAttribute('data-tab');
-    
-    tabButtons.forEach(btn => btn.classList.remove('active'));
-    tabPanels.forEach(panel => panel.classList.remove('active'));
-    
-    button.classList.add('active');
-    document.getElementById(tabId).classList.add('active');
-  });
+// Tabs
+for (const b of document.querySelectorAll('.nav-tab')) b.addEventListener('click', () => {
+  document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('active'));
+  b.classList.add('active'); $(b.dataset.tab)?.classList.add('active');
 });
 
-/* ==========================================================================
-   Ethers.js Smart Contract & Wallet Connections
-   ========================================================================== */
 async function initWeb3() {
-  if (typeof window.ethereum !== 'undefined') {
-    try {
-      provider = new ethers.BrowserProvider(window.ethereum);
-      
-      window.ethereum.on('chainChanged', () => {
-        window.location.reload();
-      });
-      
-      window.ethereum.on('accountsChanged', (accounts) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
-        } else {
-          connectWallet();
-        }
-      });
-      
-      const accounts = await provider.listAccounts();
-      if (accounts.length > 0) {
-        await connectWallet();
-      }
-    } catch (e) {
-      console.error("Failed to initialize provider:", e);
-    }
-  } else {
-    btnConnect.addEventListener('click', () => {
-      alert("Ethereum wallet not detected. Please install Coinbase Wallet or MetaMask.");
-    });
+  if (!window.ethereum) {
+    el.connect?.addEventListener('click', () => alert('No Ethereum wallet detected. Please install MetaMask.'));
+    return;
   }
-}
-
-async function connectWallet() {
   try {
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    walletAddress = accounts[0];
-    
-    signer = await provider.getSigner();
-    const network = await provider.getNetwork();
-    currentChainId = network.chainId;
-    
-    btnConnect.innerHTML = `<i class="fa-solid fa-circle-nodes"></i> Connected: ${walletAddress.substring(0, 6)}...${walletAddress.substring(38)}`;
-    btnConnect.classList.remove('btn-connect');
-    btnConnect.classList.add('btn-outline');
-    btnDisconnect.classList.remove('hidden');
-    
-    walletAddressAbbr.textContent = `${walletAddress.substring(0, 10)}...${walletAddress.substring(34)}`;
-    tokenDisplay.classList.remove('hidden');
-    
-    if (currentChainId === 5042n || currentChainId === 31337n) {
-      networkWarning.classList.add('hidden');
-
-      const contractAddress = getContractAddress(currentChainId);
-      const tokenAddress = CPLAY_TOKEN_ADDRESS[String(currentChainId)];
-
-      contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
-      tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
-      
-      await fetchPlayerProfile();
-      await loadLeaderboard();
-      startPassiveMiningTimer();
-    } else {
-      networkWarning.classList.remove('hidden');
-      disableGameControls();
+    provider = new ethers.BrowserProvider(window.ethereum);
+    if (!window.ethereum.__circleMinerListenersAttached) {
+      window.ethereum.__circleMinerListenersAttached = true;
+      window.ethereum.on('chainChanged', () => location.reload());
+      window.ethereum.on('accountsChanged', async accounts => {
+        if (!accounts?.length) return resetConnection(false);
+        await connectWallet(false);
+      });
     }
-  } catch (error) {
-    console.error("Wallet connection failed:", error);
-  }
+    const accounts = await provider.listAccounts();
+    if (accounts.length) await connectWallet(false);
+  } catch (e) { console.error('Web3 init failed:', e); }
 }
 
-function disconnectWallet() {
-  walletAddress = null;
-  signer = null;
-  contract = null;
-  btnConnect.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect Wallet`;
-  btnConnect.classList.add('btn-connect');
-  btnConnect.classList.remove('btn-outline');
-  btnDisconnect.classList.add('hidden');
-  walletAddressAbbr.textContent = "Not Connected";
-  tokenDisplay.classList.add('hidden');
-  disableGameControls();
-  if (miningUpdateInterval) {
-    clearInterval(miningUpdateInterval);
-  }
+async function connectWallet(request = true) {
+  if (connecting) return; connecting = true;
+  try {
+    if (!provider) provider = new ethers.BrowserProvider(window.ethereum);
+    const accounts = await window.ethereum.request({ method: request ? 'eth_requestAccounts' : 'eth_accounts' });
+    if (!accounts?.length) return resetConnection(false);
+    walletAddress = ethers.getAddress(accounts[0]);
+    signer = await provider.getSigner();
+    currentChainId = (await provider.getNetwork()).chainId;
 
-  if (window.ethereum && window.ethereum.request) {
-    window.ethereum.request({
-      method: 'wallet_revokePermissions',
-      params: [{ eth_accounts: {} }],
-    }).catch(() => {});
-  }
+    el.connect.innerHTML = `<i class="fa-solid fa-circle-nodes"></i> Connected: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
+    el.connect.classList.remove('btn-connect'); el.connect.classList.add('btn-outline');
+    el.disconnect?.classList.remove('hidden'); el.token?.classList.remove('hidden');
+    if (el.address) el.address.textContent = `${walletAddress.slice(0, 10)}...${walletAddress.slice(-8)}`;
+
+    if (currentChainId !== ARC_CHAIN_ID && currentChainId !== HARDHAT_CHAIN_ID) {
+      el.warning?.classList.remove('hidden'); disableGame(); return;
+    }
+    el.warning?.classList.add('hidden');
+
+    contract = new ethers.Contract(gameAddress(), GAME_ABI, signer);
+    tokenContract = new ethers.Contract(tokenAddress(), ERC20_ABI, signer);
+
+    console.log('Wallet:', walletAddress);
+    console.log('Chain:', currentChainId.toString());
+    console.log('Game contract:', await contract.getAddress());
+    console.log('CPLAY contract:', await tokenContract.getAddress());
+
+    const code = await provider.getCode(gameAddress());
+    if (code === '0x') throw new Error(`No contract bytecode at ${gameAddress()}`);
+
+    await fetchPlayerProfile();
+    await loadLeaderboard();  // Leaderboard aktif
+    startPassiveMiningTimer();
+  } catch (e) {
+    console.error('Wallet connection failed:', e);
+    if (el.status) el.status.textContent = `Contract read failed: ${errMsg(e)}`;
+  } finally { connecting = false; }
 }
 
-btnDisconnect.addEventListener('click', disconnectWallet);
-
-function disableGameControls() {
-  btnClaimMining.disabled = true;
-  btnUpgradeClick.disabled = true;
-  btnUpgradeMiner.disabled = true;
-  btnRoll.disabled = true;
-  btnSetUsername.disabled = true;
+function resetConnection(revoke = false) {
+  walletAddress = null; signer = null; contract = null; tokenContract = null; currentChainId = null;
+  if (miningUpdateInterval) clearInterval(miningUpdateInterval); miningUpdateInterval = null;
+  if (el.connect) { el.connect.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; el.connect.classList.add('btn-connect'); el.connect.classList.remove('btn-outline'); }
+  el.disconnect?.classList.add('hidden'); el.token?.classList.add('hidden');
+  if (el.address) el.address.textContent = 'Not Connected'; disableGame();
+  if (revoke) window.ethereum?.request({ method: 'wallet_revokePermissions', params: [{ eth_accounts: {} }] }).catch(() => {});
 }
+function disconnectWallet() { resetConnection(true); }
+el.connect?.addEventListener('click', () => connectWallet(true));
+el.disconnect?.addEventListener('click', disconnectWallet);
 
 async function switchNetwork() {
-  try {
-    await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x13b2' }],
-    });
-  } catch (switchError) {
-    if (switchError.code === 4902) {
-      try {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: '0x13b2',
-              chainName: 'Arc Mainnet',
-              nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
-              rpcUrls: ['https://arc-mainnet.infura.io/v3/de58e8647ba54873a65e6b8d2d7bade7'],
-              blockExplorerUrls: ['https://arc.exploreme.pro'],
-            },
-          ],
-        });
-      } catch (addError) {
-        console.error("Could not add network:", addError);
-      }
-    }
-    console.error("Failed to switch network:", switchError);
+  try { await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: ARC_CHAIN_HEX }] }); }
+  catch (e) {
+    if (e.code === 4902) await window.ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params: [{
+        chainId: ARC_CHAIN_HEX,
+        chainName: 'Arc Mainnet',
+        nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
+        rpcUrls: ['https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8'],
+        blockExplorerUrls: ['https://arc.exploreme.pro']
+      }]
+    }).catch(x => console.error(x));
+    else console.error('Network switch failed:', e);
   }
 }
+el.switch?.addEventListener('click', switchNetwork);
 
-btnSwitchNetwork.addEventListener('click', switchNetwork);
-btnConnect.addEventListener('click', connectWallet);
-
-/* ==========================================================================
-   Game Operations & UI Sync
-   ========================================================================== */
-
+// ========== LEADERBOARD (chunked to avoid RPC limit) ==========
 async function loadLeaderboard() {
-  const activeContract = contract;
-  if (!activeContract) return;
+  if (!contract) {
+    if (el.leaderboard) el.leaderboard.innerHTML = '<tr><td colspan="3">Contract not ready</td></tr>';
+    return;
+  }
   try {
-    leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">Loading leaderboard…</td></tr>';
-
-    const filter = activeContract.filters.CoinFlipResult();
+    if (el.leaderboard) el.leaderboard.innerHTML = '<tr><td colspan="3">Loading leaderboard…</td></tr>';
+    const filter = contract.filters.CoinFlipResult();
     const CHUNK = 9000;
-    const latestBlock = await activeContract.runner.provider.getBlockNumber();
+    const provider = contract.provider;
+    if (!provider) throw new Error('Provider not available');
+    const latestBlock = await provider.getBlockNumber();
     const events = [];
     let from = 0;
     while (from <= latestBlock) {
-      if (!activeContract) break;
       const to = Math.min(from + CHUNK, latestBlock);
-      const chunkEvents = await activeContract.queryFilter(filter, from, to);
+      const chunkEvents = await contract.queryFilter(filter, from, to);
       events.push(...chunkEvents);
       from = to + 1;
     }
 
     const uniquePlayers = [...new Set(events.map(e => e.args.player))];
-
     if (uniquePlayers.length === 0) {
-      leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">No plays yet — be the first!</td></tr>';
+      if (el.leaderboard) el.leaderboard.innerHTML = '<tr><td colspan="3">No plays yet — be the first!</td></tr>';
       return;
     }
 
     const playerData = await Promise.all(uniquePlayers.map(async (addr) => {
       const [winnings, name] = await Promise.all([
-        activeContract.totalWinnings(addr),
-        activeContract.usernames(addr)
+        contract.totalWinnings(addr),
+        contract.usernames(addr)
       ]);
       return { address: addr, winnings, name };
     }));
@@ -308,517 +213,228 @@ async function loadLeaderboard() {
       .slice(0, 25);
 
     if (ranked.length === 0) {
-      leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">No winners yet — be the first!</td></tr>';
+      if (el.leaderboard) el.leaderboard.innerHTML = '<tr><td colspan="3">No winners yet — be the first!</td></tr>';
       return;
     }
 
-    leaderboardTbody.innerHTML = ranked.map((p, i) => {
-      const displayName = p.name && p.name.length > 0
-        ? p.name
-        : `${p.address.slice(0, 6)}...${p.address.slice(-4)}`;
-      const winningsFormatted = Number(parseFloat(ethers.formatEther(p.winnings)).toFixed(2)).toLocaleString();
-      return `<tr>
-        <td>${i + 1}</td>
-        <td class="monospace">${displayName}</td>
-        <td>${winningsFormatted} CPLAY</td>
-      </tr>`;
-    }).join('');
+    if (el.leaderboard) {
+      el.leaderboard.innerHTML = ranked.map((p, i) => {
+        const displayName = p.name && p.name.length > 0 ? p.name : `${p.address.slice(0, 6)}...${p.address.slice(-4)}`;
+        const winningsFormatted = Number(parseFloat(ethers.formatEther(p.winnings)).toFixed(2)).toLocaleString();
+        return `<tr><td>${i + 1}</td><td class="monospace">${displayName}</td><td>${winningsFormatted} CPLAY</td></tr>`;
+      }).join('');
+    }
   } catch (error) {
-    console.error("Leaderboard load error:", error);
-    leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">Could not load leaderboard.</td></tr>';
+    console.error('Leaderboard load error:', error);
+    if (el.leaderboard) el.leaderboard.innerHTML = `<tr><td colspan="3">Error loading: ${errMsg(error)}</td></tr>`;
   }
 }
 
+// ========== PROFILE (manual eth_call to avoid RangeError) ==========
 async function fetchPlayerProfile() {
-  if (!contract || !walletAddress) return;
-
+  if (!contract || !walletAddress) return false;
   try {
-    // Manuel eth_call ile getPlayerProfile sorgusu
-    const abi = [
+    const iface = new ethers.Interface([
       "function getPlayerProfile(address) view returns (uint256,bool,bool,uint256,uint256,string,uint256,bool,uint256,uint256,uint256)"
-    ];
-    const iface = new ethers.Interface(abi);
-    const callData = iface.encodeFunctionData("getPlayerProfile", [walletAddress]);
-
-    const rawResult = await window.ethereum.request({
+    ]);
+    const data = iface.encodeFunctionData("getPlayerProfile", [walletAddress]);
+    const raw = await window.ethereum.request({
       method: "eth_call",
-      params: [{
-        to: contract.target,
-        data: callData
-      }, "latest"]
+      params: [{ to: await contract.getAddress(), data }, "latest"]
     });
-
-    const decoded = iface.decodeFunctionResult("getPlayerProfile", rawResult);
+    const decoded = iface.decodeFunctionResult("getPlayerProfile", raw);
     const result = Array.from(decoded);
 
-    console.log("✅ Player profile result:", result);
+    if (!result || result.length < 11) throw new Error(`Unexpected profile result length: ${result?.length ?? 0}`);
 
-    if (result.length !== 11) {
-      throw new Error(`Unexpected result length: ${result.length}`);
-    }
-
-    profileState.balance = result[0];
-    profileState.circleMinerEnabled = result[1];
-    profileState.luckyFlipEnabled = result[2];
-    profileState.allowance = result[3];
-    profileState.vaultBalance = result[4];
-    profileState.username = result[5];
-    profileState.totalWinnings = result[6];
-    profileState.faucetClaimed = result[7];
-    profileState.minerLevel = result[8];
-    profileState.clickLevel = result[9];
-    profileState.pendingRewards = result[10];
+    [
+      profileState.balance,
+      profileState.circleMinerEnabled,
+      profileState.luckyFlipEnabled,
+      profileState.allowance,
+      profileState.vaultBalance,
+      profileState.username,
+      profileState.totalWinnings,
+      profileState.faucetClaimed,
+      profileState.minerLevel,
+      profileState.clickLevel,
+      profileState.pendingRewards
+    ] = result;
     profileState.lastUpdated = Date.now();
 
-    // Update UI Elements
-    const formattedBalance = parseFloat(ethers.formatEther(profileState.balance)).toFixed(2);
-    playerBalanceEl.textContent = Number(formattedBalance).toLocaleString();
-
-    vaultBalanceValEl.textContent = `${Number(parseFloat(ethers.formatEther(profileState.vaultBalance)).toFixed(2)).toLocaleString()} CPLAY`;
-
-    if (profileState.username && profileState.username.length > 0) {
-      usernameDisplay.textContent = profileState.username;
-      usernameInput.placeholder = "Change username";
-    } else {
-      usernameDisplay.textContent = "— not set —";
-      usernameInput.placeholder = "Set a username";
-    }
-    usernameInput.value = "";
-    btnSetUsername.disabled = true;
-
-    totalWinningsValEl.textContent = `${Number(parseFloat(ethers.formatEther(profileState.totalWinnings)).toFixed(2)).toLocaleString()} CPLAY`;
-
-    btnRoll.disabled = !profileState.luckyFlipEnabled || profileState.balance < ethers.parseEther("10");
+    // UI updates
+    if (el.balance) el.balance.textContent = fmt(profileState.balance);
+    if (el.vault) el.vault.textContent = `${fmt(profileState.vaultBalance)} CPLAY`;
+    if (el.winnings) el.winnings.textContent = `${fmt(profileState.totalWinnings)} CPLAY`;
+    if (el.username) el.username.textContent = profileState.username || '— not set —';
+    if (el.usernameInput) { el.usernameInput.placeholder = profileState.username ? 'Change username' : 'Set a username'; el.usernameInput.value = ''; }
+    if (el.setUsername) el.setUsername.disabled = true;
+    if (el.roll) el.roll.disabled = !profileState.luckyFlipEnabled || profileState.balance < ethers.parseEther('10');
 
     if (profileState.circleMinerEnabled) {
-      clickLevelLbl.textContent = profileState.clickLevel.toString();
-      minerLevelLbl.textContent = profileState.minerLevel.toString();
-
-      const clickCost = await contract.getClickUpgradeCost(profileState.clickLevel);
-      clickUpgradeCost.textContent = parseFloat(ethers.formatEther(clickCost)).toFixed(0);
-      btnUpgradeClick.disabled = profileState.balance < clickCost;
-
-      const minerCost = await contract.getUpgradeCost(profileState.minerLevel);
-      minerUpgradeCost.textContent = parseFloat(ethers.formatEther(minerCost)).toFixed(0);
-      btnUpgradeMiner.disabled = profileState.balance < minerCost;
-
-      pendingClaimLocal = parseFloat(ethers.formatEther(profileState.pendingRewards));
-      updateMiningDisplay();
-    }
-
-  } catch (error) {
-    console.error("Error reading profile stats:", error);
-    if (typeof flipStatusMsg !== "undefined") {
-      flipStatusMsg.textContent = "Contract read failed. Check if address is correct.";
-    }
-  }
-}
-
-function startPassiveMiningTimer() {
-  if (miningUpdateInterval) {
-    clearInterval(miningUpdateInterval);
-  }
-  
-  miningUpdateInterval = setInterval(() => {
-    if (profileState.minerLevel > 0n) {
-      const baseRatePerSec = 0.001 * Number(profileState.minerLevel);
-      const ratePerSec = baseRatePerSec * (1 + Number(profileState.clickLevel) * 0.1);
-      pendingClaimLocal += ratePerSec * 0.1;
-      updateMiningDisplay();
-    }
-  }, 100);
-}
-
-function updateMiningDisplay() {
-  miningPendingEl.textContent = pendingClaimLocal.toFixed(4);
-  btnClaimMining.disabled = pendingClaimLocal <= 0;
-}
-
-function formatTime(sec) {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${m}:${s < 10 ? '0' : ''}${s}`;
-}
-
-/* ==========================================================================
-   Clicker Energy Mining
-   ========================================================================== */
-clickCrystal.addEventListener('click', (e) => {
-  const mult = 1 + Number(profileState.clickLevel);
-  localClicks += 1;
-  localClicksEl.textContent = localClicks;
-  updateMiningDisplay();
-  createClickParticle(e);
-});
-
-function createClickParticle(e) {
-  const rect = clickCrystal.getBoundingClientRect();
-  const x = e.clientX || (rect.left + rect.width / 2);
-  const y = e.clientY || (rect.top + rect.height / 2);
-  
-  const floating = document.createElement('div');
-  floating.className = 'floating-click-val';
-  floating.style.left = `${x}px`;
-  floating.style.top = `${y}px`;
-  
-  const mult = 1 + Number(profileState.clickLevel);
-  floating.textContent = `+${mult}`;
-  
-  document.body.appendChild(floating);
-  
-  setTimeout(() => {
-    floating.remove();
-  }, 800);
-}
-
-/* ==========================================================================
-   On-chain Blockchain Transactions
-   ========================================================================== */
-
-function logTransaction(actionName, txHash, status) {
-  txEmptyRow.classList.add('hidden');
-  transactionsCount++;
-  txCountEl.textContent = `${transactionsCount} Transaction${transactionsCount > 1 ? 's' : ''}`;
-  
-  const tr = document.createElement('tr');
-  const now = new Date();
-  const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-  
-  let statusBadge = '';
-  if (status === 'pending') {
-    statusBadge = '<span class="tx-status-badge pending"><i class="fa-solid fa-spinner fa-spin"></i> Pending</span>';
-  } else if (status === 'success') {
-    statusBadge = '<span class="tx-status-badge success"><i class="fa-solid fa-circle-check"></i> Success</span>';
-  } else {
-    statusBadge = '<span class="tx-status-badge failed"><i class="fa-solid fa-circle-xmark"></i> Failed</span>';
-  }
-  
-  const explorerUrl = currentChainId === 5042n 
-    ? `https://arc.exploreme.pro/tx/${txHash}` 
-    : `#`;
-    
-  const txLink = txHash !== 'N/A' 
-    ? `<a href="${explorerUrl}" target="_blank" class="monospace text-glow-blue">${txHash.substring(0, 10)}...</a>`
-    : '<span class="text-muted">N/A</span>';
-    
-  tr.innerHTML = `
-    <td>${timeStr}</td>
-    <td class="font-weight-bold">${actionName}</td>
-    <td>${statusBadge}</td>
-    <td>Gas estimate processing...</td>
-    <td>${txLink}</td>
-  `;
-  
-  txTbody.insertBefore(tr, txTbody.firstChild);
-  
-  return tr;
-}
-
-function updateTransactionLog(row, status, gasDetails) {
-  const statusTd = row.cells[2];
-  const gasTd = row.cells[3];
-  
-  if (status === 'success') {
-    statusTd.innerHTML = '<span class="tx-status-badge success"><i class="fa-solid fa-circle-check"></i> Success</span>';
-  } else {
-    statusTd.innerHTML = '<span class="tx-status-badge failed"><i class="fa-solid fa-circle-xmark"></i> Failed</span>';
-  }
-  gasTd.textContent = gasDetails || 'N/A';
-}
-
-// 1. Set Username
-usernameInput.addEventListener('input', () => {
-  btnSetUsername.disabled = !contract || usernameInput.value.trim().length === 0;
-});
-
-btnSetUsername.addEventListener('click', async () => {
-  if (!contract) return;
-  const name = usernameInput.value.trim();
-  if (!name || name.length > 20) {
-    alert("Username must be 1-20 characters.");
-    return;
-  }
-
-  btnSetUsername.disabled = true;
-  const logRow = logTransaction("Set Username", "N/A", "pending");
-
-  try {
-    const tx = await contract.setUsername(name);
-    logRow.cells[4].innerHTML = `<a href="https://arc.exploreme.pro/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-
-    const receipt = await tx.wait();
-    updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
-    usernameInput.value = "";
-    await fetchPlayerProfile();
-    await loadLeaderboard();
-  } catch (error) {
-    console.error("Set username error:", error);
-    updateTransactionLog(logRow, "failed", error.reason || "Rejected");
-    btnSetUsername.disabled = false;
-  }
-});
-
-// 2. Buy Click Upgrade
-btnUpgradeClick.addEventListener('click', async () => {
-  if (!contract) return;
-  btnUpgradeClick.disabled = true;
-
-  try {
-    const cost = await contract.getClickUpgradeCost(profileState.clickLevel);
-    const approved = await ensureApproval(cost);
-    if (!approved) { btnUpgradeClick.disabled = false; return; }
-
-    const logRow = logTransaction("Upgrade Super-Click Mult", "N/A", "pending");
-    const tx = await contract.buyClickUpgrade();
-    logRow.cells[4].innerHTML = `<a href="https://arc.exploreme.pro/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-    
-    const receipt = await tx.wait();
-    updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
-    await fetchPlayerProfile();
-  } catch (error) {
-    console.error("Upgrade click error:", error);
-    btnUpgradeClick.disabled = false;
-  }
-});
-
-// 3. Buy Miner Upgrade
-btnUpgradeMiner.addEventListener('click', async () => {
-  if (!contract) return;
-  btnUpgradeMiner.disabled = true;
-
-  try {
-    const cost = await contract.getUpgradeCost(profileState.minerLevel);
-    const approved = await ensureApproval(cost);
-    if (!approved) { btnUpgradeMiner.disabled = false; return; }
-
-    const logRow = logTransaction("Upgrade Circle Mining Rig", "N/A", "pending");
-    const tx = await contract.buyMinerUpgrade();
-    logRow.cells[4].innerHTML = `<a href="https://arc.exploreme.pro/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-    
-    const receipt = await tx.wait();
-    updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
-    await fetchPlayerProfile();
-  } catch (error) {
-    console.error("Upgrade miner error:", error);
-    btnUpgradeMiner.disabled = false;
-  }
-});
-
-// 4. Claim Mining Rewards
-btnClaimMining.addEventListener('click', async () => {
-  if (!contract) return;
-  btnClaimMining.disabled = true;
-  
-  const logRow = logTransaction("Claim Mining Rewards", "N/A", "pending");
-  
-  try {
-    const tx = await contract.claimMining();
-    logRow.cells[4].innerHTML = `<a href="https://arc.exploreme.pro/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-    
-    const receipt = await tx.wait();
-    updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
-    
-    localClicks = 0;
-    localClicksEl.textContent = 0;
-    
-    await fetchPlayerProfile();
-  } catch (error) {
-    console.error("Claim mining error:", error);
-    updateTransactionLog(logRow, "failed", error.reason || "Rejected");
-    btnClaimMining.disabled = false;
-  }
-});
-
-/* ==========================================================================
-   Lucky Flip Coin Toss
-   ========================================================================== */
-btnBetHeads.addEventListener('click', () => {
-  betChoice = "heads";
-  btnBetHeads.classList.add('active');
-  btnBetTails.classList.remove('active');
-});
-
-btnBetTails.addEventListener('click', () => {
-  betChoice = "tails";
-  btnBetTails.classList.add('active');
-  btnBetHeads.classList.remove('active');
-});
-
-btnBetMax.addEventListener('click', () => {
-  if (profileState.balance > 0n) {
-    const etherVal = parseFloat(ethers.formatEther(profileState.balance));
-    const rounded = Math.floor(etherVal / 10) * 10;
-    betAmountInput.value = Math.max(10, rounded);
-  }
-});
-
-btnRoll.addEventListener('click', async () => {
-  if (!contract) return;
-  
-  const betVal = parseFloat(betAmountInput.value);
-  if (isNaN(betVal) || betVal < 10) {
-    alert("Minimum bet amount is 10 CPLAY");
-    return;
-  }
-  
-  const betWei = ethers.parseEther(betVal.toString());
-  if (profileState.balance < betWei) {
-    alert("Insufficient CPLAY balance to cover bet.");
-    return;
-  }
-  
-  btnRoll.disabled = true;
-
-  const approved = await ensureApproval(betWei);
-  if (!approved) { btnRoll.disabled = false; return; }
-
-  flipStatusMsg.className = "flip-status-message";
-  flipStatusMsg.textContent = "Submitting bet to the blockchain...";
-  
-  coinVisual.classList.add('spin-animation');
-  
-  const isHeadsBet = (betChoice === "heads");
-  const logRow = logTransaction(`Lucky Flip Bet (${betChoice.toUpperCase()})`, "N/A", "pending");
-  
-  try {
-    const tx = await contract.coinFlip(isHeadsBet, betWei);
-    logRow.cells[4].innerHTML = `<a href="https://arc.exploreme.pro/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-    
-    const receipt = await tx.wait();
-    updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
-    
-    let won = false;
-    let payout = 0n;
-    
-    for (const log of receipt.logs) {
+      if (el.clickLevel) el.clickLevel.textContent = profileState.clickLevel.toString();
+      if (el.minerLevel) el.minerLevel.textContent = profileState.minerLevel.toString();
       try {
-        const parsedLog = contract.interface.parseLog(log);
-        if (parsedLog.name === 'CoinFlipResult') {
-          won = parsedLog.args.won;
-          payout = parsedLog.args.payout;
-        }
-      } catch (e) {}
+        const c = await contract.getClickUpgradeCost(profileState.clickLevel);
+        if (el.clickCost) el.clickCost.textContent = ethers.formatEther(c).split('.')[0];
+        if (el.upgradeClick) el.upgradeClick.disabled = profileState.balance < c;
+      } catch (e) { console.error('getClickUpgradeCost:', e); if (el.clickCost) el.clickCost.textContent = '—'; if (el.upgradeClick) el.upgradeClick.disabled = true; }
+      try {
+        const c = await contract.getUpgradeCost(profileState.minerLevel);
+        if (el.minerCost) el.minerCost.textContent = ethers.formatEther(c).split('.')[0];
+        if (el.upgradeMiner) el.upgradeMiner.disabled = profileState.balance < c;
+      } catch (e) { console.error('getUpgradeCost:', e); if (el.minerCost) el.minerCost.textContent = '—'; if (el.upgradeMiner) el.upgradeMiner.disabled = true; }
+      pendingClaimLocal = Number(ethers.formatEther(profileState.pendingRewards));
+      updateMiningDisplay();
     }
-    
-    const landedHeads = (isHeadsBet && won) || (!isHeadsBet && !won);
-    const spinTarget = landedHeads ? '1800deg' : '1980deg';
-    coinVisual.style.setProperty('--coin-spin-target', spinTarget);
-    
-    setTimeout(async () => {
-      coinVisual.classList.remove('spin-animation');
-      
-      if (won) {
-        flipStatusMsg.className = "flip-status-message won";
-        flipStatusMsg.innerHTML = `<i class="fa-solid fa-trophy"></i> YOU WON! Received ${ethers.formatEther(payout)} $CPLAY!`;
-      } else {
-        flipStatusMsg.className = "flip-status-message lost";
-        flipStatusMsg.innerHTML = `<i class="fa-solid fa-face-frown"></i> YOU LOST! Better luck next roll.`;
-      }
-      
-      await fetchPlayerProfile();
-      await loadLeaderboard();
-      btnRoll.disabled = false;
-    }, 3200);
-    
-  } catch (error) {
-    console.error("Coin flip transaction error:", error);
-    coinVisual.classList.remove('spin-animation');
-    updateTransactionLog(logRow, "failed", error.reason || "Rejected");
-    flipStatusMsg.textContent = "Transaction failed or rejected.";
-    btnRoll.disabled = false;
-  }
-});
-
-/* ==========================================================================
-   ERC20 Approval Helper
-   ========================================================================== */
-async function ensureApproval(requiredAmount) {
-  if (!tokenContract || !contract) return false;
-
-  const contractAddress = await contract.getAddress();
-  const currentAllowance = await tokenContract.allowance(walletAddress, contractAddress);
-
-  if (currentAllowance >= requiredAmount) return true;
-
-  const logRow = logTransaction("Approve $CPLAY Spend", "N/A", "pending");
-  try {
-    const tx = await tokenContract.approve(contractAddress, ethers.MaxUint256);
-    logRow.cells[4].innerHTML = `<a href="https://arc.exploreme.pro/tx/${tx.hash}" target="_blank" class="monospace text-glow-blue">${tx.hash.substring(0, 10)}...</a>`;
-    const receipt = await tx.wait();
-    updateTransactionLog(logRow, "success", `Gas used: ${receipt.gasUsed.toString()}`);
+    console.log('Player profile:', profileState);
     return true;
-  } catch (error) {
-    console.error("Approval failed:", error);
-    updateTransactionLog(logRow, "failed", error.reason || "Rejected");
+  } catch (e) {
+    console.error('Contract read failed:', e);
+    if (el.status) el.status.textContent = `Contract read failed: ${errMsg(e)}`;
+    disableGame();
     return false;
   }
 }
 
-/* ==========================================================================
-   Premium Particle Space Background
-   ========================================================================== */
-const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
-let particles = [];
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+function startPassiveMiningTimer() {
+  if (miningUpdateInterval) clearInterval(miningUpdateInterval);
+  miningUpdateInterval = setInterval(() => {
+    if (!contract || profileState.minerLevel <= 0n) return;
+    const rate = (0.001 * Number(profileState.minerLevel)) * (1 + Number(profileState.clickLevel) * 0.1);
+    pendingClaimLocal += rate * 0.1;
+    updateMiningDisplay();
+  }, 100);
 }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-class Particle {
-  constructor() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.size = Math.random() * 1.5 + 0.5;
-    this.speedX = Math.random() * 0.15 - 0.075;
-    this.speedY = Math.random() * -0.2 - 0.05;
-    this.color = Math.random() > 0.5 ? 'rgba(6, 182, 212, ' : 'rgba(139, 92, 246, ';
-    this.alpha = Math.random() * 0.5 + 0.2;
-  }
-  
-  update() {
-    this.x += this.speedX;
-    this.y += this.speedY;
-    
-    if (this.y < 0) {
-      this.y = canvas.height;
-      this.x = Math.random() * canvas.width;
-    }
-    if (this.x < 0 || this.x > canvas.width) {
-      this.x = Math.random() * canvas.width;
-    }
-  }
-  
-  draw() {
-    ctx.fillStyle = this.color + this.alpha + ')';
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fill();
-  }
+function updateMiningDisplay() {
+  if (el.pending) el.pending.textContent = pendingClaimLocal.toFixed(4);
+  if (el.claim) el.claim.disabled = !contract || pendingClaimLocal <= 0;
 }
 
-function initParticles() {
-  particles = [];
-  const count = Math.min(100, Math.floor(window.innerWidth / 15));
-  for (let i = 0; i < count; i++) {
-    particles.push(new Particle());
-  }
+el.clickCrystal?.addEventListener('click', e => {
+  localClicks++; if (el.localClicks) el.localClicks.textContent = localClicks;
+  const r = el.clickCrystal.getBoundingClientRect(), f = document.createElement('div');
+  f.className = 'floating-click-val'; f.style.left = `${e.clientX || r.left + r.width / 2}px`; f.style.top = `${e.clientY || r.top + r.height / 2}px`;
+  f.textContent = `+${1 + Number(profileState.clickLevel)}`; document.body.appendChild(f); setTimeout(() => f.remove(), 800);
+});
+
+// TX log
+function logTx(action, hash = 'N/A', status = 'pending') {
+  if (!el.txBody) return null; el.emptyTx?.classList.add('hidden'); transactionsCount++;
+  if (el.txCount) el.txCount.textContent = `${transactionsCount} Transaction${transactionsCount > 1 ? 's' : ''}`;
+  const tr = document.createElement('tr'), now = new Date();
+  const time = [now.getHours(), now.getMinutes(), now.getSeconds()].map(x => String(x).padStart(2, '0')).join(':');
+  const badge = status === 'pending' ? '<span class="tx-status-badge pending"><i class="fa-solid fa-spinner fa-spin"></i> Pending</span>' :
+                status === 'success' ? '<span class="tx-status-badge success"><i class="fa-solid fa-circle-check"></i> Success</span>' :
+                '<span class="tx-status-badge failed"><i class="fa-solid fa-circle-xmark"></i> Failed</span>';
+  const link = hash !== 'N/A' ? `<a href="${txLink(hash)}" target="_blank" rel="noopener" class="monospace text-glow-blue">${hash.slice(0, 10)}...</a>` : '<span class="text-muted">N/A</span>';
+  tr.innerHTML = `<td>${time}</td><td class="font-weight-bold">${action}</td><td>${badge}</td><td>Gas estimate processing...</td><td>${link}</td>`;
+  el.txBody.insertBefore(tr, el.txBody.firstChild); return tr;
+}
+function setTxHash(row, hash) { if (row) row.cells[4].innerHTML = `<a href="${txLink(hash)}" target="_blank" rel="noopener" class="monospace text-glow-blue">${hash.slice(0, 10)}...</a>`; }
+function updateTx(row, status, details) { if (!row) return; row.cells[2].innerHTML = status === 'success' ? '<span class="tx-status-badge success"><i class="fa-solid fa-circle-check"></i> Success</span>' : '<span class="tx-status-badge failed"><i class="fa-solid fa-circle-xmark"></i> Failed</span>'; row.cells[3].textContent = details || 'N/A'; }
+
+el.usernameInput?.addEventListener('input', () => { if (el.setUsername) el.setUsername.disabled = !contract || !el.usernameInput.value.trim() || el.usernameInput.value.trim().length > 20; });
+el.setUsername?.addEventListener('click', async () => {
+  if (!contract) return; const name = el.usernameInput.value.trim(); if (!name || name.length > 20) return alert('Username must be 1-20 characters.');
+  el.setUsername.disabled = true; const row = logTx('Set Username');
+  try { const tx = await contract.setUsername(name); setTxHash(row, tx.hash); const rc = await tx.wait(); updateTx(row, 'success', `Gas used: ${rc.gasUsed}`); await fetchPlayerProfile(); await loadLeaderboard(); }
+  catch (e) { console.error(e); updateTx(row, 'failed', errMsg(e)); el.setUsername.disabled = false; }
+});
+
+async function ensureApproval(amount) {
+  if (!tokenContract || !contract || !walletAddress) return false;
+  try {
+    const spender = await contract.getAddress();
+    const allow = await tokenContract.allowance(walletAddress, spender);
+    if (allow >= amount) return true;
+    const row = logTx('Approve $CPLAY Spend');
+    const tx = await tokenContract.approve(spender, ethers.MaxUint256);
+    setTxHash(row, tx.hash);
+    const rc = await tx.wait();
+    updateTx(row, 'success', `Gas used: ${rc.gasUsed}`);
+    return true;
+  } catch (e) { console.error('Approval failed:', e); return false; }
 }
 
-function animateParticles() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach(p => {
-    p.update();
-    p.draw();
-  });
-  requestAnimationFrame(animateParticles);
+el.upgradeClick?.addEventListener('click', async () => {
+  if (!contract) return; el.upgradeClick.disabled = true;
+  try {
+    const cost = await contract.getClickUpgradeCost(profileState.clickLevel);
+    if (profileState.balance < cost) return alert('Insufficient CPLAY balance.');
+    if (!await ensureApproval(cost)) return;
+    const row = logTx('Upgrade Super-Click Mult');
+    const tx = await contract.buyClickUpgrade();
+    setTxHash(row, tx.hash);
+    const rc = await tx.wait();
+    updateTx(row, 'success', `Gas used: ${rc.gasUsed}`);
+    await fetchPlayerProfile();
+  } catch (e) { console.error(e); alert(errMsg(e)); } finally { el.upgradeClick.disabled = false; }
+});
+
+el.upgradeMiner?.addEventListener('click', async () => {
+  if (!contract) return; el.upgradeMiner.disabled = true;
+  try {
+    const cost = await contract.getUpgradeCost(profileState.minerLevel);
+    if (profileState.balance < cost) return alert('Insufficient CPLAY balance.');
+    if (!await ensureApproval(cost)) return;
+    const row = logTx('Upgrade Circle Mining Rig');
+    const tx = await contract.buyMinerUpgrade();
+    setTxHash(row, tx.hash);
+    const rc = await tx.wait();
+    updateTx(row, 'success', `Gas used: ${rc.gasUsed}`);
+    await fetchPlayerProfile();
+  } catch (e) { console.error(e); alert(errMsg(e)); } finally { el.upgradeMiner.disabled = false; }
+});
+
+el.claim?.addEventListener('click', async () => {
+  if (!contract) return; el.claim.disabled = true;
+  const row = logTx('Claim Mining Rewards');
+  try {
+    const tx = await contract.claimMining();
+    setTxHash(row, tx.hash);
+    const rc = await tx.wait();
+    updateTx(row, 'success', `Gas used: ${rc.gasUsed}`);
+    localClicks = 0; pendingClaimLocal = 0;
+    if (el.localClicks) el.localClicks.textContent = '0';
+    await fetchPlayerProfile();
+  } catch (e) { console.error(e); updateTx(row, 'failed', errMsg(e)); el.claim.disabled = false; }
+});
+
+el.heads?.addEventListener('click', () => { betChoice = 'heads'; el.heads.classList.add('active'); el.tails?.classList.remove('active'); });
+el.tails?.addEventListener('click', () => { betChoice = 'tails'; el.tails.classList.add('active'); el.heads?.classList.remove('active'); });
+el.max?.addEventListener('click', () => { const b = Math.floor(Number(ethers.formatEther(profileState.balance)) / 10) * 10; if (el.bet) el.bet.value = String(Math.max(10, b)); });
+
+el.roll?.addEventListener('click', async () => {
+  if (!contract) return; const value = Number(el.bet?.value); if (!Number.isFinite(value) || value < 10) return alert('Minimum bet amount is 10 CPLAY.');
+  let amount; try { amount = ethers.parseEther(String(value)); } catch { return alert('Invalid bet amount.'); }
+  if (profileState.balance < amount) return alert('Insufficient CPLAY balance.'); el.roll.disabled = true;
+  const row = logTx(`Lucky Flip Bet (${betChoice.toUpperCase()})`);
+  try {
+    if (!await ensureApproval(amount)) { el.roll.disabled = false; return; }
+    if (el.status) { el.status.className = 'flip-status-message'; el.status.textContent = 'Submitting bet to the blockchain...'; }
+    el.coin?.classList.add('spin-animation'); const heads = betChoice === 'heads'; const tx = await contract.coinFlip(heads, amount); setTxHash(row, tx.hash); const rc = await tx.wait(); updateTx(row, 'success', `Gas used: ${rc.gasUsed}`);
+    let won = false, payout = 0n;
+    for (const log of rc.logs) { try { const p = contract.interface.parseLog(log); if (p?.name === 'CoinFlipResult') { won = Boolean(p.args.won); payout = p.args.payout; break; } } catch {} }
+    const landedHeads = (heads && won) || (!heads && !won); el.coin?.style.setProperty('--coin-spin-target', landedHeads ? '1800deg' : '1980deg');
+    setTimeout(async () => {
+      el.coin?.classList.remove('spin-animation');
+      if (el.status) { el.status.className = `flip-status-message ${won ? 'won' : 'lost'}`; el.status.innerHTML = won ? `<i class="fa-solid fa-trophy"></i> YOU WON! Received ${ethers.formatEther(payout)} $CPLAY!` : `<i class="fa-solid fa-face-frown"></i> YOU LOST! Better luck next roll.`; }
+      await fetchPlayerProfile();
+      await loadLeaderboard();
+    }, 3200);
+  } catch (e) { console.error('Coin flip failed:', e); el.coin?.classList.remove('spin-animation'); updateTx(row, 'failed', errMsg(e)); if (el.status) el.status.textContent = `Transaction failed: ${errMsg(e)}`; el.roll.disabled = false; }
+});
+
+// Background particles
+if (el.canvas) {
+  const ctx = el.canvas.getContext('2d');
+  let particles = [];
+  function resize() { el.canvas.width = innerWidth; el.canvas.height = innerHeight; }
+  function init() { particles = Array.from({ length: Math.min(100, Math.floor(innerWidth / 15)) }, () => ({ x: Math.random() * el.canvas.width, y: Math.random() * el.canvas.height, s: Math.random() * 1.5 + 0.5, dx: Math.random() * 0.15 - 0.075, dy: Math.random() * -0.2 - 0.05, c: Math.random() > 0.5 ? 'rgba(6, 182, 212, ' : 'rgba(139, 92, 246, ', a: Math.random() * 0.5 + 0.2 })); }
+  function animate() { ctx.clearRect(0, 0, el.canvas.width, el.canvas.height); for (const p of particles) { p.x += p.dx; p.y += p.dy; if (p.y < 0) { p.y = el.canvas.height; p.x = Math.random() * el.canvas.width; } if (p.x < 0 || p.x > el.canvas.width) p.x = Math.random() * el.canvas.width; ctx.fillStyle = p.c + p.a + ')'; ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2); ctx.fill(); } requestAnimationFrame(animate); }
+  addEventListener('resize', () => { resize(); init(); }); resize(); init(); animate();
 }
 
-initParticles();
-animateParticles();
-
-// Start
-initWeb3();
+disableGame(); initWeb3();
+})();
