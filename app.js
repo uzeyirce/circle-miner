@@ -41,7 +41,6 @@ const CPLAY_TOKEN_ADDRESS = {
 };
 
 // ===== MANUAL CONTRACT ABI (to avoid artifacts.js issues) =====
-const CONTRACT_ABI = [
   "function getPlayerProfile(address) view returns (uint256,bool,bool,uint256,uint256,string,uint256,bool,uint256,uint256,uint256)",
   "function getClickUpgradeCost(uint256) view returns (uint256)",
   "function buyClickUpgrade() returns (bool)",
