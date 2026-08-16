@@ -236,7 +236,7 @@ async function switchNetwork() {
   try {
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x13B3' }], // Düzeltildi: 5042 = 0x13B3
+      params: [{ chainId: '0x13B3' }], // 5042 = 0x13B3
     });
   } catch (switchError) {
     if (switchError.code === 4902) {
@@ -245,7 +245,7 @@ async function switchNetwork() {
           method: 'wallet_addEthereumChain',
           params: [
             {
-              chainId: '0x13B3', // Düzeltildi
+              chainId: '0x13B3',
               chainName: 'Arc Mainnet',
               nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
               rpcUrls: ['https://arc-mainnet.infura.io/v3/de58e8647ba54873a65e6b8d2d7bade7'],
@@ -343,7 +343,7 @@ async function fetchPlayerProfile() {
     const rawResult = await window.ethereum.request({
       method: "eth_call",
       params: [{
-        to: contract.address, // contract.target -> contract.address
+        to: contract.address,
         data: callData
       }, "latest"]
     });
@@ -414,7 +414,8 @@ async function fetchPlayerProfile() {
   }
 }
 
-// ✅ DÜZELTİLDİ: Pending Claim canlı aksın
+// Ticks the pending-claim display between profile refreshes, mirroring the
+// contract's exact formula so the number shown is what you'll actually get.
 function startPassiveMiningTimer() {
   if (miningUpdateInterval) {
     clearInterval(miningUpdateInterval);
@@ -427,14 +428,13 @@ function startPassiveMiningTimer() {
     if (minerLevel > 0) {
       const baseRatePerSec = 0.001 * minerLevel;
       const ratePerSec = baseRatePerSec * (1 + clickLevel * 0.1);
-      pendingClaimLocal += ratePerSec * 0.1;
+      pendingClaimLocal += ratePerSec * 0.1; // her 100ms'de bir
     }
 
     updateMiningDisplay(); // her zaman güncelle
   }, 100);
 }
 
-// ✅ DÜZELTİLDİ: Her zaman göster
 function updateMiningDisplay() {
   miningPendingEl.textContent = pendingClaimLocal.toFixed(4);
   btnClaimMining.disabled = pendingClaimLocal <= 0.0001;
