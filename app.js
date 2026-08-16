@@ -181,9 +181,10 @@ async function loadLeaderboard() {
     if (el.leaderboard) el.leaderboard.innerHTML = '<tr><td colspan="3">Loading leaderboard…</td></tr>';
     const filter = contract.filters.CoinFlipResult();
     const CHUNK = 9000;
-    const provider = contract.provider;
-    if (!provider) throw new Error('Provider not available');
-    const latestBlock = await provider.getBlockNumber();
+    // Global provider'ı kullan (zaten connectWallet'te oluşturuldu)
+    const prov = provider || contract.runner?.provider;
+    if (!prov) throw new Error('Provider not available');
+    const latestBlock = await prov.getBlockNumber();
     const events = [];
     let from = 0;
     while (from <= latestBlock) {
