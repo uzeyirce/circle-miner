@@ -288,21 +288,23 @@ btnConnect.addEventListener('click', connectWallet);
 // Builds the Top 25 leaderboard by scanning CoinFlipResult events for unique
 // players, then reading each one's authoritative on-chain totalWinnings.
 async function loadLeaderboard() {
-  if (!contract) return;
+  const activeContract = contract; // snapshot — avoid a race if `contract` changes mid-call
+  if (!activeContract) return;
   try {
     leaderboardTbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">Loading leaderboard…</td></tr>';
 
-    const filter = contract.filters.CoinFlipResult();
+    const filter = activeContract.filters.CoinFlipResult();
 
     // RPC caps eth_getLogs at 10,000 blocks per call — scan in safe 9000-block
     // chunks instead of asking for the whole [0, latest] range in one shot.
     const CHUNK = 9000;
-    const latestBlock = await contract.runner.provider.getBlockNumber();
+    const latestBlock = await activeContract.runner.provider.getBlockNumber();
     const events = [];
     let from = 0;
     while (from <= latestBlock) {
+      if (!activeContract) break; // bail cleanly if invalidated mid-scan
       const to = Math.min(from + CHUNK, latestBlock);
-      const chunkEvents = await contract.queryFilter(filter, from, to);
+      const chunkEvents = await activeContract.queryFilter(filter, from, to);
       events.push(...chunkEvents);
       from = to + 1;
     }
