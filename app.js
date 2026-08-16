@@ -41,6 +41,7 @@ const CPLAY_TOKEN_ADDRESS = {
 };
 
 // ===== MANUAL CONTRACT ABI (to avoid artifacts.js issues) =====
+const CONTRACT_ABI = [
   "function getPlayerProfile(address) view returns (uint256,bool,bool,uint256,uint256,string,uint256,bool,uint256,uint256,uint256)",
   "function getClickUpgradeCost(uint256) view returns (uint256)",
   "function buyClickUpgrade() returns (bool)",
@@ -300,20 +301,15 @@ async function fetchPlayerProfile() {
 
 /* ===== MINING TIMER ===== */
 function startPassiveMiningTimer() {
-  if (miningUpdateInterval) {
-    clearInterval(miningUpdateInterval);
-  }
-
+  if (miningUpdateInterval) clearInterval(miningUpdateInterval);
   miningUpdateInterval = setInterval(() => {
     const minerLevel = Number(profileState.minerLevel || 0n);
     const clickLevel = Number(profileState.clickLevel || 0n);
-
     if (minerLevel > 0) {
-      const baseRatePerSec = 0.001 * minerLevel;
-      const ratePerSec = baseRatePerSec * (1 + clickLevel * 0.1);
-      pendingClaimLocal += ratePerSec * 0.1;
+      const base = 0.001 * minerLevel;
+      const rate = base * (1 + clickLevel * 0.1);
+      pendingClaimLocal += rate * 0.1; // every 100ms
     }
-
     updateMiningDisplay();
   }, 100);
 }
