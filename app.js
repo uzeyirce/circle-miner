@@ -27,7 +27,7 @@ const GAME_ABI = [
   'function coinFlip(bool,uint256)',
   'function totalWinnings(address) view returns (uint256)',
   'function usernames(address) view returns (string)',
-  'event CoinFlipResult(address indexed player,uint256 bet,bool won,uint256 payout)'
+  'event CoinFlipResult(address indexed player,bool betHeads,bool won,uint256 betAmount,uint256 devFee,uint256 payout,uint256 seed)'
 ];
 
 const ERC20_ABI = [
@@ -213,7 +213,8 @@ async function loadLeaderboard() {
     if (!prov) throw new Error('Provider not available');
     const latestBlock = await prov.getBlockNumber();
     const events = [];
-    let from = 0;
+    const LOOKBACK = 500000; // blok 0'dan taramak binlerce RPC cagrisi demek
+    let from = Math.max(0, latestBlock - LOOKBACK);
     while (from <= latestBlock) {
       const to = Math.min(from + CHUNK, latestBlock);
       const chunkEvents = await contract.queryFilter(filter, from, to);
@@ -346,21 +347,50 @@ el.clickCrystal?.addEventListener('click', e => {
   f.textContent = `+${1 + Number(profileState.clickLevel)}`; document.body.appendChild(f); setTimeout(() => f.remove(), 800);
 });
 
-// TX log
-function logTx(action, hash = 'N/A', status = 'pending') {
-  if (!el.txBody) return null; el.emptyTx?.classList.add('hidden'); transactionsCount++;
-  if (el.txCount) el.txCount.textContent = `${transactionsCount} Transaction${transactionsCount > 1 ? 's' : ''}`;
-  const tr = document.createElement('tr'), now = new Date();
-  const time = [now.getHours(), now.getMinutes(), now.getSeconds()].map(x => String(x).padStart(2, '0')).join(':');
-  const badge = status === 'pending' ? '<span class="tx-status-badge pending"><i class="fa-solid fa-spinner fa-spin"></i> Pending</span>' :
-                status === 'success' ? '<span class="tx-status-badge success"><i class="fa-solid fa-circle-check"></i> Success</span>' :
-                '<span class="tx-status-badge failed"><i class="fa-solid fa-circle-xmark"></i> Failed</span>';
-  const link = hash !== 'N/A' ? `<a href="${txLink(hash)}" target="_blank" rel="noopener" class="monospace text-glow-blue">${hash.slice(0, 10)}...</a>` : '<span class="text-muted">N/A</span>';
-  tr.innerHTML = `<td>${time}</td><td class="font-weight-bold">${action}</td><td>${badge}</td><td>Gas estimate processing...</td><td>${link}</td>`;
-  el.txBody.insertBefore(tr, el.txBody.firstChild); return tr;
+// TX log (localStorage ile kalici)
+const TX_STORE_KEY = 'circleMinerTxLogs';
+let txLogs = [];
+try { txLogs = JSON.parse(localStorage.getItem(TX_STORE_KEY) || '[]'); } catch { txLogs = []; }
+
+function saveTxLogs() {
+  try { localStorage.setItem(TX_STORE_KEY, JSON.stringify(txLogs.slice(0, 50))); } catch {}
 }
-function setTxHash(row, hash) { if (row) row.cells[4].innerHTML = `<a href="${txLink(hash)}" target="_blank" rel="noopener" class="monospace text-glow-blue">${hash.slice(0, 10)}...</a>`; }
-function updateTx(row, status, details) { if (!row) return; row.cells[2].innerHTML = status === 'success' ? '<span class="tx-status-badge success"><i class="fa-solid fa-circle-check"></i> Success</span>' : '<span class="tx-status-badge failed"><i class="fa-solid fa-circle-xmark"></i> Failed</span>'; row.cells[3].textContent = details || 'N/A'; }
+function badgeHtml(status) {
+  return status === 'pending' ? '<span class="tx-status-badge pending"><i class="fa-solid fa-spinner fa-spin"></i> Pending</span>' :
+         status === 'success' ? '<span class="tx-status-badge success"><i class="fa-solid fa-circle-check"></i> Success</span>' :
+         '<span class="tx-status-badge failed"><i class="fa-solid fa-circle-xmark"></i> Failed</span>';
+}
+function renderTxLogs() {
+  if (!el.txBody) return;
+  transactionsCount = txLogs.length;
+  if (el.txCount) el.txCount.textContent = `${transactionsCount} Transaction${transactionsCount !== 1 ? 's' : ''}`;
+  if (transactionsCount === 0) { el.emptyTx?.classList.remove('hidden'); el.txBody.innerHTML = ''; return; }
+  el.emptyTx?.classList.add('hidden');
+  el.txBody.innerHTML = txLogs.map(t => {
+    const link = t.hash && t.hash !== 'N/A'
+      ? `<a href="${txLink(t.hash)}" target="_blank" rel="noopener" class="monospace text-glow-blue">${t.hash.slice(0, 10)}...</a>`
+      : '<span class="text-muted">N/A</span>';
+    return `<tr><td>${t.time}</td><td class="font-weight-bold">${t.action}</td><td>${badgeHtml(t.status)}</td><td>${t.details || 'Gas estimate processing...'}</td><td>${link}</td></tr>`;
+  }).join('');
+}
+function logTx(action, hash = 'N/A', status = 'pending') {
+  const now = new Date();
+  const time = [now.getHours(), now.getMinutes(), now.getSeconds()].map(x => String(x).padStart(2, '0')).join(':');
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  txLogs.unshift({ id, time, action, hash, status, details: '' });
+  txLogs = txLogs.slice(0, 50);
+  saveTxLogs(); renderTxLogs();
+  return id;
+}
+function setTxHash(id, hash) {
+  const t = txLogs.find(x => x.id === id);
+  if (t) { t.hash = hash; saveTxLogs(); renderTxLogs(); }
+}
+function updateTx(id, status, details) {
+  const t = txLogs.find(x => x.id === id);
+  if (t) { t.status = status; t.details = details || 'N/A'; saveTxLogs(); renderTxLogs(); }
+}
+renderTxLogs();
 
 el.usernameInput?.addEventListener('input', () => { if (el.setUsername) el.setUsername.disabled = !contract || !el.usernameInput.value.trim() || el.usernameInput.value.trim().length > 20; });
 el.setUsername?.addEventListener('click', async () => {
