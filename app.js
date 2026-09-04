@@ -7,7 +7,7 @@ const HARDHAT_CHAIN_ID = 31337n;
 const ARC_CHAIN_HEX = '0x13B2';
 
 const GAME_ADDRESS = {
-  '5042': '0x0e682f391241Eb774f97f17FA96E94750b621BAc',
+  '5042': '0x8a4E8a29904a38e320caAfc69cA21Ca2bC429856',
   '31337': '0x5FbDB2315678afecb367f032d93F642f64180aa3'
 };
 const CPLAY_ADDRESS = {
@@ -24,6 +24,7 @@ const GAME_ABI = [
   'function buyMinerUpgrade()',
   'function claimMining()',
   'function setUsername(string)',
+  'function coinFlip(bool,uint256) returns (bool)',
   'function commitFlip(bool,uint256,bytes32)',
   'function revealFlip(bytes32) returns (bool)',
   'function forfeitExpiredFlip()',
@@ -148,7 +149,7 @@ async function connectWallet(request = true) {
     await loadRecentActivity();
     startActivityListener();
     updateStreak();
-    await resumePendingFlip();
+    // await resumePendingFlip(); // tek imzali modda gerekmiyor
     try {
       const claimed = await contract.hasClaimedFaucet(walletAddress);
       const fb = document.getElementById('btn-faucet');
@@ -717,50 +718,49 @@ el.roll?.addEventListener('click', async () => {
   if (profileState.balance < amount) return alert('Insufficient CPLAY balance.');
 
   el.roll.disabled = true;
+  const row = logTx(`Lucky Flip Bet (${betChoice.toUpperCase()})`);
 
   try {
-    // Onceki bekleyen flip varsa once onu cozelim
-    const [hasPending] = await contract.getPendingFlip(walletAddress);
-    if (hasPending) {
-      if (el.status) el.status.textContent = 'Settling your previous flip first...';
-      await resumePendingFlip();
-      el.roll.disabled = false;
-      return;
-    }
-
     if (!await ensureApproval(amount)) { el.roll.disabled = false; return; }
-
-    // Gizli deger uret ve commit hash hesapla
-    const secretBytes = ethers.randomBytes(32);
-    const secret = ethers.hexlify(secretBytes);
-    const commitHash = ethers.keccak256(
-      ethers.solidityPacked(['bytes32', 'address'], [secret, walletAddress])
-    );
+    if (el.status) { el.status.className = 'flip-status-message'; el.status.textContent = 'Submitting bet to the blockchain...'; }
+    el.coin?.classList.add('spin-animation');
 
     const heads = betChoice === 'heads';
-    saveSecret(secret, heads, value);
+    const tx = await contract.coinFlip(heads, amount);
+    setTxHash(row, tx.hash);
+    const rc = await tx.wait();
+    updateTx(row, 'success', `Gas used: ${rc.gasUsed}`);
 
-    const row1 = logTx(`Commit Flip (${betChoice.toUpperCase()})`);
-    if (el.status) { el.status.className = 'flip-status-message'; el.status.textContent = 'Step 1/2 — Committing your bet...'; }
+    let won = false, payout = 0n;
+    for (const log of rc.logs) {
+      try {
+        const p = contract.interface.parseLog(log);
+        if (p?.name === 'CoinFlipResult') { won = Boolean(p.args.won); payout = p.args.payout; break; }
+      } catch {}
+    }
 
-    const tx1 = await contract.commitFlip(heads, amount, commitHash);
-    setTxHash(row1, tx1.hash);
-    const rc1 = await tx1.wait();
-    updateTx(row1, 'success', `Gas used: ${rc1.gasUsed}`);
+    const landedHeads = (heads && won) || (!heads && !won);
+    el.coin?.style.setProperty('--coin-spin-target', landedHeads ? '1800deg' : '1980deg');
 
-    if (el.status) el.status.textContent = 'Step 2/2 — Waiting for the next block, then revealing...';
-    await new Promise(r => setTimeout(r, 3000)); // reveal gecikmesi icin bekle
-
-    const row2 = logTx('Reveal Flip');
-    await doReveal(secret, row2);
+    setTimeout(async () => {
+      el.coin?.classList.remove('spin-animation');
+      if (el.status) {
+        el.status.className = `flip-status-message ${won ? 'won' : 'lost'}`;
+        el.status.innerHTML = won
+          ? `<i class="fa-solid fa-trophy"></i> YOU WON! Received ${ethers.formatEther(payout)} $CPLAY!`
+          : `<i class="fa-solid fa-face-frown"></i> YOU LOST! Better luck next roll.`;
+      }
+      await fetchPlayerProfile();
+      await loadLeaderboard();
+    }, 2500);
 
   } catch (e) {
     console.error('Coin flip failed:', e);
     el.coin?.classList.remove('spin-animation');
+    updateTx(row, 'failed', errMsg(e));
     if (el.status) el.status.textContent = `Transaction failed: ${errMsg(e)}`;
   } finally {
     el.roll.disabled = false;
-    await fetchPlayerProfile();
   }
 });
 

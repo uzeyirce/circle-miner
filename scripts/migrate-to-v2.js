@@ -3,7 +3,7 @@ const hre = require("hardhat");
 const { ethers } = hre;
 
 const V1 = '0xd67d5a4559d07e8154E0B0dd2DB72597f727e748';
-const V2 = '0x0e682f391241Eb774f97f17FA96E94750b621BAc';
+const V2 = '0x8a4E8a29904a38e320caAfc69cA21Ca2bC429856';
 
 // Migrate edilecek adresleri elle yaz — tarama yok
 const PLAYERS = [

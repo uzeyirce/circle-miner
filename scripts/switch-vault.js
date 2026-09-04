@@ -3,7 +3,7 @@ const hre = require("hardhat");
 const { ethers } = hre;
 
 const VAULT = '0xB908AD7cdd1982BE5D21DC52046fA132C22846eE';
-const V2 = '0x0e682f391241Eb774f97f17FA96E94750b621BAc';
+const V2 = '0x8a4E8a29904a38e320caAfc69cA21Ca2bC429856';
 
 async function main(){
   const [signer] = await ethers.getSigners();

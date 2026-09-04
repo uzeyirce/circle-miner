@@ -273,6 +273,47 @@ contract BasePlayAdventureV2 is Ownable, ReentrancyGuard {
     }
 
     // ==========================================================================
+    // INSTANT FLIP — single transaction. Faster UX, but the outcome derives
+    // from block data, which a block producer can see before including the tx.
+    // Kept behind its own flag so it can be disabled instantly if abused.
+    // ==========================================================================
+
+    bool public instantFlipEnabled = true;
+
+    function setInstantFlipEnabled(bool v) external onlyOwner {
+        instantFlipEnabled = v;
+        emit FeatureToggled("instantFlip", v);
+    }
+
+    function coinFlip(bool betHeads, uint256 betAmount) external nonReentrant returns (bool won) {
+        require(luckyFlipEnabled && instantFlipEnabled, "Instant flip is not currently active");
+        require(betAmount >= minBet, "Bet below minimum");
+        require(cplayToken.balanceOf(msg.sender) >= betAmount, "Insufficient balance");
+        require(cplayToken.allowance(msg.sender, address(this)) >= betAmount, "Approve CPLAY spend first");
+
+        uint256 payoutAmount = (betAmount * coinflipPayoutBps) / BPS_DENOMINATOR;
+        require(vault.vaultBalance() >= payoutAmount, "Vault cannot cover this bet right now, try smaller");
+
+        (uint256 devFee, ) = _splitToOwnerAndVault(betAmount);
+
+        uint256 seed = uint256(keccak256(abi.encodePacked(
+            block.timestamp, block.prevrandao, msg.sender, block.number, totalWinnings[msg.sender]
+        )));
+        bool resultIsHeads = (seed % 2 == 0);
+        won = (betHeads == resultIsHeads);
+
+        uint256 actualPayout = 0;
+        if (won) {
+            actualPayout = payoutAmount;
+            totalWinnings[msg.sender] += actualPayout;
+            vault.payout(msg.sender, actualPayout);
+        }
+
+        emit CoinFlipResult(msg.sender, betHeads, won, betAmount, devFee, actualPayout, seed);
+        return won;
+    }
+
+    // ==========================================================================
     // USERNAME
     // ==========================================================================
 
