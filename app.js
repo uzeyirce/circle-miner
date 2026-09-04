@@ -4,7 +4,7 @@
 
 const ARC_CHAIN_ID = 5042n;
 const HARDHAT_CHAIN_ID = 31337n;
-const ARC_CHAIN_HEX = '0x13B3'; // DÜZELTİLDİ (büyük harf)
+const ARC_CHAIN_HEX = '0x13B2';
 
 const GAME_ADDRESS = {
   '5042': '0xd67d5a4559d07e8154E0B0dd2DB72597f727e748',
