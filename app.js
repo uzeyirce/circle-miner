@@ -154,19 +154,46 @@ el.connect?.addEventListener('click', () => connectWallet(true));
 el.disconnect?.addEventListener('click', disconnectWallet);
 
 async function switchNetwork() {
-  try { await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: ARC_CHAIN_HEX }] }); }
-  catch (e) {
-    if (e.code === 4902) await window.ethereum.request({
-      method: 'wallet_addEthereumChain',
-      params: [{
-        chainId: ARC_CHAIN_HEX,
-        chainName: 'Arc Mainnet',
-        nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
-        rpcUrls: ['https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8'],
-        blockExplorerUrls: ['https://arc.exploreme.pro']
-      }]
-    }).catch(x => console.error(x));
-    else console.error('Network switch failed:', e);
+  if (!window.ethereum) {
+    if (el.status) el.status.textContent = 'No wallet found — please install/unlock Rabby.';
+    return;
+  }
+
+  if (!walletAddress) {
+    try {
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+    } catch (e) {
+      if (el.status) el.status.textContent = 'Please connect your wallet first.';
+      return;
+    }
+  }
+
+  try {
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: ARC_CHAIN_HEX }]
+    });
+  } catch (e) {
+    if (e.code === 4902) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: ARC_CHAIN_HEX,
+            chainName: 'Arc Mainnet',
+            nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 6 },
+            rpcUrls: ['https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8'],
+            blockExplorerUrls: ['https://arc.exploreme.pro']
+          }]
+        });
+      } catch (addErr) {
+        console.error(addErr);
+        if (el.status) el.status.textContent = 'Could not add Arc Mainnet: ' + (addErr.message || addErr);
+      }
+    } else {
+      console.error('Network switch failed:', e);
+      if (el.status) el.status.textContent = 'Network switch failed: ' + (e.message || e);
+    }
   }
 }
 el.switch?.addEventListener('click', switchNetwork);

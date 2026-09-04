@@ -1,17 +1,17 @@
 {
   "symbol": "TOKEN",
   "decimals": 18,
-  "buyEvents": 1663,
-  "sellEvents": 846,
-  "plainTransfers": 840,
+  "buyEvents": 2049,
+  "sellEvents": 1111,
+  "plainTransfers": 1158,
   "wallets": [
     {
       "address": "0x2804d131cfb046f987e7e532bc58cfc30326b350",
       "bought": 0,
-      "sold": 401095433.169327,
-      "net": -401095433.169327,
+      "sold": 541272160.9168252,
+      "net": -541272160.9168252,
       "buyCount": 0,
-      "sellCount": 272,
+      "sellCount": 394,
       "fullyExited": true,
       "diamondHands": false,
       "activeTrader": false
@@ -19,10 +19,10 @@
     {
       "address": "0x7c02be75f481d0ae5741c6484230ea20f015f9e2",
       "bought": 0,
-      "sold": 166378115.01142392,
-      "net": -166378115.01142392,
+      "sold": 171388842.76920033,
+      "net": -171388842.76920033,
       "buyCount": 0,
-      "sellCount": 100,
+      "sellCount": 114,
       "fullyExited": true,
       "diamondHands": false,
       "activeTrader": false
@@ -30,33 +30,55 @@
     {
       "address": "0xa130577e3fcd1775e6ae51c89aa5d0d4c586484c",
       "bought": 0,
-      "sold": 110068252.25083551,
-      "net": -110068252.25083551,
+      "sold": 118973722.9961031,
+      "net": -118973722.9961031,
       "buyCount": 0,
-      "sellCount": 47,
+      "sellCount": 52,
       "fullyExited": true,
       "diamondHands": false,
       "activeTrader": false
     },
     {
+      "address": "0x928a00e18b033e1e8bfcd30960de43ee48618d8d",
+      "bought": 28668777.738970395,
+      "sold": 28668777.738970395,
+      "net": 0,
+      "buyCount": 26,
+      "sellCount": 15,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
       "address": "0x09bcbc95c8387949e35199464b2a6a4fc2411c2e",
-      "bought": 14142395.023439866,
+      "bought": 17132154.083110847,
       "sold": 0,
-      "net": 14142395.023439866,
-      "buyCount": 28,
+      "net": 17132154.083110847,
+      "buyCount": 32,
       "sellCount": 0,
       "fullyExited": false,
       "diamondHands": true,
       "activeTrader": false
     },
     {
-      "address": "0x928a00e18b033e1e8bfcd30960de43ee48618d8d",
-      "bought": 11287220.976084946,
-      "sold": 11287220.976084946,
+      "address": "0x344d75c37d69d5c0dd37f6d53cd16f30f0a48d5e",
+      "bought": 1901359.412399015,
+      "sold": 1901359.412399015,
       "net": 0,
       "buyCount": 16,
-      "sellCount": 9,
+      "sellCount": 10,
       "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0x39bfe08dbe9d69113649fc53f88c5af3a4d88626",
+      "bought": 15110574.465015113,
+      "sold": 14861653.986622753,
+      "net": 248920.47839236108,
+      "buyCount": 13,
+      "sellCount": 12,
+      "fullyExited": false,
       "diamondHands": false,
       "activeTrader": true
     },
@@ -72,6 +94,28 @@
       "activeTrader": true
     },
     {
+      "address": "0x1b15a511eb1c9b4c5185257d188b543de65eb589",
+      "bought": 43900583.04872648,
+      "sold": 25739613.815107696,
+      "net": 18160969.23361878,
+      "buyCount": 15,
+      "sellCount": 8,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0xcc103face1916b445f1989c86c11c78b89fde5aa",
+      "bought": 2545262.820912283,
+      "sold": 2045262.8209568781,
+      "net": 499999.99995540455,
+      "buyCount": 16,
+      "sellCount": 7,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
       "address": "0xab05793b1eed9571493853acbdf42df69b09fd53",
       "bought": 35517483.952083685,
       "sold": 0,
@@ -83,15 +127,15 @@
       "activeTrader": false
     },
     {
-      "address": "0x1b15a511eb1c9b4c5185257d188b543de65eb589",
-      "bought": 37390675.03727841,
-      "sold": 19229705.803659625,
-      "net": 18160969.23361878,
-      "buyCount": 13,
-      "sellCount": 6,
+      "address": "0x154ba457f81a022b54dd2016c07d4e286d7e11b4",
+      "bought": 2542625.576088236,
+      "sold": 0,
+      "net": 2542625.576088236,
+      "buyCount": 20,
+      "sellCount": 0,
       "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": true
+      "diamondHands": true,
+      "activeTrader": false
     },
     {
       "address": "0x175034c0b6692a311625973fd0fac4d7203e07fe",
@@ -101,6 +145,28 @@
       "buyCount": 12,
       "sellCount": 7,
       "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0xcc73f2e516d6e9406af17e60f1553a89fd8853ca",
+      "bought": 3431637.4389640377,
+      "sold": 1000000.0000000076,
+      "net": 2431637.43896403,
+      "buyCount": 18,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xfbdef288e52f77cef39abbd913b96e4d47065302",
+      "bought": 6291185.757255528,
+      "sold": 6291185.757255528,
+      "net": 0,
+      "buyCount": 9,
+      "sellCount": 10,
+      "fullyExited": true,
       "diamondHands": false,
       "activeTrader": true
     },
@@ -116,10 +182,10 @@
       "activeTrader": true
     },
     {
-      "address": "0xcc73f2e516d6e9406af17e60f1553a89fd8853ca",
-      "bought": 3431637.4389640377,
+      "address": "0x25a0ab08350273cbfa4ca4ac25bdb4730fe72739",
+      "bought": 658757.3374239291,
       "sold": 0,
-      "net": 3431637.4389640377,
+      "net": 658757.3374239291,
       "buyCount": 18,
       "sellCount": 0,
       "fullyExited": false,
@@ -127,15 +193,15 @@
       "activeTrader": false
     },
     {
-      "address": "0x344d75c37d69d5c0dd37f6d53cd16f30f0a48d5e",
-      "bought": 783475.2018009882,
-      "sold": 783475.2018009882,
-      "net": 0,
-      "buyCount": 12,
-      "sellCount": 6,
+      "address": "0x3b3d1383e070b343607994860137e5fc092563ca",
+      "bought": 0,
+      "sold": 30585531.114005405,
+      "net": -30585531.114005405,
+      "buyCount": 0,
+      "sellCount": 18,
       "fullyExited": true,
       "diamondHands": false,
-      "activeTrader": true
+      "activeTrader": false
     },
     {
       "address": "0xb62e7420734c550da304b41706574dfafb5c34a4",
@@ -149,28 +215,6 @@
       "activeTrader": true
     },
     {
-      "address": "0x39bfe08dbe9d69113649fc53f88c5af3a4d88626",
-      "bought": 7729344.480311477,
-      "sold": 7480424.001919116,
-      "net": 248920.47839236108,
-      "buyCount": 9,
-      "sellCount": 8,
-      "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": true
-    },
-    {
-      "address": "0x25a0ab08350273cbfa4ca4ac25bdb4730fe72739",
-      "bought": 632491.164623839,
-      "sold": 0,
-      "net": 632491.164623839,
-      "buyCount": 17,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x277631af442f5b794270ac01076bbddbf63d8128",
       "bought": 69823.72977184554,
       "sold": 0,
@@ -182,26 +226,15 @@
       "activeTrader": false
     },
     {
-      "address": "0x3b3d1383e070b343607994860137e5fc092563ca",
-      "bought": 0,
-      "sold": 26585531.114005405,
-      "net": -26585531.114005405,
-      "buyCount": 0,
-      "sellCount": 16,
-      "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0x154ba457f81a022b54dd2016c07d4e286d7e11b4",
-      "bought": 1410486.5149491562,
-      "sold": 0,
-      "net": 1410486.5149491562,
-      "buyCount": 16,
-      "sellCount": 0,
+      "address": "0xc7c3919db953469ee409b05ffc643670090ca48b",
+      "bought": 1184900.9390820826,
+      "sold": 682760.7478510085,
+      "net": 502140.191231074,
+      "buyCount": 12,
+      "sellCount": 3,
       "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
+      "diamondHands": false,
+      "activeTrader": true
     },
     {
       "address": "0xb4783c1de4cefb74bda219ed82c91490683e2076",
@@ -248,6 +281,17 @@
       "activeTrader": true
     },
     {
+      "address": "0xda7688299bf1302b395efe2577a1f03374e26f7e",
+      "bought": 892420.9344437616,
+      "sold": 487975.01011493226,
+      "net": 404445.9243288293,
+      "buyCount": 10,
+      "sellCount": 3,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
       "address": "0x92a8d5ce2ecc201be0d707f4922ab6484bb50d61",
       "bought": 32386188.95195563,
       "sold": 16203200.097414946,
@@ -270,12 +314,12 @@
       "activeTrader": true
     },
     {
-      "address": "0xcc103face1916b445f1989c86c11c78b89fde5aa",
-      "bought": 1442554.8404531507,
-      "sold": 1101472.954339031,
-      "net": 341081.8861141198,
-      "buyCount": 11,
-      "sellCount": 2,
+      "address": "0x5140bcccf8f8d309c656835482b7b826ebba2369",
+      "bought": 5866287.897282888,
+      "sold": 4955047.732850753,
+      "net": 911240.1644321355,
+      "buyCount": 9,
+      "sellCount": 4,
       "fullyExited": false,
       "diamondHands": false,
       "activeTrader": true
@@ -303,12 +347,12 @@
       "activeTrader": true
     },
     {
-      "address": "0xc7c3919db953469ee409b05ffc643670090ca48b",
-      "bought": 682760.7478510085,
-      "sold": 184870.66967326053,
-      "net": 497890.078177748,
-      "buyCount": 10,
-      "sellCount": 2,
+      "address": "0x470b8e769f25cd7629aabb2559af233b112787da",
+      "bought": 3106911.031531219,
+      "sold": 2687291.7838218976,
+      "net": 419619.2477093214,
+      "buyCount": 9,
+      "sellCount": 3,
       "fullyExited": false,
       "diamondHands": false,
       "activeTrader": true
@@ -325,17 +369,6 @@
       "activeTrader": true
     },
     {
-      "address": "0xfbdef288e52f77cef39abbd913b96e4d47065302",
-      "bought": 3239772.5897707096,
-      "sold": 3239772.5897707096,
-      "net": 0,
-      "buyCount": 6,
-      "sellCount": 6,
-      "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": true
-    },
-    {
       "address": "0xe9712795150953fbbcf0c922490593fd2d2c7e2a",
       "bought": 31608618.963075884,
       "sold": 15600000,
@@ -347,14 +380,14 @@
       "activeTrader": true
     },
     {
-      "address": "0xda7688299bf1302b395efe2577a1f03374e26f7e",
-      "bought": 892420.9344437616,
-      "sold": 119552.63845049188,
-      "net": 772868.2959932697,
-      "buyCount": 10,
-      "sellCount": 1,
+      "address": "0x0063087ee4b1716138216b9306ca19d38f72ad5c",
+      "bought": 1949594.4918510104,
+      "sold": 0,
+      "net": 1949594.4918510104,
+      "buyCount": 11,
+      "sellCount": 0,
       "fullyExited": false,
-      "diamondHands": false,
+      "diamondHands": true,
       "activeTrader": false
     },
     {
@@ -391,6 +424,28 @@
       "activeTrader": true
     },
     {
+      "address": "0xd6c0b0ed4ef53cff86e05436e70d2b782e0f1348",
+      "bought": 17970588.108100396,
+      "sold": 5000000,
+      "net": 12970588.108100394,
+      "buyCount": 9,
+      "sellCount": 2,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0xa06c339c9e0d521f93e612391e7460b478d5f85e",
+      "bought": 19309713.979360905,
+      "sold": 0,
+      "net": 19309713.979360905,
+      "buyCount": 10,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0xffcab85a2e7367b37ad816b3386007af816303db",
       "bought": 6266818.555266246,
       "sold": 6266818.555266246,
@@ -402,14 +457,36 @@
       "activeTrader": false
     },
     {
-      "address": "0x0063087ee4b1716138216b9306ca19d38f72ad5c",
-      "bought": 1868658.8175360742,
-      "sold": 0,
-      "net": 1868658.8175360742,
-      "buyCount": 10,
-      "sellCount": 0,
+      "address": "0xcc841df03d2fe47b164754d4b2d359dbd0fcabf2",
+      "bought": 2340520.936422395,
+      "sold": 919089.2908957952,
+      "net": 1421431.6455266,
+      "buyCount": 9,
+      "sellCount": 1,
       "fullyExited": false,
-      "diamondHands": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xeb6f1662874bc3b149b83c3be74b2e5c47518a45",
+      "bought": 4893104.759798955,
+      "sold": 4352369.793878158,
+      "net": 540734.9659207971,
+      "buyCount": 6,
+      "sellCount": 4,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0xf8d58ab5f3b1564167b8621b2e522856a75094ad",
+      "bought": 1610984.6414197367,
+      "sold": 125127.31653044416,
+      "net": 1485857.3248892925,
+      "buyCount": 9,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
       "activeTrader": false
     },
     {
@@ -424,15 +501,48 @@
       "activeTrader": true
     },
     {
-      "address": "0xcc841df03d2fe47b164754d4b2d359dbd0fcabf2",
-      "bought": 2340520.936422395,
+      "address": "0xf3467a2b4796c94ff72c23eb8e5135bd76e5c149",
+      "bought": 13837231.822098851,
+      "sold": 2065304.5486730323,
+      "net": 11771927.27342582,
+      "buyCount": 8,
+      "sellCount": 2,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0xa71ff93ac169ae38210a91c840119d7e491bb988",
+      "bought": 20776693.56746293,
+      "sold": 10238888.449602762,
+      "net": 10537805.117860166,
+      "buyCount": 7,
+      "sellCount": 3,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0x7c4227a017c1f21f6f365fe3e4c3e8a817ec26f9",
+      "bought": 23145462.966893435,
       "sold": 0,
-      "net": 2340520.936422395,
+      "net": 23145462.966893435,
       "buyCount": 9,
       "sellCount": 0,
       "fullyExited": false,
       "diamondHands": true,
       "activeTrader": false
+    },
+    {
+      "address": "0x93af86803d8ce199ae333149ec67821bae118635",
+      "bought": 391552.28976902313,
+      "sold": 349105.11399324005,
+      "net": 42447.175775783115,
+      "buyCount": 5,
+      "sellCount": 4,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
     },
     {
       "address": "0x00f4870732a65a3294687072ad2f335b76f6742a",
@@ -446,26 +556,37 @@
       "activeTrader": false
     },
     {
-      "address": "0xf8d58ab5f3b1564167b8621b2e522856a75094ad",
-      "bought": 1287322.4129225917,
-      "sold": 125127.31653044416,
-      "net": 1162195.0963921475,
-      "buyCount": 8,
-      "sellCount": 1,
-      "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0xd6c0b0ed4ef53cff86e05436e70d2b782e0f1348",
-      "bought": 12684414.11512849,
-      "sold": 5000000,
-      "net": 7684414.115128489,
-      "buyCount": 7,
-      "sellCount": 2,
-      "fullyExited": false,
+      "address": "0x9636aae56429e221b70ab99feff3fb4642273faf",
+      "bought": 2845625.408690761,
+      "sold": 2845625.408690761,
+      "net": 0,
+      "buyCount": 4,
+      "sellCount": 5,
+      "fullyExited": true,
       "diamondHands": false,
       "activeTrader": true
+    },
+    {
+      "address": "0xfea748c56111ee132af51ef2c1af063066666666",
+      "bought": 5118327.80182319,
+      "sold": 5118327.80182319,
+      "net": 0,
+      "buyCount": 6,
+      "sellCount": 3,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0x14f5fbbf169a2aadccabaf7c1545a2301d559822",
+      "bought": 590142.8567633514,
+      "sold": 0,
+      "net": 590142.8567633514,
+      "buyCount": 9,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
     },
     {
       "address": "0x647f81c3de8f9d7c780c32cc5e93400601667af1",
@@ -479,17 +600,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x470b8e769f25cd7629aabb2559af233b112787da",
-      "bought": 2267672.5361125763,
-      "sold": 1086348.2260904165,
-      "net": 1181324.3100221597,
-      "buyCount": 7,
-      "sellCount": 1,
-      "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
       "address": "0xa7dd5b9c977d7a926d446d6b939be48b93423c34",
       "bought": 221036.56646149233,
       "sold": 0,
@@ -499,6 +609,17 @@
       "fullyExited": false,
       "diamondHands": true,
       "activeTrader": false
+    },
+    {
+      "address": "0x3411ce638fa512a1be5d43e84471173ab5a1875a",
+      "bought": 1152338.7407653828,
+      "sold": 1152338.7407653828,
+      "net": 0,
+      "buyCount": 4,
+      "sellCount": 4,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
     },
     {
       "address": "0x044e18dd17adfa2a0760cc4d0a5aba691629eecd",
@@ -523,17 +644,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x93af86803d8ce199ae333149ec67821bae118635",
-      "bought": 349105.11399324005,
-      "sold": 349105.11399324005,
-      "net": 0,
-      "buyCount": 4,
-      "sellCount": 4,
-      "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": true
-    },
-    {
       "address": "0x4d80648c453584d4b3b92c5a055091d9c3e4f384",
       "bought": 10637022.87909047,
       "sold": 10637022.87909047,
@@ -543,6 +653,17 @@
       "fullyExited": true,
       "diamondHands": false,
       "activeTrader": true
+    },
+    {
+      "address": "0x88054bd4a3d77e11d09702532d594ecfa7777fba",
+      "bought": 749659.0577912967,
+      "sold": 166412.4894442946,
+      "net": 583246.5683470021,
+      "buyCount": 7,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
     },
     {
       "address": "0xbf554b1d3b22d2638b7dbde52339902fbfaae1a0",
@@ -589,6 +710,17 @@
       "activeTrader": false
     },
     {
+      "address": "0xe72a40adb522a702010e8d437a6d812be998dfcd",
+      "bought": 1143057.5798356885,
+      "sold": 0,
+      "net": 1143057.5798356885,
+      "buyCount": 8,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0x2634dd1e2c4d7031fbf675d94e70b97bd0356f8e",
       "bought": 8763720.949529758,
       "sold": 8763720.949529758,
@@ -611,12 +743,45 @@
       "activeTrader": false
     },
     {
+      "address": "0xfe2282be943ddb6500bad74f9d6e2d21af7e1249",
+      "bought": 655583.6188963548,
+      "sold": 0,
+      "net": 655583.6188963548,
+      "buyCount": 8,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0x1db3c6a2ea9fd77e533564f1834b30a382d6a924",
       "bought": 3637327.7377660666,
       "sold": 3237345.1057045776,
       "net": 399982.6320614892,
       "buyCount": 4,
       "sellCount": 3,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0xcb7ab1a08d45748fd6d956e8c422f8cf5944eb87",
+      "bought": 12590736.999726485,
+      "sold": 4435531.949686318,
+      "net": 8155205.050040167,
+      "buyCount": 5,
+      "sellCount": 2,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0x544e53b73ae0d158ca425d749c0d62149317939a",
+      "bought": 1341861.5702393663,
+      "sold": 1139890.6884172559,
+      "net": 201970.88182211047,
+      "buyCount": 3,
+      "sellCount": 4,
       "fullyExited": false,
       "diamondHands": false,
       "activeTrader": true
@@ -631,17 +796,6 @@
       "fullyExited": true,
       "diamondHands": false,
       "activeTrader": true
-    },
-    {
-      "address": "0x88054bd4a3d77e11d09702532d594ecfa7777fba",
-      "bought": 749659.0577912967,
-      "sold": 0,
-      "net": 749659.0577912967,
-      "buyCount": 7,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
     },
     {
       "address": "0xfc21f3fd7b038565b4d89eafc7066e3a12c811fe",
@@ -677,17 +831,6 @@
       "activeTrader": true
     },
     {
-      "address": "0x9636aae56429e221b70ab99feff3fb4642273faf",
-      "bought": 1298358.4174300106,
-      "sold": 1298358.4174300106,
-      "net": 0,
-      "buyCount": 3,
-      "sellCount": 4,
-      "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": true
-    },
-    {
       "address": "0x1213ab7124eab2b241d9fe3ecc64d4fda911d205",
       "bought": 1723571.6670744698,
       "sold": 1723571.6670744698,
@@ -699,10 +842,43 @@
       "activeTrader": true
     },
     {
-      "address": "0xe72a40adb522a702010e8d437a6d812be998dfcd",
-      "bought": 1141277.4399621221,
+      "address": "0x932a629c91e8f8b04bd90626c7cf8791e02dd964",
+      "bought": 445387.6693421923,
+      "sold": 118510.19526232568,
+      "net": 326877.4740798666,
+      "buyCount": 6,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x34a8c6cab4a188312cca1e826f9f027cf7833e1c",
+      "bought": 3838379.238254239,
+      "sold": 3838379.238254239,
+      "net": 0,
+      "buyCount": 4,
+      "sellCount": 3,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0xec12066a8518f811e4170e31b1a18fa500d238a5",
+      "bought": 2211926.014176685,
+      "sold": 2211926.014176685,
+      "net": 0,
+      "buyCount": 6,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x4e09d8a5b8df253b53d116852a9870a6baaafc14",
+      "bought": 7171002.331545649,
       "sold": 0,
-      "net": 1141277.4399621221,
+      "net": 7171002.331545649,
       "buyCount": 7,
       "sellCount": 0,
       "fullyExited": false,
@@ -710,11 +886,66 @@
       "activeTrader": false
     },
     {
+      "address": "0xb6a6b9a21815d5777b76530b3a7e65e8610d4953",
+      "bought": 1114766.8301498322,
+      "sold": 849766.8301498322,
+      "net": 265000,
+      "buyCount": 4,
+      "sellCount": 3,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
       "address": "0x55a9e8d00d37cab30633352bdb946dfb407e1511",
       "bought": 7560627.550131781,
       "sold": 0,
       "net": 7560627.550131781,
       "buyCount": 7,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xc6aae4c1c98370c7e192ea2d635a1ee4bc3c287f",
+      "bought": 772110.4862758915,
+      "sold": 0,
+      "net": 772110.4862758915,
+      "buyCount": 7,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x7b13c2367846d39afd2fa85fe35b50b13747416f",
+      "bought": 2336238.741700771,
+      "sold": 0,
+      "net": 2336238.741700771,
+      "buyCount": 7,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x75a7011f4f809af6666d0a21ef4f23ce2069a60b",
+      "bought": 1277266.2221496373,
+      "sold": 1039831.3828607418,
+      "net": 237434.8392888956,
+      "buyCount": 4,
+      "sellCount": 2,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0x2f6ee248e351a15093c573ff3d6c934384a14ad4",
+      "bought": 5997097.886742604,
+      "sold": 0,
+      "net": 5997097.886742604,
+      "buyCount": 6,
       "sellCount": 0,
       "fullyExited": false,
       "diamondHands": true,
@@ -754,6 +985,17 @@
       "activeTrader": true
     },
     {
+      "address": "0x3fb2e905c882b22fa0c858d835763ba2fc248704",
+      "bought": 50484555.56897964,
+      "sold": 0,
+      "net": 50484555.56897964,
+      "buyCount": 6,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0x934c8f3daf33debed9473b61fe4f80365e826906",
       "bought": 956677.4235935131,
       "sold": 956677.4235935131,
@@ -776,6 +1018,17 @@
       "activeTrader": false
     },
     {
+      "address": "0x7f42f769ec5cfe93434690712c641c7b5aac7f05",
+      "bought": 592176.0932498742,
+      "sold": 592176.0932498742,
+      "net": 0,
+      "buyCount": 2,
+      "sellCount": 4,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
       "address": "0xec13c150946f06afcadbc81782c498fbb216a80c",
       "bought": 80481.08857715089,
       "sold": 36906.06968614547,
@@ -787,21 +1040,10 @@
       "activeTrader": false
     },
     {
-      "address": "0xfea748c56111ee132af51ef2c1af063066666666",
-      "bought": 4030085.36447296,
-      "sold": 1493663.2468316236,
-      "net": 2536422.1176413368,
-      "buyCount": 5,
-      "sellCount": 1,
-      "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0xec12066a8518f811e4170e31b1a18fa500d238a5",
-      "bought": 2211926.014176685,
+      "address": "0x1d5d289dc30122576e4cecce17283cf3948b5ca7",
+      "bought": 4207806.635666748,
       "sold": 0,
-      "net": 2211926.014176685,
+      "net": 4207806.635666748,
       "buyCount": 6,
       "sellCount": 0,
       "fullyExited": false,
@@ -820,6 +1062,17 @@
       "activeTrader": false
     },
     {
+      "address": "0xb038e63b50454d5a467dc18ade524d40af4a3587",
+      "bought": 416096.69527851633,
+      "sold": 416096.69527851633,
+      "net": 0,
+      "buyCount": 4,
+      "sellCount": 2,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
       "address": "0x41e635d81635964b1c957b35607cbb18b2cb3fba",
       "bought": 455018.32016313163,
       "sold": 0,
@@ -829,6 +1082,17 @@
       "fullyExited": false,
       "diamondHands": true,
       "activeTrader": false
+    },
+    {
+      "address": "0x9f9516d55bac54daf1426b34ff74c7c8151cd1d8",
+      "bought": 152488.6865293169,
+      "sold": 152488.6865293169,
+      "net": 0,
+      "buyCount": 3,
+      "sellCount": 3,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
     },
     {
       "address": "0x279d81d99ad2563e3567eeaaeb46286ce3ee9733",
@@ -842,15 +1106,15 @@
       "activeTrader": true
     },
     {
-      "address": "0xb6a6b9a21815d5777b76530b3a7e65e8610d4953",
-      "bought": 1114766.8301498322,
-      "sold": 201292.8894871329,
-      "net": 913473.9406626993,
-      "buyCount": 4,
-      "sellCount": 2,
+      "address": "0x97d13b1e1e6d9cf837c722feb81d51fd22040e31",
+      "bought": 170767.12257390053,
+      "sold": 0,
+      "net": 170767.12257390053,
+      "buyCount": 6,
+      "sellCount": 0,
       "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": true
+      "diamondHands": true,
+      "activeTrader": false
     },
     {
       "address": "0x4dd6a587225ed95393e4ab348cb2715e128aace4",
@@ -861,6 +1125,28 @@
       "sellCount": 1,
       "fullyExited": false,
       "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x327e2a0d83dcd4cbad89b35cf9f768eec81687a8",
+      "bought": 7202384.88109959,
+      "sold": 0,
+      "net": 7202384.88109959,
+      "buyCount": 6,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x7c8daf7361b5f4396589c803194886a276f7409a",
+      "bought": 4466597.704451103,
+      "sold": 0,
+      "net": 4466597.704451103,
+      "buyCount": 6,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
       "activeTrader": false
     },
     {
@@ -875,17 +1161,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x75a7011f4f809af6666d0a21ef4f23ce2069a60b",
-      "bought": 1139531.9613902697,
-      "sold": 1039831.3828607418,
-      "net": 99700.57852952798,
-      "buyCount": 3,
-      "sellCount": 2,
-      "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": true
-    },
-    {
       "address": "0x88a09a05b60e5649e6f20b45d305d80d44431d42",
       "bought": 11707874.68090085,
       "sold": 6707000,
@@ -897,32 +1172,21 @@
       "activeTrader": true
     },
     {
-      "address": "0x7c4227a017c1f21f6f365fe3e4c3e8a817ec26f9",
-      "bought": 17251305.56221457,
-      "sold": 0,
-      "net": 17251305.56221457,
-      "buyCount": 5,
-      "sellCount": 0,
+      "address": "0x704514ccdb7ecca51d3c5cf9d7fdbf471980d7f0",
+      "bought": 1049148.5200410527,
+      "sold": 655717.8250256579,
+      "net": 393430.69501539477,
+      "buyCount": 3,
+      "sellCount": 2,
       "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
+      "diamondHands": false,
+      "activeTrader": true
     },
     {
       "address": "0x95442e8dc7063bef38b9ccd17a13f2fe0b2a0703",
       "bought": 24651157.868076388,
       "sold": 0,
       "net": 24651157.868076388,
-      "buyCount": 5,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x3fb2e905c882b22fa0c858d835763ba2fc248704",
-      "bought": 43173302.10363105,
-      "sold": 0,
-      "net": 43173302.10363105,
       "buyCount": 5,
       "sellCount": 0,
       "fullyExited": false,
@@ -963,10 +1227,54 @@
       "activeTrader": false
     },
     {
+      "address": "0xee93df30aba14b72c95c5306cb05f3a4d2dae5d3",
+      "bought": 1169909.7276440929,
+      "sold": 765391.0250623932,
+      "net": 404518.70258169976,
+      "buyCount": 3,
+      "sellCount": 2,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0x30fba607754c8bb9bfa26d99f5734d9f5f20cbc3",
+      "bought": 256725.7392539544,
+      "sold": 183663.80706284186,
+      "net": 73061.93219111254,
+      "buyCount": 2,
+      "sellCount": 3,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
       "address": "0x29496b7bf2595db8d71c3c15548cab8f85b04771",
       "bought": 20584352.38451233,
       "sold": 0,
       "net": 20584352.38451233,
+      "buyCount": 5,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xaad314c686b80ea255c6881cd017b39e3c09d57a",
+      "bought": 1582751.0261811865,
+      "sold": 0,
+      "net": 1582751.0261811865,
+      "buyCount": 5,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xc3ff44d10abd3c660c06965ee820ec5ab0a78e64",
+      "bought": 300328.492689578,
+      "sold": 0,
+      "net": 300328.492689578,
       "buyCount": 5,
       "sellCount": 0,
       "fullyExited": false,
@@ -1029,6 +1337,17 @@
       "activeTrader": false
     },
     {
+      "address": "0x8bc1f9461e9f3d2657400ef6f5473213069a0b59",
+      "bought": 193657.69185812102,
+      "sold": 126193.57960242717,
+      "net": 67464.11225569384,
+      "buyCount": 3,
+      "sellCount": 2,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
       "address": "0x66015648e32096196165352d3350b27444922299",
       "bought": 1101558.488876327,
       "sold": 1101558.488876327,
@@ -1040,14 +1359,25 @@
       "activeTrader": true
     },
     {
-      "address": "0x932a629c91e8f8b04bd90626c7cf8791e02dd964",
-      "bought": 171408.4646102593,
-      "sold": 118510.19526232568,
-      "net": 52898.26934793364,
+      "address": "0x8bf974a130b84f095a94cc1daf1566c016037625",
+      "bought": 605113.8398436501,
+      "sold": 185286.17587316348,
+      "net": 419827.66397048667,
       "buyCount": 4,
       "sellCount": 1,
       "fullyExited": false,
       "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x9c622ce25a69097537b3eee75c1db3ce28104c36",
+      "bought": 3034633.0413146433,
+      "sold": 0,
+      "net": 3034633.0413146433,
+      "buyCount": 5,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
       "activeTrader": false
     },
     {
@@ -1062,17 +1392,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x34a8c6cab4a188312cca1e826f9f027cf7833e1c",
-      "bought": 2169452.7271642154,
-      "sold": 2169452.7271642154,
-      "net": 0,
-      "buyCount": 3,
-      "sellCount": 2,
-      "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": true
-    },
-    {
       "address": "0x8a2d7ebee3e219177cffc9e61e8a38c66d7510cf",
       "bought": 188479.3271919088,
       "sold": 348460.97189396323,
@@ -1082,6 +1401,17 @@
       "fullyExited": true,
       "diamondHands": false,
       "activeTrader": true
+    },
+    {
+      "address": "0x0842aa323680b7f0bce282267d8c1e6e842a5046",
+      "bought": 253057.06112542463,
+      "sold": 0,
+      "net": 253057.06112542463,
+      "buyCount": 5,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
     },
     {
       "address": "0xa0b693d76af328e6281c2f870eecf40973b1d2f5",
@@ -1106,28 +1436,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x14f5fbbf169a2aadccabaf7c1545a2301d559822",
-      "bought": 242411.07404137283,
-      "sold": 0,
-      "net": 242411.07404137283,
-      "buyCount": 5,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x9f9516d55bac54daf1426b34ff74c7c8151cd1d8",
-      "bought": 152488.6865293169,
-      "sold": 92353.60712715006,
-      "net": 60135.07940216685,
-      "buyCount": 3,
-      "sellCount": 2,
-      "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": true
-    },
-    {
       "address": "0x26c84247042d827c4e03da34d88a36896c744a81",
       "bought": 378404.5706111708,
       "sold": 0,
@@ -1150,6 +1458,39 @@
       "activeTrader": false
     },
     {
+      "address": "0x2b89f84aef21ef02017784aad55fec10695c2418",
+      "bought": 66835.98389501817,
+      "sold": 66835.98389501817,
+      "net": 0,
+      "buyCount": 3,
+      "sellCount": 2,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0x0876e530b9b2bccb8f803690af9988882c09a938",
+      "bought": 773283.3291211801,
+      "sold": 773283.3291211801,
+      "net": 0,
+      "buyCount": 4,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x814c33a00703fca3926be99c74a376dc5b57f5d8",
+      "bought": 2436019.855530372,
+      "sold": 0,
+      "net": 2436019.855530372,
+      "buyCount": 5,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0x511862447ed6f72a7eae11a667d02560e99ff593",
       "bought": 1147347.85594945,
       "sold": 0,
@@ -1161,14 +1502,69 @@
       "activeTrader": false
     },
     {
-      "address": "0xa06c339c9e0d521f93e612391e7460b478d5f85e",
-      "bought": 12899237.13414947,
+      "address": "0xd0ff8a3035e8469566384f3d448bf79b809701a2",
+      "bought": 280348.37110284495,
       "sold": 0,
-      "net": 12899237.13414947,
-      "buyCount": 4,
+      "net": 280348.37110284495,
+      "buyCount": 5,
       "sellCount": 0,
       "fullyExited": false,
       "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x94e131c8230f5d300ce101e2bc31536bf47d0df1",
+      "bought": 2028760.4513426512,
+      "sold": 2028760.4513426512,
+      "net": 0,
+      "buyCount": 3,
+      "sellCount": 2,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0x28cab576d0f839e870998a621e028a4ce0d76a86",
+      "bought": 9507900.366723837,
+      "sold": 9507900.366723837,
+      "net": 0,
+      "buyCount": 2,
+      "sellCount": 3,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0x7a5a4ddeccdabd9ad940a70262d556a1e81f375f",
+      "bought": 358571.5844663283,
+      "sold": 358571.5844663283,
+      "net": 0,
+      "buyCount": 4,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xaa790ef961b76e928e5b722daafa16286ea7f25d",
+      "bought": 10659072.070428737,
+      "sold": 10659072.070428737,
+      "net": 0,
+      "buyCount": 3,
+      "sellCount": 2,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0xc9e1f982678d75b5ca4840103f6d7e6192f8e2d3",
+      "bought": 0,
+      "sold": 3434150.072151354,
+      "net": -3434150.072151354,
+      "buyCount": 0,
+      "sellCount": 5,
+      "fullyExited": true,
+      "diamondHands": false,
       "activeTrader": false
     },
     {
@@ -1282,6 +1678,17 @@
       "activeTrader": false
     },
     {
+      "address": "0x9f601d95adf05344b445efd5a15447cd9bff522e",
+      "bought": 769002.0214281272,
+      "sold": 0,
+      "net": 769002.0214281272,
+      "buyCount": 4,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0x0125054443c774ac1009187b54bd6b035ee4c61a",
       "bought": 4034761.384042577,
       "sold": 134761.38404257686,
@@ -1291,17 +1698,6 @@
       "fullyExited": false,
       "diamondHands": false,
       "activeTrader": true
-    },
-    {
-      "address": "0x704514ccdb7ecca51d3c5cf9d7fdbf471980d7f0",
-      "bought": 1049148.5200410527,
-      "sold": 524574.2600205264,
-      "net": 524574.2600205264,
-      "buyCount": 3,
-      "sellCount": 1,
-      "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": false
     },
     {
       "address": "0xca73621e9465bd3cb12aa190e4fcb6d589dbc3b7",
@@ -1337,26 +1733,15 @@
       "activeTrader": false
     },
     {
-      "address": "0x7f42f769ec5cfe93434690712c641c7b5aac7f05",
-      "bought": 260620.7351808758,
-      "sold": 260620.7351808758,
-      "net": 0,
-      "buyCount": 1,
-      "sellCount": 3,
-      "fullyExited": true,
+      "address": "0x1fd8f3c51b92441ceab2ce5583512129cff0ee29",
+      "bought": 7029042.425454753,
+      "sold": 2014521.2127273767,
+      "net": 5014521.212727376,
+      "buyCount": 3,
+      "sellCount": 1,
+      "fullyExited": false,
       "diamondHands": false,
       "activeTrader": false
-    },
-    {
-      "address": "0x3411ce638fa512a1be5d43e84471173ab5a1875a",
-      "bought": 531663.0447363082,
-      "sold": 531663.0447363082,
-      "net": 0,
-      "buyCount": 2,
-      "sellCount": 2,
-      "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": true
     },
     {
       "address": "0x19f86add154950edd10883e7fe142423932d6935",
@@ -1381,9 +1766,9 @@
       "activeTrader": false
     },
     {
-      "address": "0xee93df30aba14b72c95c5306cb05f3a4d2dae5d3",
-      "bought": 765391.0250623932,
-      "sold": 765391.0250623932,
+      "address": "0x5253965537144fd83b1d617f9025ac7856feb4de",
+      "bought": 2742138.4593207785,
+      "sold": 2742138.4593207785,
       "net": 0,
       "buyCount": 2,
       "sellCount": 2,
@@ -1458,14 +1843,14 @@
       "activeTrader": false
     },
     {
-      "address": "0xc3ff44d10abd3c660c06965ee820ec5ab0a78e64",
-      "bought": 56813.31108136682,
-      "sold": 0,
-      "net": 56813.31108136682,
-      "buyCount": 4,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
+      "address": "0x8442c503cd19f532525284046eb9cb1ac56afbb9",
+      "bought": 26986.018780833696,
+      "sold": 26986.018780833696,
+      "net": 0,
+      "buyCount": 3,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
       "activeTrader": false
     },
     {
@@ -1557,10 +1942,10 @@
       "activeTrader": true
     },
     {
-      "address": "0x8bc1f9461e9f3d2657400ef6f5473213069a0b59",
-      "bought": 193657.69185812102,
-      "sold": 58729.46734673333,
-      "net": 134928.22451138767,
+      "address": "0x7dd691fedc4b533099929a16de1c1c56ecb4c537",
+      "bought": 1258435.3852556252,
+      "sold": 1111,
+      "net": 1257324.3852556252,
       "buyCount": 3,
       "sellCount": 1,
       "fullyExited": false,
@@ -1579,15 +1964,37 @@
       "activeTrader": false
     },
     {
-      "address": "0x8bf974a130b84f095a94cc1daf1566c016037625",
-      "bought": 370572.35174632695,
-      "sold": 185286.17587316348,
-      "net": 185286.17587316348,
-      "buyCount": 3,
-      "sellCount": 1,
-      "fullyExited": false,
+      "address": "0xe05e757025a8ecc0af6975166b5c2360876404f6",
+      "bought": 682267.3416836938,
+      "sold": 682267.3416836938,
+      "net": 0,
+      "buyCount": 2,
+      "sellCount": 2,
+      "fullyExited": true,
       "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0xe072397a452d6904058eeb1a96639de354343f25",
+      "bought": 2714770.317522608,
+      "sold": 0,
+      "net": 2714770.317522608,
+      "buyCount": 4,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
       "activeTrader": false
+    },
+    {
+      "address": "0xfb53fdcf46d8cfcd5b1f3e43f48a81142193fd94",
+      "bought": 1873377.1422348083,
+      "sold": 1873377.1422348083,
+      "net": 0,
+      "buyCount": 2,
+      "sellCount": 2,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
     },
     {
       "address": "0x35213397143307b7086d5eea66161a87f4903b02",
@@ -1612,15 +2019,15 @@
       "activeTrader": false
     },
     {
-      "address": "0x1d5d289dc30122576e4cecce17283cf3948b5ca7",
-      "bought": 2029475.0817064315,
-      "sold": 0,
-      "net": 2029475.0817064315,
-      "buyCount": 4,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
+      "address": "0x31991dac341b353c83bdf72577fa8fa0d065469c",
+      "bought": 1706999.1554198738,
+      "sold": 1706999.1554198738,
+      "net": 0,
+      "buyCount": 2,
+      "sellCount": 2,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
     },
     {
       "address": "0xac1c61373766aacb6472e2be7d03828fbfabe06a",
@@ -1656,6 +2063,28 @@
       "activeTrader": false
     },
     {
+      "address": "0x41e16a854fa335fb9806a6f63b5aa229f8a93288",
+      "bought": 3936961.693713713,
+      "sold": 1497203.3896859891,
+      "net": 2439758.304027724,
+      "buyCount": 2,
+      "sellCount": 2,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0xf3ac811cff58c18a1bea4cac71973962ca112557",
+      "bought": 3115868.3345883717,
+      "sold": 1550962.1774902812,
+      "net": 1564906.1570980905,
+      "buyCount": 3,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
       "address": "0x2a986b33d6330bbb5333c6e19da018dad7c2e2b0",
       "bought": 14154.610453160061,
       "sold": 10554.610453160061,
@@ -1665,6 +2094,17 @@
       "fullyExited": false,
       "diamondHands": false,
       "activeTrader": true
+    },
+    {
+      "address": "0x276e6bcb6f61d3e81849fc8758f50e1ce71cd041",
+      "bought": 239442.88741646105,
+      "sold": 0,
+      "net": 239442.88741646105,
+      "buyCount": 4,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
     },
     {
       "address": "0x6c33a925c2d3d92d459ea7a8dbc0c326ea616c63",
@@ -1685,28 +2125,6 @@
       "buyCount": 3,
       "sellCount": 1,
       "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0x4e09d8a5b8df253b53d116852a9870a6baaafc14",
-      "bought": 2714105.436746594,
-      "sold": 0,
-      "net": 2714105.436746594,
-      "buyCount": 4,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x2b89f84aef21ef02017784aad55fec10695c2418",
-      "bought": 66835.98389501817,
-      "sold": 13644.138885029952,
-      "net": 53191.84500998822,
-      "buyCount": 3,
-      "sellCount": 1,
-      "fullyExited": false,
       "diamondHands": false,
       "activeTrader": false
     },
@@ -1755,17 +2173,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x0876e530b9b2bccb8f803690af9988882c09a938",
-      "bought": 773283.3291211801,
-      "sold": 0,
-      "net": 773283.3291211801,
-      "buyCount": 4,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0xd6cb74c5dd5e9dcc8cddaac013eac51645641511",
       "bought": 556887.2272385608,
       "sold": 556887.2272385608,
@@ -1775,17 +2182,6 @@
       "fullyExited": true,
       "diamondHands": false,
       "activeTrader": true
-    },
-    {
-      "address": "0x814c33a00703fca3926be99c74a376dc5b57f5d8",
-      "bought": 1802500.5085010808,
-      "sold": 0,
-      "net": 1802500.5085010808,
-      "buyCount": 4,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
     },
     {
       "address": "0xd37ec4c923605bd14cd83c818531610c1dc8082a",
@@ -1799,6 +2195,17 @@
       "activeTrader": false
     },
     {
+      "address": "0x7dde673605d7a95a787420c55357a90cd5717d4b",
+      "bought": 17489.76763936838,
+      "sold": 17489.76763936838,
+      "net": 0,
+      "buyCount": 2,
+      "sellCount": 2,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
       "address": "0x57b92faa5e0fce4ce68dce04599c8123e74e38c5",
       "bought": 20460413.338394657,
       "sold": 0,
@@ -1810,26 +2217,15 @@
       "activeTrader": false
     },
     {
-      "address": "0x97d13b1e1e6d9cf837c722feb81d51fd22040e31",
-      "bought": 52423.81654682234,
+      "address": "0xe24124607cff27004206974223e5abd8d9e1e865",
+      "bought": 147662.6017295407,
       "sold": 0,
-      "net": 52423.81654682234,
+      "net": 147662.6017295407,
       "buyCount": 4,
       "sellCount": 0,
       "fullyExited": false,
       "diamondHands": true,
       "activeTrader": false
-    },
-    {
-      "address": "0xf3467a2b4796c94ff72c23eb8e5135bd76e5c149",
-      "bought": 2065304.5486730323,
-      "sold": 2065304.5486730323,
-      "net": 0,
-      "buyCount": 2,
-      "sellCount": 2,
-      "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": true
     },
     {
       "address": "0xb486c677b475fbf97c97531cb20b0795452a67d0",
@@ -1843,17 +2239,6 @@
       "activeTrader": true
     },
     {
-      "address": "0xd0ff8a3035e8469566384f3d448bf79b809701a2",
-      "bought": 153921.09564447938,
-      "sold": 0,
-      "net": 153921.09564447938,
-      "buyCount": 4,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0xc65aa07a7134b08a558cbc29aba93cebdfb02a33",
       "bought": 768421.4994122004,
       "sold": 0,
@@ -1865,6 +2250,17 @@
       "activeTrader": false
     },
     {
+      "address": "0x3dba8813419b5c869a889c8568edfcc4ee978b90",
+      "bought": 703596.96437663,
+      "sold": 703596.96437663,
+      "net": 0,
+      "buyCount": 2,
+      "sellCount": 2,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
       "address": "0xf8d9739f624816a8d34e8cc16427f0ede1819801",
       "bought": 9792797.561770286,
       "sold": 9792797.561770286,
@@ -1874,6 +2270,83 @@
       "fullyExited": true,
       "diamondHands": false,
       "activeTrader": true
+    },
+    {
+      "address": "0x1837e2cfc622a72368ed835c1a98fcfc5de42b0f",
+      "bought": 6696807.11678977,
+      "sold": 6696807.11678977,
+      "net": 0,
+      "buyCount": 2,
+      "sellCount": 2,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": true
+    },
+    {
+      "address": "0xdab21f49562204b2f0229bd5a5dbec114c0683ee",
+      "bought": 4355309.606591306,
+      "sold": 2177654.803295,
+      "net": 2177654.8032963052,
+      "buyCount": 3,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xc84be5b1c225cc0ccd1965ee19aebd54490f78ec",
+      "bought": 95871.08766607492,
+      "sold": 49588.26336134245,
+      "net": 46282.82430473247,
+      "buyCount": 3,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x21a584ab5d9e44b5b90fab28a77faaadb5a2e9b8",
+      "bought": 274902.04507921246,
+      "sold": 0,
+      "net": 274902.04507921246,
+      "buyCount": 4,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x0a28f7bba95b8ffd3b39ee0fc0700f84cdc0b397",
+      "bought": 7455515.306486945,
+      "sold": 0,
+      "net": 7455515.306486945,
+      "buyCount": 4,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x3b8de87ec836cfdc35f84a99c1a49ecd47534cdb",
+      "bought": 1406029.563055765,
+      "sold": 0,
+      "net": 1406029.563055765,
+      "buyCount": 4,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x42b5ac2512a3117687ce9272ab877a3956afd9f0",
+      "bought": 27151651.179958493,
+      "sold": 11948245.399199607,
+      "net": 15203405.780758886,
+      "buyCount": 2,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
     },
     {
       "address": "0x0808486e032683dc948dcdb1f96c986af57d621f",
@@ -1920,17 +2393,6 @@
       "activeTrader": false
     },
     {
-      "address": "0xcb7ab1a08d45748fd6d956e8c422f8cf5944eb87",
-      "bought": 9483010.969790757,
-      "sold": 1327805.919750589,
-      "net": 8155205.050040167,
-      "buyCount": 2,
-      "sellCount": 1,
-      "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
       "address": "0xe9cfc6e40043fc068949e851d9ccc492b85bc9d2",
       "bought": 7292375.876657063,
       "sold": 0,
@@ -1950,6 +2412,17 @@
       "sellCount": 2,
       "fullyExited": true,
       "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x8179d6a2d7e61931c60af9edbb496ea85b55b596",
+      "bought": 2266706.0606243275,
+      "sold": 0,
+      "net": 2266706.0606243275,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
       "activeTrader": false
     },
     {
@@ -1975,10 +2448,10 @@
       "activeTrader": false
     },
     {
-      "address": "0x9f601d95adf05344b445efd5a15447cd9bff522e",
-      "bought": 455477.7005161104,
+      "address": "0x1df1a1d728a329722fb3d6db3c2c9a224ce89211",
+      "bought": 484241.0031144842,
       "sold": 0,
-      "net": 455477.7005161104,
+      "net": 484241.0031144842,
       "buyCount": 3,
       "sellCount": 0,
       "fullyExited": false,
@@ -2019,21 +2492,10 @@
       "activeTrader": false
     },
     {
-      "address": "0x544e53b73ae0d158ca425d749c0d62149317939a",
-      "bought": 1341108.0341882,
-      "sold": 265939.4272733875,
-      "net": 1075168.6069148125,
-      "buyCount": 2,
-      "sellCount": 1,
-      "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0xd63db203772b19bb2c7bd8b27c7f582ac104a7be",
-      "bought": 55680.04974541374,
+      "address": "0x7929656d46c163e0434eefcef0f900de4867cd6b",
+      "bought": 4378824.493279905,
       "sold": 0,
-      "net": 55680.04974541374,
+      "net": 4378824.493279905,
       "buyCount": 3,
       "sellCount": 0,
       "fullyExited": false,
@@ -2041,10 +2503,21 @@
       "activeTrader": false
     },
     {
-      "address": "0x1fd8f3c51b92441ceab2ce5583512129cff0ee29",
-      "bought": 7029042.425454753,
+      "address": "0xbe724450b887f6ed4aa8105169ce79a54de6088e",
+      "bought": 16393529.347480481,
       "sold": 0,
-      "net": 7029042.425454753,
+      "net": 16393529.347480481,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xd63db203772b19bb2c7bd8b27c7f582ac104a7be",
+      "bought": 55680.04974541374,
+      "sold": 0,
+      "net": 55680.04974541374,
       "buyCount": 3,
       "sellCount": 0,
       "fullyExited": false,
@@ -2096,6 +2569,17 @@
       "activeTrader": false
     },
     {
+      "address": "0xedf3c91daaad35ab4c55e80b34e0106dd1b99b84",
+      "bought": 11371951.2296829,
+      "sold": 0,
+      "net": 11371951.2296829,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0xa85ab9769f9c40aeb8dc8441fdd1b25dea21ba1b",
       "bought": 3908113.256053947,
       "sold": 0,
@@ -2129,10 +2613,32 @@
       "activeTrader": false
     },
     {
+      "address": "0xde12d4c718621139703962ed4eebc12f2f7ce47f",
+      "bought": 1075995.6963545203,
+      "sold": 571068.046120317,
+      "net": 504927.6502342033,
+      "buyCount": 2,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
       "address": "0xc8b8f77b9673ce8a195d140aed77066120a0d483",
       "bought": 36281.93107519253,
       "sold": 0,
       "net": 36281.93107519253,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x83f0c60069a11d650c628bb75fb6c53b048316f2",
+      "bought": 154115.93236623576,
+      "sold": 0,
+      "net": 154115.93236623576,
       "buyCount": 3,
       "sellCount": 0,
       "fullyExited": false,
@@ -2151,10 +2657,10 @@
       "activeTrader": false
     },
     {
-      "address": "0x5253965537144fd83b1d617f9025ac7856feb4de",
-      "bought": 2742138.4593207785,
-      "sold": 486830.3588526655,
-      "net": 2255308.1004681126,
+      "address": "0xf6028dd6a9245b44f41dd88828c3148901657ffd",
+      "bought": 12180904.758405032,
+      "sold": 7844551.70804737,
+      "net": 4336353.050357662,
       "buyCount": 2,
       "sellCount": 1,
       "fullyExited": false,
@@ -2206,39 +2712,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x30fba607754c8bb9bfa26d99f5734d9f5f20cbc3",
-      "bought": 110601.87487172932,
-      "sold": 110601.87487172932,
-      "net": 0,
-      "buyCount": 1,
-      "sellCount": 2,
-      "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0xaad314c686b80ea255c6881cd017b39e3c09d57a",
-      "bought": 989275.8789082111,
-      "sold": 0,
-      "net": 989275.8789082111,
-      "buyCount": 3,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x8442c503cd19f532525284046eb9cb1ac56afbb9",
-      "bought": 26986.018780833696,
-      "sold": 0,
-      "net": 26986.018780833696,
-      "buyCount": 3,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x3882efe29eb18bc9e1a440c36f7a2244fd7fc67e",
       "bought": 555744.1314324527,
       "sold": 0,
@@ -2258,6 +2731,17 @@
       "sellCount": 1,
       "fullyExited": false,
       "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xbe0dd578600cca43181aba43f9876817f5883e71",
+      "bought": 1288268.6638345495,
+      "sold": 0,
+      "net": 1288268.6638345495,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
       "activeTrader": false
     },
     {
@@ -2316,17 +2800,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x7dd691fedc4b533099929a16de1c1c56ecb4c537",
-      "bought": 740486.691229223,
-      "sold": 1111,
-      "net": 739375.691229223,
-      "buyCount": 2,
-      "sellCount": 1,
-      "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
       "address": "0x70f2fec449bab02dfe0194ec51847c98adbf44f2",
       "bought": 2278083.6340439226,
       "sold": 0,
@@ -2349,39 +2822,6 @@
       "activeTrader": false
     },
     {
-      "address": "0xe05e757025a8ecc0af6975166b5c2360876404f6",
-      "bought": 682267.3416836938,
-      "sold": 279803.2425550716,
-      "net": 402464.0991286222,
-      "buyCount": 2,
-      "sellCount": 1,
-      "fullyExited": false,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0x9c622ce25a69097537b3eee75c1db3ce28104c36",
-      "bought": 1075295.9021906187,
-      "sold": 0,
-      "net": 1075295.9021906187,
-      "buyCount": 3,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0xe072397a452d6904058eeb1a96639de354343f25",
-      "bought": 2188621.727488569,
-      "sold": 0,
-      "net": 2188621.727488569,
-      "buyCount": 3,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0xf57dd5647b5978be869ea2f74dced71002188267",
       "bought": 43206.620430303235,
       "sold": 43206.620430303235,
@@ -2393,13 +2833,13 @@
       "activeTrader": false
     },
     {
-      "address": "0xfb53fdcf46d8cfcd5b1f3e43f48a81142193fd94",
-      "bought": 1873377.1422348083,
-      "sold": 1139306.352083497,
-      "net": 734070.7901513113,
+      "address": "0xab315f86070a0e5169212a7d1f7adeb6d074901b",
+      "bought": 187209.50081080108,
+      "sold": 187209.50081080108,
+      "net": 0,
       "buyCount": 2,
       "sellCount": 1,
-      "fullyExited": false,
+      "fullyExited": true,
       "diamondHands": false,
       "activeTrader": false
     },
@@ -2470,21 +2910,10 @@
       "activeTrader": false
     },
     {
-      "address": "0xd8bd3186de743642db0d60b1885ef6229e19a9d4",
-      "bought": 1510381.398525814,
-      "sold": 1510381.398525814,
-      "net": 0,
-      "buyCount": 2,
-      "sellCount": 1,
-      "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0x0842aa323680b7f0bce282267d8c1e6e842a5046",
-      "bought": 183536.24855693302,
+      "address": "0x6e1526d700f70354419eb8153a5b51e0cc916ba1",
+      "bought": 2611303.1588597493,
       "sold": 0,
-      "net": 183536.24855693302,
+      "net": 2611303.1588597493,
       "buyCount": 3,
       "sellCount": 0,
       "fullyExited": false,
@@ -2492,13 +2921,13 @@
       "activeTrader": false
     },
     {
-      "address": "0x41e16a854fa335fb9806a6f63b5aa229f8a93288",
-      "bought": 3936961.693713713,
-      "sold": 683950.6216779891,
-      "net": 3253011.072035724,
+      "address": "0xd8bd3186de743642db0d60b1885ef6229e19a9d4",
+      "bought": 1510381.398525814,
+      "sold": 1510381.398525814,
+      "net": 0,
       "buyCount": 2,
       "sellCount": 1,
-      "fullyExited": false,
+      "fullyExited": true,
       "diamondHands": false,
       "activeTrader": false
     },
@@ -2514,6 +2943,17 @@
       "activeTrader": false
     },
     {
+      "address": "0xea623ab1a2530ea1fa40de878326ec1c68151b88",
+      "bought": 569094.2056008459,
+      "sold": 227637.68224033836,
+      "net": 341456.5233605075,
+      "buyCount": 2,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
       "address": "0x536f6e6bcbab397cf71212bbd2f09b8a5e0d3a1c",
       "bought": 250863.47675814925,
       "sold": 0,
@@ -2522,17 +2962,6 @@
       "sellCount": 0,
       "fullyExited": false,
       "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0xf3ac811cff58c18a1bea4cac71973962ca112557",
-      "bought": 2067949.5699870416,
-      "sold": 1550962.1774902812,
-      "net": 516987.3924967604,
-      "buyCount": 2,
-      "sellCount": 1,
-      "fullyExited": false,
-      "diamondHands": false,
       "activeTrader": false
     },
     {
@@ -2690,6 +3119,17 @@
       "activeTrader": false
     },
     {
+      "address": "0x63862b469cc1dac32b29ac05e749adbe0cd0b85c",
+      "bought": 6874071.789544962,
+      "sold": 0,
+      "net": 6874071.789544962,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0xf2af83b4e1e4065ef21a16c99d1a34a464ac6530",
       "bought": 268308.97859607125,
       "sold": 13415.448929803562,
@@ -2701,10 +3141,54 @@
       "activeTrader": false
     },
     {
+      "address": "0x991f23fddb8bedf6cf56bb6d208a54a44bca2ecf",
+      "bought": 1384466.2136753255,
+      "sold": 0,
+      "net": 1384466.2136753255,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0x17a8552df414ad867d0514619d3746a6e934f234",
       "bought": 128572.37786680863,
       "sold": 0,
       "net": 128572.37786680863,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x57d8de54a1671d66446cb1b9862ec9434939cb65",
+      "bought": 33190.11645168457,
+      "sold": 0,
+      "net": 33190.11645168457,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x5a0d8ba29e31380df06f1302274e12ed432522ee",
+      "bought": 677446.6954299852,
+      "sold": 469698.19669983815,
+      "net": 207748.49873014708,
+      "buyCount": 2,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x6aafd2f727684d560638f60124ff6d3e7651262f",
+      "bought": 400793.54393373965,
+      "sold": 0,
+      "net": 400793.54393373965,
       "buyCount": 3,
       "sellCount": 0,
       "fullyExited": false,
@@ -2723,14 +3207,36 @@
       "activeTrader": false
     },
     {
-      "address": "0xe24124607cff27004206974223e5abd8d9e1e865",
-      "bought": 121740.24007480535,
+      "address": "0xb5c10fad430197b30d73d79e0b2c7b747501b968",
+      "bought": 2894139.7840072736,
       "sold": 0,
-      "net": 121740.24007480535,
+      "net": 2894139.7840072736,
       "buyCount": 3,
       "sellCount": 0,
       "fullyExited": false,
       "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x1434651d4a3127ab5e92d4228b11416452b90bde",
+      "bought": 2390608.867596217,
+      "sold": 0,
+      "net": 2390608.867596217,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x2e09261fa59e15a5317d6adfab1138be135fcdaa",
+      "bought": 339394.42127541185,
+      "sold": 339394.42127541185,
+      "net": 0,
+      "buyCount": 2,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
       "activeTrader": false
     },
     {
@@ -2738,17 +3244,6 @@
       "bought": 83669.10666426278,
       "sold": 0,
       "net": 83669.10666426278,
-      "buyCount": 3,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0xa71ff93ac169ae38210a91c840119d7e491bb988",
-      "bought": 5987350.640085177,
-      "sold": 0,
-      "net": 5987350.640085177,
       "buyCount": 3,
       "sellCount": 0,
       "fullyExited": false,
@@ -2800,6 +3295,72 @@
       "activeTrader": false
     },
     {
+      "address": "0x5439055db2b7214bd13ef0853c62eca7e732ac77",
+      "bought": 58981.04194042491,
+      "sold": 0,
+      "net": 58981.04194042491,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x4c685e25e7c280e8c8a3276c79263d0f3480ed39",
+      "bought": 2564202.8196441517,
+      "sold": 0,
+      "net": 2564202.8196441517,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xbb67bd0d00c1cc109740de9aed4f1bc89b4b1f24",
+      "bought": 311768.2539210137,
+      "sold": 0,
+      "net": 311768.2539210137,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xde516a96bd0c5f4abcd5f0fb01abbfe447a5ae76",
+      "bought": 5620291.1928284755,
+      "sold": 0,
+      "net": 5620291.1928284755,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x3fcd8c2c8ac4dd8d38167155c145302aeab5466a",
+      "bought": 51594.35017583414,
+      "sold": 0,
+      "net": 51594.35017583414,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x23c98294f6cb63a0a1d1b10096bfa7823ddae31b",
+      "bought": 4610698.008226194,
+      "sold": 0,
+      "net": 4610698.008226194,
+      "buyCount": 3,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0x586b5e77581a2ea7708464ae804cb9394568672b",
       "bought": 12473554.996709164,
       "sold": 0,
@@ -2808,17 +3369,6 @@
       "sellCount": 0,
       "fullyExited": false,
       "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x42b5ac2512a3117687ce9272ab877a3956afd9f0",
-      "bought": 11948245.399199607,
-      "sold": 11948245.399199607,
-      "net": 0,
-      "buyCount": 1,
-      "sellCount": 1,
-      "fullyExited": true,
-      "diamondHands": false,
       "activeTrader": false
     },
     {
@@ -3031,10 +3581,10 @@
       "activeTrader": false
     },
     {
-      "address": "0x8179d6a2d7e61931c60af9edbb496ea85b55b596",
-      "bought": 1695031.9032961794,
+      "address": "0xa98f58ff9fd1e5fdb002b479927faa0a17a03e13",
+      "bought": 108147.87196443178,
       "sold": 0,
-      "net": 1695031.9032961794,
+      "net": 108147.87196443178,
       "buyCount": 2,
       "sellCount": 0,
       "fullyExited": false,
@@ -3042,10 +3592,10 @@
       "activeTrader": false
     },
     {
-      "address": "0x1df1a1d728a329722fb3d6db3c2c9a224ce89211",
-      "bought": 330954.80419472395,
+      "address": "0x4bf84ae236ac4769953f7a0db52326f955c0f97b",
+      "bought": 1231605.1187495745,
       "sold": 0,
-      "net": 330954.80419472395,
+      "net": 1231605.1187495745,
       "buyCount": 2,
       "sellCount": 0,
       "fullyExited": false,
@@ -3094,17 +3644,6 @@
       "sellCount": 1,
       "fullyExited": true,
       "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0x2f6ee248e351a15093c573ff3d6c934384a14ad4",
-      "bought": 496270.7772686035,
-      "sold": 0,
-      "net": 496270.7772686035,
-      "buyCount": 2,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
       "activeTrader": false
     },
     {
@@ -3189,17 +3728,6 @@
       "bought": 2169726.0260001454,
       "sold": 0,
       "net": 2169726.0260001454,
-      "buyCount": 2,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0xbe724450b887f6ed4aa8105169ce79a54de6088e",
-      "bought": 5079750.013033736,
-      "sold": 0,
-      "net": 5079750.013033736,
       "buyCount": 2,
       "sellCount": 0,
       "fullyExited": false,
@@ -3361,17 +3889,6 @@
       "activeTrader": false
     },
     {
-      "address": "0xeb6f1662874bc3b149b83c3be74b2e5c47518a45",
-      "bought": 540734.9659207971,
-      "sold": 0,
-      "net": 540734.9659207971,
-      "buyCount": 2,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x3ac984227dbe0e7c32ccd9eb3792d30749f24a64",
       "bought": 11000990.193452096,
       "sold": 0,
@@ -3383,32 +3900,10 @@
       "activeTrader": false
     },
     {
-      "address": "0xde12d4c718621139703962ed4eebc12f2f7ce47f",
-      "bought": 1075995.6963545203,
-      "sold": 0,
-      "net": 1075995.6963545203,
-      "buyCount": 2,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x132eff2caba32819280e0b0d646a1b650926b892",
       "bought": 431548.41541207954,
       "sold": 0,
       "net": 431548.41541207954,
-      "buyCount": 2,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x83f0c60069a11d650c628bb75fb6c53b048316f2",
-      "bought": 100016.68634870346,
-      "sold": 0,
-      "net": 100016.68634870346,
       "buyCount": 2,
       "sellCount": 0,
       "fullyExited": false,
@@ -3430,17 +3925,6 @@
       "address": "0x0c7555d6c8a83c182bbb792859887f6db7cb9ff9",
       "bought": 74137.87416219953,
       "sold": 74137.87416219953,
-      "net": 0,
-      "buyCount": 1,
-      "sellCount": 1,
-      "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0xf6028dd6a9245b44f41dd88828c3148901657ffd",
-      "bought": 7844551.70804737,
-      "sold": 7844551.70804737,
       "net": 0,
       "buyCount": 1,
       "sellCount": 1,
@@ -3757,6 +4241,17 @@
       "activeTrader": false
     },
     {
+      "address": "0xb6a30fd5ed09dadd85ff5d6c0c704273053f6bc3",
+      "bought": 1011361.9551343614,
+      "sold": 1011361.9551343614,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
       "address": "0x95f5a3dd0084f5b6e5b0683a8993616a2431e218",
       "bought": 107737.90985799827,
       "sold": 0,
@@ -3812,17 +4307,6 @@
       "activeTrader": false
     },
     {
-      "address": "0xab315f86070a0e5169212a7d1f7adeb6d074901b",
-      "bought": 187209.50081080108,
-      "sold": 0,
-      "net": 187209.50081080108,
-      "buyCount": 2,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x6d4ee8a1b1accd3218e3c49b4741d0e2cdc0c965",
       "bought": 357327.0685379719,
       "sold": 357327.0685379719,
@@ -3845,6 +4329,17 @@
       "activeTrader": false
     },
     {
+      "address": "0x9ca12ee9d25de383d8dde730f34d8bbc324f595a",
+      "bought": 1705177.1044506016,
+      "sold": 0,
+      "net": 1705177.1044506016,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0xcf8fa57c7a0cbcec23978bfce55645afd2a77abd",
       "bought": 286492.93522839027,
       "sold": 0,
@@ -3853,17 +4348,6 @@
       "sellCount": 0,
       "fullyExited": false,
       "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x31991dac341b353c83bdf72577fa8fa0d065469c",
-      "bought": 854857.7965282192,
-      "sold": 854857.7965282192,
-      "net": 0,
-      "buyCount": 1,
-      "sellCount": 1,
-      "fullyExited": true,
-      "diamondHands": false,
       "activeTrader": false
     },
     {
@@ -3893,6 +4377,39 @@
       "bought": 281905.1446306915,
       "sold": 0,
       "net": 281905.1446306915,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x17078d3b7f67f7207719b7e0f91656644425e58e",
+      "bought": 1543.4548917845918,
+      "sold": 0,
+      "net": 1543.4548917845918,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x86c79fa5c75bb947cd9443b1e9dcb670a0546806",
+      "bought": 3307033.883108816,
+      "sold": 0,
+      "net": 3307033.883108816,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x6fd47437d11644bb071bbbccadf9f20572038600",
+      "bought": 33810.92927870329,
+      "sold": 0,
+      "net": 33810.92927870329,
       "buyCount": 2,
       "sellCount": 0,
       "fullyExited": false,
@@ -3944,10 +4461,10 @@
       "activeTrader": false
     },
     {
-      "address": "0xb038e63b50454d5a467dc18ade524d40af4a3587",
-      "bought": 127958.3808846104,
+      "address": "0x27af79cc75d498c0e2440d5c42e14d3b4dff8dca",
+      "bought": 240740.8947287045,
       "sold": 0,
-      "net": 127958.3808846104,
+      "net": 240740.8947287045,
       "buyCount": 2,
       "sellCount": 0,
       "fullyExited": false,
@@ -3963,17 +4480,6 @@
       "sellCount": 1,
       "fullyExited": true,
       "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0xea623ab1a2530ea1fa40de878326ec1c68151b88",
-      "bought": 569094.2056008459,
-      "sold": 0,
-      "net": 569094.2056008459,
-      "buyCount": 2,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
       "activeTrader": false
     },
     {
@@ -4054,6 +4560,17 @@
       "activeTrader": false
     },
     {
+      "address": "0x6908613ab3f2cba0c213dcdc9fb1a66d5efdb958",
+      "bought": 116278.20721123596,
+      "sold": 116278.20721123596,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
       "address": "0x2a1e3a60d83d100db5082590255ff960a06a972e",
       "bought": 427003.8221545754,
       "sold": 0,
@@ -4069,17 +4586,6 @@
       "bought": 85197.58031044781,
       "sold": 0,
       "net": 85197.58031044781,
-      "buyCount": 2,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x276e6bcb6f61d3e81849fc8758f50e1ce71cd041",
-      "bought": 77115.43488456882,
-      "sold": 0,
-      "net": 77115.43488456882,
       "buyCount": 2,
       "sellCount": 0,
       "fullyExited": false,
@@ -4186,6 +4692,28 @@
       "activeTrader": false
     },
     {
+      "address": "0x47463a374676436af551ff0c11e382d0786d3c4a",
+      "bought": 324523.8900343034,
+      "sold": 0,
+      "net": 324523.8900343034,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xd691f42c8301fc56b056b96527143eeec3f9c79e",
+      "bought": 2148989.278373575,
+      "sold": 2148989.278373575,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
       "address": "0xb90501f22e478b9bd9f3f8a2119b91fd4d53d0b5",
       "bought": 112434.17029395072,
       "sold": 0,
@@ -4241,6 +4769,17 @@
       "activeTrader": false
     },
     {
+      "address": "0x476d629b0de8d0929389520893c14bf4cd8dbbae",
+      "bought": 983712.3447464188,
+      "sold": 0,
+      "net": 983712.3447464188,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0xf613bdee12ebf8b204d21c4ab57793f0ad47c607",
       "bought": 226517.3547805167,
       "sold": 0,
@@ -4271,17 +4810,6 @@
       "sellCount": 1,
       "fullyExited": true,
       "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0x63862b469cc1dac32b29ac05e749adbe0cd0b85c",
-      "bought": 2266775.910599761,
-      "sold": 0,
-      "net": 2266775.910599761,
-      "buyCount": 2,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
       "activeTrader": false
     },
     {
@@ -4340,28 +4868,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x7dde673605d7a95a787420c55357a90cd5717d4b",
-      "bought": 9565.13524601329,
-      "sold": 9565.13524601329,
-      "net": 0,
-      "buyCount": 1,
-      "sellCount": 1,
-      "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
-      "address": "0x991f23fddb8bedf6cf56bb6d208a54a44bca2ecf",
-      "bought": 989971.4354172766,
-      "sold": 0,
-      "net": 989971.4354172766,
-      "buyCount": 2,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x801130a7458584b04316f5f08d46f6b2db12399d",
       "bought": 2060964.9423335055,
       "sold": 2060964.9423335055,
@@ -4381,6 +4887,17 @@
       "sellCount": 1,
       "fullyExited": true,
       "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x2dab68c813d812177121ebf78ee8f44c0acb4edb",
+      "bought": 482652.3236271001,
+      "sold": 0,
+      "net": 482652.3236271001,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
       "activeTrader": false
     },
     {
@@ -4417,28 +4934,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x57d8de54a1671d66446cb1b9862ec9434939cb65",
-      "bought": 14256.394962606038,
-      "sold": 0,
-      "net": 14256.394962606038,
-      "buyCount": 2,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x5a0d8ba29e31380df06f1302274e12ed432522ee",
-      "bought": 469698.19669983815,
-      "sold": 469698.19669983815,
-      "net": 0,
-      "buyCount": 1,
-      "sellCount": 1,
-      "fullyExited": true,
-      "diamondHands": false,
-      "activeTrader": false
-    },
-    {
       "address": "0xbea32b8d21d84d9af3784f996cf8584d5bf1f366",
       "bought": 466901.5340990542,
       "sold": 466901.5340990542,
@@ -4450,10 +4945,32 @@
       "activeTrader": false
     },
     {
+      "address": "0x0f5252ad37f67a7423fb0af9b8227946436bb44e",
+      "bought": 46757.05942098691,
+      "sold": 0,
+      "net": 46757.05942098691,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0xe1e678f6879beb912e3ca14faa4afc3e0bc21ada",
       "bought": 862043.8848119482,
       "sold": 0,
       "net": 862043.8848119482,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x33185a5c780078cc09a666d13b904f0bee6ecc03",
+      "bought": 183298.28007115732,
+      "sold": 0,
+      "net": 183298.28007115732,
       "buyCount": 2,
       "sellCount": 0,
       "fullyExited": false,
@@ -4516,6 +5033,17 @@
       "activeTrader": false
     },
     {
+      "address": "0x14fd21bfdacb85fb4444733d42f9a26d04fad30e",
+      "bought": 434406.08564769954,
+      "sold": 0,
+      "net": 434406.08564769954,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0x7860296b2ddff83bfdcda37f029636a558af5940",
       "bought": 335801.4667795513,
       "sold": 0,
@@ -4542,17 +5070,6 @@
       "bought": 88992.15001123688,
       "sold": 0,
       "net": 88992.15001123688,
-      "buyCount": 2,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x2e09261fa59e15a5317d6adfab1138be135fcdaa",
-      "bought": 339394.42127541185,
-      "sold": 0,
-      "net": 339394.42127541185,
       "buyCount": 2,
       "sellCount": 0,
       "fullyExited": false,
@@ -4604,6 +5121,28 @@
       "activeTrader": false
     },
     {
+      "address": "0x4fb5253b99d1101f4e9be7f819dde6ae69e49fef",
+      "bought": 54828.98931005217,
+      "sold": 54828.98931005217,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xb3f6c343fc0c1493aba1f2c65a885dcf0e908df5",
+      "bought": 274268.9543226458,
+      "sold": 0,
+      "net": 274268.9543226458,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
       "address": "0xdb099e06e52c611a702840ca986f75662a8bca60",
       "bought": 129735.51619796568,
       "sold": 0,
@@ -4615,14 +5154,36 @@
       "activeTrader": false
     },
     {
-      "address": "0xc6aae4c1c98370c7e192ea2d635a1ee4bc3c287f",
-      "bought": 166633.43232246026,
+      "address": "0x455077b76d9326b9405214d89b8ccc25a88ce219",
+      "bought": 9028525.997421779,
       "sold": 0,
-      "net": 166633.43232246026,
+      "net": 9028525.997421779,
       "buyCount": 2,
       "sellCount": 0,
       "fullyExited": false,
       "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xbc2694f617d373476af108ae2ca14bdf1f2b00f2",
+      "bought": 2216144.6789198634,
+      "sold": 2216144.6789198634,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x13e9e02ffb720b81908f1dd0d4e3eddb275b0fd2",
+      "bought": 50127.7168764127,
+      "sold": 37595.78765730952,
+      "net": 12531.929219103175,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
       "activeTrader": false
     },
     {
@@ -4637,14 +5198,432 @@
       "activeTrader": false
     },
     {
-      "address": "0x5439055db2b7214bd13ef0853c62eca7e732ac77",
-      "bought": 46034.56698702223,
+      "address": "0x34c700ac36ca0f4cc9d91a14d89aea123940b59b",
+      "bought": 10729452.039360134,
       "sold": 0,
-      "net": 46034.56698702223,
+      "net": 10729452.039360134,
       "buyCount": 2,
       "sellCount": 0,
       "fullyExited": false,
       "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x811c0956f42b2ac0299cc34ffb1495aef92eb9a9",
+      "bought": 0,
+      "sold": 567195.41116638,
+      "net": -567195.41116638,
+      "buyCount": 0,
+      "sellCount": 2,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x372baa0b2970bd5add0f7c3930f9ea978c2c2a83",
+      "bought": 84093.53007140453,
+      "sold": 0,
+      "net": 84093.53007140453,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x6cee4da8145ae2f2c91487d0b9d19b808ae6c54d",
+      "bought": 436988.3831220013,
+      "sold": 436988.3831220013,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x897544baa8d5f3935744f3d5d603a868b234d170",
+      "bought": 151713.31258726807,
+      "sold": 151713.31258726807,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x10f2466055e4a0bf37502fc81ef9781ff46a64aa",
+      "bought": 6375114.857587066,
+      "sold": 0,
+      "net": 6375114.857587066,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xc1ad393edc44a3a435b8bbb50793f1036202941e",
+      "bought": 649603.5715358475,
+      "sold": 649603.5715358475,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x6b7d8012a8ad6fe3d46d1a0f0ae27b5be0106109",
+      "bought": 491579.2886418515,
+      "sold": 491579.2886418515,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x26a578e5871a4eafb35975f781ccae8ebf0d5270",
+      "bought": 26288.27047835725,
+      "sold": 0,
+      "net": 26288.27047835725,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x7117cd12f637eb23b93b5965f20de81789560d6e",
+      "bought": 263898.6702374442,
+      "sold": 263898.6702374442,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xf8efda22ba9b5aa3716d86875cab3a34638bedaa",
+      "bought": 781431.2275099483,
+      "sold": 0,
+      "net": 781431.2275099483,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xf235874ca751cf81aef408fcdfa5ed4dc54abcef",
+      "bought": 7338956.482008734,
+      "sold": 0,
+      "net": 7338956.482008734,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x8ab82cf8d04d2935d9f54fab75d08295e001f110",
+      "bought": 2510870.0631914446,
+      "sold": 2510870.0631914446,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x9a00acb650b32127f41a8ee5546483ae200c363a",
+      "bought": 894569.617036384,
+      "sold": 894569.617036384,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xc88b5d3426053485c1cd89c74db26accc5ed1d06",
+      "bought": 22127.71682567961,
+      "sold": 0,
+      "net": 22127.71682567961,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x3e42c5167db99f98ac5abd98afe64694587542da",
+      "bought": 29925.320173672946,
+      "sold": 14962.660086836473,
+      "net": 14962.660086836473,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xc3042619fec9547a87fe3598c1c501d7322c70d4",
+      "bought": 525428.563276367,
+      "sold": 394071.4224572753,
+      "net": 131357.14081909176,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xb58c45a39ab7fb62abd11a648bb322f5c5c067bd",
+      "bought": 469071.14110347326,
+      "sold": 0,
+      "net": 469071.14110347326,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x2714741e8a4aeee94d49c94136c46511185fb2c2",
+      "bought": 429903.8357153004,
+      "sold": 429903.8357153004,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x3765eadcafd51a80874bfa0fc44017637103767a",
+      "bought": 1130331.4456101682,
+      "sold": 0,
+      "net": 1130331.4456101682,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xa076f97032d34589836c288b91441d00f2a7678e",
+      "bought": 308508.28114764096,
+      "sold": 0,
+      "net": 308508.28114764096,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x4477386c8db5c25420b58e2d91173519c5933565",
+      "bought": 4707887.767385217,
+      "sold": 0,
+      "net": 4707887.767385217,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x794ee59b0108b4b7d735538423a825a30270f1b7",
+      "bought": 10202021.981667135,
+      "sold": 0,
+      "net": 10202021.981667135,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xb531948f27661a045fa656ee6b62063adf2ebf06",
+      "bought": 82145.31067221165,
+      "sold": 82145.31067221165,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xdaf696e031b133060c3ee50da1c8ef160bee355f",
+      "bought": 488271.51717922086,
+      "sold": 488271.51717922086,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x1830b6b5a318ac22fa39603780b3ad5d7f3a9ce6",
+      "bought": 694983.1449083325,
+      "sold": 0,
+      "net": 694983.1449083325,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x8cbed12fe8b098c9f102ef0fdba3fc831f58fa45",
+      "bought": 439123.6227237662,
+      "sold": 0,
+      "net": 439123.6227237662,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xdc90e81b54d4da92796e417506189916e4812481",
+      "bought": 152518.7850399705,
+      "sold": 0,
+      "net": 152518.7850399705,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xb8b4ad77ea69b63d11808ce5c9ec1494a2d52d76",
+      "bought": 618917.3204155914,
+      "sold": 0,
+      "net": 618917.3204155914,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xeaf9eca12f525a6992bd5fc564cfea93023b9680",
+      "bought": 250109.07810463573,
+      "sold": 0,
+      "net": 250109.07810463573,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x06c0d435e09041a287d67c62b99c70245121de52",
+      "bought": 24003.54652993448,
+      "sold": 24001.14617528149,
+      "net": 2.4003546529892033,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": false,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xcf64444d40b04df539c4ee2e675bf3419fc2b92e",
+      "bought": 256881.12752245687,
+      "sold": 0,
+      "net": 256881.12752245687,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x376902437b1a4c48b114ccf9e1e32d6c156385f8",
+      "bought": 3430167.74762038,
+      "sold": 0,
+      "net": 3430167.74762038,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xc928f9891dce5d6c3561bae573e0342778fc8db6",
+      "bought": 235093.30662012773,
+      "sold": 0,
+      "net": 235093.30662012773,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x61d5f8a46ce735959ee6f683408e1b16fbd9c150",
+      "bought": 347664.40091232606,
+      "sold": 0,
+      "net": 347664.40091232606,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x2678c15c9d8ca6a8adecae7b69b1c52f898f0899",
+      "bought": 44305.48056528946,
+      "sold": 44305.48056528946,
+      "net": 0,
+      "buyCount": 1,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xe031b7ecf95238f864e385674c7da555d2bc2c05",
+      "bought": 400245.18238494196,
+      "sold": 0,
+      "net": 400245.18238494196,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xa3a482054ae9eaf4a22473bcdc93813bb2913316",
+      "bought": 5665908.270333568,
+      "sold": 0,
+      "net": 5665908.270333568,
+      "buyCount": 2,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x35b08be91ec81ee41f2d88346bdb2b331a3e1137",
+      "bought": 0,
+      "sold": 8461.85030647176,
+      "net": -8461.85030647176,
+      "buyCount": 0,
+      "sellCount": 2,
+      "fullyExited": true,
+      "diamondHands": false,
       "activeTrader": false
     },
     {
@@ -4912,32 +5891,10 @@
       "activeTrader": false
     },
     {
-      "address": "0xa98f58ff9fd1e5fdb002b479927faa0a17a03e13",
-      "bought": 43522.99462352984,
-      "sold": 0,
-      "net": 43522.99462352984,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x700c4a099276fe1fb094ec7aa45375b0bcd96703",
       "bought": 176154.72568060408,
       "sold": 0,
       "net": 176154.72568060408,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x4bf84ae236ac4769953f7a0db52326f955c0f97b",
-      "bought": 668048.1299136379,
-      "sold": 0,
-      "net": 668048.1299136379,
       "buyCount": 1,
       "sellCount": 0,
       "fullyExited": false,
@@ -5092,17 +6049,6 @@
       "bought": 604468.9562725663,
       "sold": 0,
       "net": 604468.9562725663,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x7929656d46c163e0434eefcef0f900de4867cd6b",
-      "bought": 1774929.2984502271,
-      "sold": 0,
-      "net": 1774929.2984502271,
       "buyCount": 1,
       "sellCount": 0,
       "fullyExited": false,
@@ -5279,17 +6225,6 @@
       "bought": 362853.5994636905,
       "sold": 0,
       "net": 362853.5994636905,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0xedf3c91daaad35ab4c55e80b34e0106dd1b99b84",
-      "bought": 9366621.05083817,
-      "sold": 0,
-      "net": 9366621.05083817,
       "buyCount": 1,
       "sellCount": 0,
       "fullyExited": false,
@@ -5517,17 +6452,6 @@
       "activeTrader": false
     },
     {
-      "address": "0xbe0dd578600cca43181aba43f9876817f5883e71",
-      "bought": 274726.0599346449,
-      "sold": 0,
-      "net": 274726.0599346449,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x2eff7b44d181964bdc917a6638f4df89d6a880fc",
       "bought": 81696.44078248486,
       "sold": 0,
@@ -5708,17 +6632,6 @@
       "bought": 9147.029348668737,
       "sold": 0,
       "net": 9147.029348668737,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0xb6a30fd5ed09dadd85ff5d6c0c704273053f6bc3",
-      "bought": 1011361.9551343614,
-      "sold": 0,
-      "net": 1011361.9551343614,
       "buyCount": 1,
       "sellCount": 0,
       "fullyExited": false,
@@ -5924,17 +6837,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x9ca12ee9d25de383d8dde730f34d8bbc324f595a",
-      "bought": 958691.0656014286,
-      "sold": 0,
-      "net": 958691.0656014286,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x106022b035132e731ffb19651471e399b71b093d",
       "bought": 10900621.407283463,
       "sold": 0,
@@ -5990,43 +6892,10 @@
       "activeTrader": false
     },
     {
-      "address": "0x17078d3b7f67f7207719b7e0f91656644425e58e",
-      "bought": 780.6131328583444,
-      "sold": 0,
-      "net": 780.6131328583444,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x86c79fa5c75bb947cd9443b1e9dcb670a0546806",
-      "bought": 919250.4675776411,
-      "sold": 0,
-      "net": 919250.4675776411,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x2abc7461260b3b48b81541cfe5b2e8e74b38c0de",
       "bought": 376541.55143975344,
       "sold": 0,
       "net": 376541.55143975344,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x6e1526d700f70354419eb8153a5b51e0cc916ba1",
-      "bought": 562162.3274374923,
-      "sold": 0,
-      "net": 562162.3274374923,
       "buyCount": 1,
       "sellCount": 0,
       "fullyExited": false,
@@ -6071,17 +6940,6 @@
       "bought": 1380086.4221849558,
       "sold": 0,
       "net": 1380086.4221849558,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x6fd47437d11644bb071bbbccadf9f20572038600",
-      "bought": 23298.215254353796,
-      "sold": 0,
-      "net": 23298.215254353796,
       "buyCount": 1,
       "sellCount": 0,
       "fullyExited": false,
@@ -6166,17 +7024,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x27af79cc75d498c0e2440d5c42e14d3b4dff8dca",
-      "bought": 118635.1324767029,
-      "sold": 0,
-      "net": 118635.1324767029,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x6563053d2583a23ef62a07353fed86649d8d7df1",
       "bought": 366249.1821575245,
       "sold": 0,
@@ -6247,17 +7094,6 @@
       "bought": 468901.78526782495,
       "sold": 0,
       "net": 468901.78526782495,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x6908613ab3f2cba0c213dcdc9fb1a66d5efdb958",
-      "bought": 116278.20721123596,
-      "sold": 0,
-      "net": 116278.20721123596,
       "buyCount": 1,
       "sellCount": 0,
       "fullyExited": false,
@@ -6694,28 +7530,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x47463a374676436af551ff0c11e382d0786d3c4a",
-      "bought": 68300.08198736244,
-      "sold": 0,
-      "net": 68300.08198736244,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0xd691f42c8301fc56b056b96527143eeec3f9c79e",
-      "bought": 2148989.278373575,
-      "sold": 0,
-      "net": 2148989.278373575,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x4bc4a231e56ce24b8ea3b1ef4f72d13fe7e0309b",
       "bought": 1748422.801507974,
       "sold": 0,
@@ -6881,17 +7695,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x476d629b0de8d0929389520893c14bf4cd8dbbae",
-      "bought": 190152.17391580087,
-      "sold": 0,
-      "net": 190152.17391580087,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0xaa4233eab5e074cbb076dc15a407294bed15859e",
       "bought": 1057988.5192366263,
       "sold": 0,
@@ -7046,17 +7849,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x2dab68c813d812177121ebf78ee8f44c0acb4edb",
-      "bought": 195682.29910281659,
-      "sold": 0,
-      "net": 195682.29910281659,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x4f2df2ab51f1215ec3e75eb8b2ee4de7ea2b7ff8",
       "bought": 1323319.2826910298,
       "sold": 0,
@@ -7145,43 +7937,10 @@
       "activeTrader": false
     },
     {
-      "address": "0x0f5252ad37f67a7423fb0af9b8227946436bb44e",
-      "bought": 2454.581096627093,
-      "sold": 0,
-      "net": 2454.581096627093,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0xbdd2e8046c67c1c01a0b9d74b07e7d8b1dd74e2b",
       "bought": 1718201.367534649,
       "sold": 0,
       "net": 1718201.367534649,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x33185a5c780078cc09a666d13b904f0bee6ecc03",
-      "bought": 58141.59189992985,
-      "sold": 0,
-      "net": 58141.59189992985,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x6aafd2f727684d560638f60124ff6d3e7651262f",
-      "bought": 80172.21970938533,
-      "sold": 0,
-      "net": 80172.21970938533,
       "buyCount": 1,
       "sellCount": 0,
       "fullyExited": false,
@@ -7303,39 +8062,6 @@
       "bought": 22628.228762741302,
       "sold": 0,
       "net": 22628.228762741302,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0xb5c10fad430197b30d73d79e0b2c7b747501b968",
-      "bought": 627821.5072458497,
-      "sold": 0,
-      "net": 627821.5072458497,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x1434651d4a3127ab5e92d4228b11416452b90bde",
-      "bought": 628578.4904108052,
-      "sold": 0,
-      "net": 628578.4904108052,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x14fd21bfdacb85fb4444733d42f9a26d04fad30e",
-      "bought": 225942.21342291043,
-      "sold": 0,
-      "net": 225942.21342291043,
       "buyCount": 1,
       "sellCount": 0,
       "fullyExited": false,
@@ -7519,28 +8245,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x4fb5253b99d1101f4e9be7f819dde6ae69e49fef",
-      "bought": 54828.98931005217,
-      "sold": 0,
-      "net": 54828.98931005217,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0xb3f6c343fc0c1493aba1f2c65a885dcf0e908df5",
-      "bought": 142427.57899535017,
-      "sold": 0,
-      "net": 142427.57899535017,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x4c2bad6ded85c73dec25930c4d88d72a93512eff",
       "bought": 71078.30307615233,
       "sold": 0,
@@ -7585,17 +8289,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x455077b76d9326b9405214d89b8ccc25a88ce219",
-      "bought": 815147.5457174513,
-      "sold": 0,
-      "net": 815147.5457174513,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0xd3001afd9bae93a313d6285cffa13f066cc04de9",
       "bought": 2710073.111313825,
       "sold": 0,
@@ -7607,32 +8300,10 @@
       "activeTrader": false
     },
     {
-      "address": "0xbc2694f617d373476af108ae2ca14bdf1f2b00f2",
-      "bought": 2216144.6789198634,
-      "sold": 0,
-      "net": 2216144.6789198634,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x91b3be8ac9eb7fe52bdd2e24ac7698917e0f4b22",
       "bought": 238024.7419781617,
       "sold": 0,
       "net": 238024.7419781617,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x3dba8813419b5c869a889c8568edfcc4ee978b90",
-      "bought": 473067.22208784684,
-      "sold": 0,
-      "net": 473067.22208784684,
       "buyCount": 1,
       "sellCount": 0,
       "fullyExited": false,
@@ -7662,39 +8333,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x13e9e02ffb720b81908f1dd0d4e3eddb275b0fd2",
-      "bought": 50127.7168764127,
-      "sold": 0,
-      "net": 50127.7168764127,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x5140bcccf8f8d309c656835482b7b826ebba2369",
-      "bought": 98851.28634360193,
-      "sold": 0,
-      "net": 98851.28634360193,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x34c700ac36ca0f4cc9d91a14d89aea123940b59b",
-      "bought": 1480488.7119587234,
-      "sold": 0,
-      "net": 1480488.7119587234,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0x471faf231212caad6554b4e3ec1fc5255f36f468",
       "bought": 214498.7748984972,
       "sold": 0,
@@ -7703,28 +8341,6 @@
       "sellCount": 0,
       "fullyExited": false,
       "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x94e131c8230f5d300ce101e2bc31536bf47d0df1",
-      "bought": 730205.0841903667,
-      "sold": 0,
-      "net": 730205.0841903667,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
-      "address": "0x811c0956f42b2ac0299cc34ffb1495aef92eb9a9",
-      "bought": 0,
-      "sold": 557195.41116638,
-      "net": -557195.41116638,
-      "buyCount": 0,
-      "sellCount": 1,
-      "fullyExited": true,
-      "diamondHands": false,
       "activeTrader": false
     },
     {
@@ -7772,17 +8388,6 @@
       "activeTrader": false
     },
     {
-      "address": "0x372baa0b2970bd5add0f7c3930f9ea978c2c2a83",
-      "bought": 56956.56975961808,
-      "sold": 0,
-      "net": 56956.56975961808,
-      "buyCount": 1,
-      "sellCount": 0,
-      "fullyExited": false,
-      "diamondHands": true,
-      "activeTrader": false
-    },
-    {
       "address": "0xf612a106ead46b287e35349ac9c71a2af93e4424",
       "bought": 79074.93794277888,
       "sold": 0,
@@ -7805,10 +8410,10 @@
       "activeTrader": false
     },
     {
-      "address": "0x1837e2cfc622a72368ed835c1a98fcfc5de42b0f",
-      "bought": 2346041.0974240573,
+      "address": "0x419c2919847346417693527402a0da1fe60c4ee4",
+      "bought": 745987.34276902,
       "sold": 0,
-      "net": 2346041.0974240573,
+      "net": 745987.34276902,
       "buyCount": 1,
       "sellCount": 0,
       "fullyExited": false,
@@ -7816,10 +8421,901 @@
       "activeTrader": false
     },
     {
-      "address": "0x419c2919847346417693527402a0da1fe60c4ee4",
-      "bought": 745987.34276902,
+      "address": "0x64a91f9c294c43bef2610d41e30c4c661e220d33",
+      "bought": 335294.0545578545,
       "sold": 0,
-      "net": 745987.34276902,
+      "net": 335294.0545578545,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xd0f992aa052c9e5bd3265c7a60f8df1777fa47ae",
+      "bought": 321531.46351807966,
+      "sold": 0,
+      "net": 321531.46351807966,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x60a186eb8c99eeec9040830645a96fc7f43ca69c",
+      "bought": 3473430.6255351906,
+      "sold": 0,
+      "net": 3473430.6255351906,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xa8689cc615d18e01cfbe5a257c2c17efa347a962",
+      "bought": 3117283.3879726627,
+      "sold": 0,
+      "net": 3117283.3879726627,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xdb8f92196f07839143f3e014cab705a028062ee9",
+      "bought": 3020269.956673948,
+      "sold": 0,
+      "net": 3020269.956673948,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x16ea0b7baddeda73d4956e912bedde8d2ea2645e",
+      "bought": 345575.5118487758,
+      "sold": 0,
+      "net": 345575.5118487758,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xcf07c3a85a981c8ee5ddcac65273bc574c32728b",
+      "bought": 7041564.652607433,
+      "sold": 0,
+      "net": 7041564.652607433,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xd5438ea6d2d0f5384ee5888a350c35520c8947b8",
+      "bought": 141912.8907698973,
+      "sold": 0,
+      "net": 141912.8907698973,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xbc5b445a3fab3222b7ffb0243819aeb05e471d4a",
+      "bought": 51090.018454939534,
+      "sold": 0,
+      "net": 51090.018454939534,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x804cbf5743e40cd34960bdbbbd2fde8318208c25",
+      "bought": 6621771.812069899,
+      "sold": 0,
+      "net": 6621771.812069899,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xb34904567064bfe2c571aa9cc7b319c6ad31662e",
+      "bought": 253814.659904461,
+      "sold": 0,
+      "net": 253814.659904461,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x5acaa323a0a5f5af47a95a2e595c078fbc60d8c6",
+      "bought": 94495.96155223655,
+      "sold": 0,
+      "net": 94495.96155223655,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x31bddf5310020c4fd29e2112355bdc5b56b44345",
+      "bought": 101543.23971583652,
+      "sold": 0,
+      "net": 101543.23971583652,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xd46c5c095de9aa5b23f40332e1460a04725ad4e9",
+      "bought": 85098.76084257166,
+      "sold": 0,
+      "net": 85098.76084257166,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x583f0b587ca2794473547be5f6ee7a77174744d6",
+      "bought": 88938.98142110919,
+      "sold": 0,
+      "net": 88938.98142110919,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xc37ea06d6fa89a564cd5f95414c053fd429908cb",
+      "bought": 116639.93491463482,
+      "sold": 0,
+      "net": 116639.93491463482,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x0b8c0f4869b5fc625ad693c52d1ce359cb1d5a2b",
+      "bought": 70178.15235001234,
+      "sold": 0,
+      "net": 70178.15235001234,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x1dca668b586cb2e174c46dbc5adabaae5fd30e7a",
+      "bought": 70505.06215456937,
+      "sold": 0,
+      "net": 70505.06215456937,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x38ea22af8b5478232a3dbdfec720b8d33b26b91e",
+      "bought": 69083.73648054464,
+      "sold": 0,
+      "net": 69083.73648054464,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x1ffa683fc09a3cd3f703e01d3b14652f9905433e",
+      "bought": 65622.37327649814,
+      "sold": 0,
+      "net": 65622.37327649814,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x02cf9f243cc28cc0d19279aa475747cbcbf4c3e0",
+      "bought": 92268.34577768118,
+      "sold": 0,
+      "net": 92268.34577768118,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x2817cd258d8f12e02102d92dc277c39adb1946eb",
+      "bought": 65362.77738551674,
+      "sold": 0,
+      "net": 65362.77738551674,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xc3e81cb9e75cd2f9089f50dd60f328fdfa41fa86",
+      "bought": 98257.10205390224,
+      "sold": 0,
+      "net": 98257.10205390224,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x95fcf84773a5367f74d7e4527b6819d74b5b212a",
+      "bought": 101011.53564716938,
+      "sold": 0,
+      "net": 101011.53564716938,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xf25fee17f86c6d4720436262d62ae678910b0c26",
+      "bought": 111311.78949884512,
+      "sold": 0,
+      "net": 111311.78949884512,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x6d0a3484d7bcecc58824941c05f5257b2e553577",
+      "bought": 113476.94664637336,
+      "sold": 0,
+      "net": 113476.94664637336,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xbe45da6ac44034a8fac9568914ae014a9ed0dee1",
+      "bought": 101473.6760975368,
+      "sold": 0,
+      "net": 101473.6760975368,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x1239886838c08cab416c8f1d8900428878c23c2b",
+      "bought": 118388.03591203423,
+      "sold": 0,
+      "net": 118388.03591203423,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x8e10fcc1a3096a77b10699f1d6df4dd245ba43a8",
+      "bought": 93981.92721553113,
+      "sold": 0,
+      "net": 93981.92721553113,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x4b94616005e91cc09c156baf234579713a996375",
+      "bought": 94555.039555959,
+      "sold": 0,
+      "net": 94555.039555959,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xe0ae0b33a66cb969dd134e482932ef886e677b51",
+      "bought": 104220.02214492371,
+      "sold": 0,
+      "net": 104220.02214492371,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x1279c06f9e13b816767b7e23d0e2494a4e353efc",
+      "bought": 681852.7898504057,
+      "sold": 0,
+      "net": 681852.7898504057,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x421dae35ced5c4cb4be76126693852c1409a970f",
+      "bought": 549219.5104755191,
+      "sold": 0,
+      "net": 549219.5104755191,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x0021f5c50ac56aa164df0b3cda2c3a7d54ba0feb",
+      "bought": 150034.50479559306,
+      "sold": 0,
+      "net": 150034.50479559306,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x6b2838a4095f01c9de93e49a6065f12cb93a68e0",
+      "bought": 252188.98922140105,
+      "sold": 0,
+      "net": 252188.98922140105,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xd407bee7a47b5e888005f7b8589f0a5ba847ba72",
+      "bought": 187963.2124759837,
+      "sold": 0,
+      "net": 187963.2124759837,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x6ea854267a85935c1159efbf900d528942e2565f",
+      "bought": 150304.9598480902,
+      "sold": 0,
+      "net": 150304.9598480902,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x8ae75480ebebc1021135d5db51c25169f784c9cd",
+      "bought": 217416.6114350263,
+      "sold": 0,
+      "net": 217416.6114350263,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x3b20d232feccf5757b541cbc79c5ea170b0874b0",
+      "bought": 1002596.0008233526,
+      "sold": 0,
+      "net": 1002596.0008233526,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x56fd71b8f4fefe4955a0393eac4e8a07e3ecdd46",
+      "bought": 1751150.738910996,
+      "sold": 0,
+      "net": 1751150.738910996,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xc24927722bd8804ce2687da3cd3529930e968adf",
+      "bought": 853824.993733278,
+      "sold": 0,
+      "net": 853824.993733278,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xf7215d5ac8f2e784f83f3cbed1a5c159589f4c7e",
+      "bought": 232852.50079314018,
+      "sold": 0,
+      "net": 232852.50079314018,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x90cf981e592841b5304e81b87f30cd420026a661",
+      "bought": 0,
+      "sold": 26003.511072089215,
+      "net": -26003.511072089215,
+      "buyCount": 0,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0xd55ff1fc823009d7106d7e64889ecf135c97d076",
+      "bought": 1410759.6942934976,
+      "sold": 0,
+      "net": 1410759.6942934976,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x6170e73acde8f9ff62af87b6f004fe6b356b7bdb",
+      "bought": 512079.5607937749,
+      "sold": 0,
+      "net": 512079.5607937749,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xfaf246a8dd7d2781825bc4e325e30e01d00b2566",
+      "bought": 2349559.5197480293,
+      "sold": 0,
+      "net": 2349559.5197480293,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xfe9c7d5a3f4913c3a47421e027674db4d27e3aa7",
+      "bought": 0,
+      "sold": 461000,
+      "net": -461000,
+      "buyCount": 0,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x5b13a1bd6ab0b7fb68c736ff8401c29609e9b108",
+      "bought": 2181.46507676216,
+      "sold": 0,
+      "net": 2181.46507676216,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xc40dcad571ee3f4cb423fe5cf80bc897ffe3909f",
+      "bought": 331251.5979671059,
+      "sold": 0,
+      "net": 331251.5979671059,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xb831f67f52ad248d88b1c9692ebc25bd75e08c5e",
+      "bought": 4138948.8408000763,
+      "sold": 0,
+      "net": 4138948.8408000763,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x0ca0b2743d09790494ecb058fd05366b5febf54c",
+      "bought": 2003040.6866675923,
+      "sold": 0,
+      "net": 2003040.6866675923,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x9c0495b8dd0fba14090b1d731b4ef24a3693cb7a",
+      "bought": 162456.2208359028,
+      "sold": 0,
+      "net": 162456.2208359028,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x4d44eda1a876ffdd63741e516064a0e58a84dcc2",
+      "bought": 830058.563446155,
+      "sold": 0,
+      "net": 830058.563446155,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x3c43c8593407ab8fc5b7e68cb3ff9b0087aedd5d",
+      "bought": 1031469.4537083467,
+      "sold": 0,
+      "net": 1031469.4537083467,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x4c4ef406ac983bfb665986c46f77d0140d96af5b",
+      "bought": 100492.904198806,
+      "sold": 0,
+      "net": 100492.904198806,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x0cecb7b8b0e7aae39056a5190ce6eb426b248ffd",
+      "bought": 89295.30986858769,
+      "sold": 0,
+      "net": 89295.30986858769,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x406304a6ab393f878c8457db66ab15e80746072e",
+      "bought": 485469.4012685533,
+      "sold": 0,
+      "net": 485469.4012685533,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x9527b8a6ef65d03c949f1b052b127985caf55aaf",
+      "bought": 134209.15135587152,
+      "sold": 0,
+      "net": 134209.15135587152,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x9a6c28fd6a3365f0e931ef701d1a04d63f3db1fe",
+      "bought": 44699.65919420809,
+      "sold": 0,
+      "net": 44699.65919420809,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x593a31c8db4b43dbedee3ba512c7368f017216fd",
+      "bought": 1799269.077260996,
+      "sold": 0,
+      "net": 1799269.077260996,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xdc096605992d6f004a5aa5fe59f5cfa6e150eed3",
+      "bought": 873648.291926035,
+      "sold": 0,
+      "net": 873648.291926035,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xc45a5e131ffef983b34dacce5e6e1d0873af09fe",
+      "bought": 31846.94670525614,
+      "sold": 0,
+      "net": 31846.94670525614,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xe68c993786326434b036552d1417d942638416e7",
+      "bought": 5810288.183203961,
+      "sold": 0,
+      "net": 5810288.183203961,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xa73bed06bcbfc0b00daf206e72accfcb65f3548f",
+      "bought": 15341.219619314972,
+      "sold": 0,
+      "net": 15341.219619314972,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xd74f937abeeaf6f6f5bf2c8851d8b9ed705f0ab3",
+      "bought": 774393.575353874,
+      "sold": 0,
+      "net": 774393.575353874,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x00f8c3f23d07c02cc0698e1d7325ef309fe109da",
+      "bought": 0,
+      "sold": 100000,
+      "net": -100000,
+      "buyCount": 0,
+      "sellCount": 1,
+      "fullyExited": true,
+      "diamondHands": false,
+      "activeTrader": false
+    },
+    {
+      "address": "0x7e468d0d40dab9ddbd1bbdf66145c65345d83cc8",
+      "bought": 77945.19903308761,
+      "sold": 0,
+      "net": 77945.19903308761,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xcc79797ed04d9b5ed59c002fb629cded87a47326",
+      "bought": 31295.284559988588,
+      "sold": 0,
+      "net": 31295.284559988588,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x9efd9fc88d4b950ae11411005ffe81efcf1b9635",
+      "bought": 111293.0787685577,
+      "sold": 0,
+      "net": 111293.0787685577,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x87335c8a59cfcc5c0190a03ffd23432f46fe4646",
+      "bought": 32537.56930477946,
+      "sold": 0,
+      "net": 32537.56930477946,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x986078356c24752ed49aa730e02ffe835ac537bf",
+      "bought": 2172986.3182775136,
+      "sold": 0,
+      "net": 2172986.3182775136,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xf06734d4ec921eeaeb05122db400485b1bb85dca",
+      "bought": 362375.830183845,
+      "sold": 0,
+      "net": 362375.830183845,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x51854424531bd820bb9c1dd34cbbc1e364e67189",
+      "bought": 106721.32165080353,
+      "sold": 0,
+      "net": 106721.32165080353,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x1e9755c2038be51d632353ca41ed40d86c5caea2",
+      "bought": 167116.2406740718,
+      "sold": 0,
+      "net": 167116.2406740718,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x10eafd25531dbfbf6a6100f6cb4981cc67974c6a",
+      "bought": 8461.926463809936,
+      "sold": 0,
+      "net": 8461.926463809936,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x816c187d6bac86c0b9e0799f78bff04c8524298e",
+      "bought": 8447.74904593908,
+      "sold": 0,
+      "net": 8447.74904593908,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x4dfa914667029d5bcf93475fdb9b6e3298cd322d",
+      "bought": 838460.6645918433,
+      "sold": 0,
+      "net": 838460.6645918433,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x4f1092712cc74f0f38c2626851396122ab35d960",
+      "bought": 416740.3003230822,
+      "sold": 0,
+      "net": 416740.3003230822,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x5f06b7b4da73be27f03b0150f53e802b4db30c67",
+      "bought": 556740.8784654634,
+      "sold": 0,
+      "net": 556740.8784654634,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0xcc0a8b70d748e8af13f977b9b089fe0f3eb2296a",
+      "bought": 60649.69822046588,
+      "sold": 0,
+      "net": 60649.69822046588,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x39102621217c9528df0f3e2f698e5af4ba272dc5",
+      "bought": 13390.536774909071,
+      "sold": 0,
+      "net": 13390.536774909071,
+      "buyCount": 1,
+      "sellCount": 0,
+      "fullyExited": false,
+      "diamondHands": true,
+      "activeTrader": false
+    },
+    {
+      "address": "0x74d5e4688c442817e7918d1ab2155a265f4bbddb",
+      "bought": 37186.41856007507,
+      "sold": 0,
+      "net": 37186.41856007507,
       "buyCount": 1,
       "sellCount": 0,
       "fullyExited": false,
