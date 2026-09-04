@@ -107,12 +107,28 @@
               <span class="stat-value" id="username-display">—</span>
             </div>
             <div class="stat-row">
-              <span class="stat-label">Vault Balance:</span>
-              <span class="stat-value" id="vault-balance-val">—</span>
+              <span class="stat-label">Your Balance:</span>
+              <span class="stat-value" id="profile-balance">—</span>
             </div>
             <div class="stat-row">
               <span class="stat-label">Total Winnings:</span>
               <span class="stat-value" id="total-winnings-val">0.00 CPLAY</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Total Wagered:</span>
+              <span class="stat-value" id="profile-wagered">—</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Flip Record:</span>
+              <span class="stat-value" id="profile-record">—</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Miner Level:</span>
+              <span class="stat-value" id="profile-miner-level">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Click Level:</span>
+              <span class="stat-value" id="profile-click-level">0</span>
             </div>
           </div>
 
@@ -120,6 +136,20 @@
             <input type="text" id="username-input" placeholder="Set a username" maxlength="20">
             <button class="btn btn-sm" id="btn-set-username" disabled>Save</button>
           </div>
+        </div>
+
+        <!-- Global prize pool (NOT the player's own money) -->
+        <div class="glass-panel profile-panel">
+          <h2 class="section-title"><i class="fa-solid fa-vault"></i> Prize Pool</h2>
+          <div class="profile-stats">
+            <div class="stat-row">
+              <span class="stat-label">Vault (global):</span>
+              <span class="stat-value" id="vault-balance-val">—</span>
+            </div>
+          </div>
+          <p class="panel-desc" style="margin-top:8px;">
+            Shared on-chain reward pool that funds all payouts. Grows as players bet and buy upgrades.
+          </p>
         </div>
       </aside>
 

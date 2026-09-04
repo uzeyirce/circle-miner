@@ -62,7 +62,10 @@ const el = {
   minerCost: $('miner-upgrade-cost'), upgradeMiner: $('btn-upgrade-miner'), coin: $('coin-visual'),
   heads: $('btn-bet-heads'), tails: $('btn-bet-tails'), bet: $('bet-amount'), max: $('btn-bet-max'),
   roll: $('btn-roll'), status: $('flip-status-msg'), txBody: $('tx-tbody'), txCount: $('tx-count'),
-  emptyTx: $('tx-empty-row'), canvas: $('bg-canvas')
+  emptyTx: $('tx-empty-row'), canvas: $('bg-canvas'),
+  profileBalance: $('profile-balance'), profileWagered: $('profile-wagered'),
+  profileRecord: $('profile-record'), profileMinerLevel: $('profile-miner-level'),
+  profileClickLevel: $('profile-click-level')
 };
 
 function disableGame() {
@@ -296,6 +299,10 @@ async function fetchPlayerProfile() {
     if (el.vault) el.vault.textContent = `${fmt(profileState.vaultBalance)} CPLAY`;
     if (el.winnings) el.winnings.textContent = `${fmt(profileState.totalWinnings)} CPLAY`;
     if (el.username) el.username.textContent = profileState.username || '— not set —';
+    if (el.profileBalance) el.profileBalance.textContent = `${fmt(profileState.balance)} CPLAY`;
+    if (el.profileMinerLevel) el.profileMinerLevel.textContent = profileState.minerLevel.toString();
+    if (el.profileClickLevel) el.profileClickLevel.textContent = profileState.clickLevel.toString();
+    loadPlayerFlipStats();
     if (el.usernameInput) { el.usernameInput.placeholder = profileState.username ? 'Change username' : 'Set a username'; el.usernameInput.value = ''; }
     if (el.setUsername) el.setUsername.disabled = true;
     if (el.roll) el.roll.disabled = !profileState.luckyFlipEnabled || profileState.balance < ethers.parseEther('10');
@@ -323,6 +330,42 @@ async function fetchPlayerProfile() {
     if (el.status) el.status.textContent = `Contract read failed: ${errMsg(e)}`;
     disableGame();
     return false;
+  }
+}
+
+async function loadPlayerFlipStats() {
+  if (!contract || !walletAddress) return;
+  try {
+    const prov = provider || contract.runner?.provider;
+    if (!prov) return;
+    const latestBlock = await prov.getBlockNumber();
+    const LOOKBACK = 100000;
+    const CHUNK = 9000;
+    const filter = contract.filters.CoinFlipResult(walletAddress);
+    const events = [];
+    let from = Math.max(0, latestBlock - LOOKBACK);
+    while (from <= latestBlock) {
+      const to = Math.min(from + CHUNK, latestBlock);
+      try { events.push(...await contract.queryFilter(filter, from, to)); }
+      catch (e) { console.warn('flip stats chunk failed:', e?.message || e); }
+      from = to + 1;
+    }
+    if (!events.length) {
+      if (el.profileRecord) el.profileRecord.textContent = 'No flips yet';
+      if (el.profileWagered) el.profileWagered.textContent = '0 CPLAY';
+      return;
+    }
+    let wins = 0, wagered = 0n;
+    for (const ev of events) {
+      if (ev.args.won) wins++;
+      wagered += ev.args.betAmount;
+    }
+    const losses = events.length - wins;
+    const rate = ((wins / events.length) * 100).toFixed(0);
+    if (el.profileRecord) el.profileRecord.textContent = `${wins}W / ${losses}L (${rate}%)`;
+    if (el.profileWagered) el.profileWagered.textContent = `${fmt(wagered)} CPLAY`;
+  } catch (e) {
+    console.error('loadPlayerFlipStats failed:', e);
   }
 }
 
