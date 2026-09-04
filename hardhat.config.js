@@ -14,7 +14,7 @@ module.exports = {
   },
   networks: {
     "arc-mainnet": {
-      url: "https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8",
+      url: "https://rpc.arc-scan.org",
       chainId: 5042,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
