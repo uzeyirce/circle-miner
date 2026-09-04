@@ -65,7 +65,9 @@ const el = {
   emptyTx: $('tx-empty-row'), canvas: $('bg-canvas'),
   profileBalance: $('profile-balance'), profileWagered: $('profile-wagered'),
   profileRecord: $('profile-record'), profileMinerLevel: $('profile-miner-level'),
-  profileClickLevel: $('profile-click-level')
+  profileClickLevel: $('profile-click-level'),
+  activityFeed: $('activity-feed'), streakCount: $('streak-count'),
+  streakDots: $('streak-dots'), streakMsg: $('streak-msg')
 };
 
 function disableGame() {
@@ -137,6 +139,9 @@ async function connectWallet(request = true) {
 
     await fetchPlayerProfile();
     await loadLeaderboard();  // Leaderboard aktif
+    await loadRecentActivity();
+    startActivityListener();
+    updateStreak();
     startPassiveMiningTimer();
   } catch (e) {
     console.error('Wallet connection failed:', e);
@@ -296,7 +301,15 @@ async function fetchPlayerProfile() {
 
     // UI updates
     if (el.balance) el.balance.textContent = fmt(profileState.balance);
-    if (el.vault) el.vault.textContent = `${fmt(profileState.vaultBalance)} CPLAY`;
+    if (el.vault) {
+      const newVault = fmt(profileState.vaultBalance);
+      if (el.vault.textContent !== newVault && el.vault.textContent !== '—') {
+        el.vault.classList.remove('pulse');
+        void el.vault.offsetWidth;
+        el.vault.classList.add('pulse');
+      }
+      el.vault.textContent = newVault;
+    }
     if (el.winnings) el.winnings.textContent = `${fmt(profileState.totalWinnings)} CPLAY`;
     if (el.username) el.username.textContent = profileState.username || '— not set —';
     if (el.profileBalance) el.profileBalance.textContent = `${fmt(profileState.balance)} CPLAY`;
@@ -366,6 +379,103 @@ async function loadPlayerFlipStats() {
     if (el.profileWagered) el.profileWagered.textContent = `${fmt(wagered)} CPLAY`;
   } catch (e) {
     console.error('loadPlayerFlipStats failed:', e);
+  }
+}
+
+// ===== LIVE ACTIVITY FEED =====
+const seenActivityTx = new Set();
+
+function renderActivityItem(player, won, betAmount, payout, prepend = true) {
+  if (!el.activityFeed) return;
+  const empty = el.activityFeed.querySelector('.activity-empty');
+  if (empty) empty.remove();
+
+  const short = `${player.slice(0, 6)}...${player.slice(-4)}`;
+  const div = document.createElement('div');
+  div.className = `activity-item ${won ? 'win' : 'loss'}`;
+  div.innerHTML = won
+    ? `<span>\ud83c\udf89</span><span class="act-addr">${short}</span><span>won</span><span class="act-amount">+${fmt(payout)} CPLAY</span>`
+    : `<span>\ud83c\udfb2</span><span class="act-addr">${short}</span><span>bet</span><span class="act-amount">${fmt(betAmount)} CPLAY</span>`;
+
+  if (prepend) el.activityFeed.insertBefore(div, el.activityFeed.firstChild);
+  else el.activityFeed.appendChild(div);
+
+  while (el.activityFeed.children.length > 30) el.activityFeed.lastChild.remove();
+}
+
+async function loadRecentActivity() {
+  if (!contract) return;
+  try {
+    const prov = provider || contract.runner?.provider;
+    if (!prov) return;
+    const latestBlock = await prov.getBlockNumber();
+    const LOOKBACK = 50000;
+    const CHUNK = 9000;
+    const filter = contract.filters.CoinFlipResult();
+    const events = [];
+    let from = Math.max(0, latestBlock - LOOKBACK);
+    while (from <= latestBlock) {
+      const to = Math.min(from + CHUNK, latestBlock);
+      try { events.push(...await contract.queryFilter(filter, from, to)); }
+      catch (e) { console.warn('activity chunk failed:', e?.message || e); }
+      from = to + 1;
+    }
+    events.sort((a, b) => b.blockNumber - a.blockNumber);
+    const recent = events.slice(0, 20);
+    if (!recent.length) return;
+    if (el.activityFeed) el.activityFeed.innerHTML = '';
+    for (const ev of recent) {
+      seenActivityTx.add(ev.transactionHash);
+      renderActivityItem(ev.args.player, ev.args.won, ev.args.betAmount, ev.args.payout, false);
+    }
+  } catch (e) { console.error('loadRecentActivity failed:', e); }
+}
+
+function startActivityListener() {
+  if (!contract) return;
+  try {
+    contract.on('CoinFlipResult', (player, betHeads, won, betAmount, devFee, payout, seed, ev) => {
+      const hash = ev?.log?.transactionHash || ev?.transactionHash;
+      if (hash && seenActivityTx.has(hash)) return;
+      if (hash) seenActivityTx.add(hash);
+      renderActivityItem(player, won, betAmount, payout, true);
+    });
+  } catch (e) { console.warn('activity listener failed:', e?.message || e); }
+}
+
+// ===== DAILY STREAK (frontend tracking; on-chain rewards to come) =====
+const STREAK_KEY = 'circleMinerStreak';
+
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+
+function updateStreak() {
+  let data = { streak: 0, lastDay: null, best: 0 };
+  try { data = JSON.parse(localStorage.getItem(STREAK_KEY)) || data; } catch {}
+
+  const today = todayStr();
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+  if (data.lastDay === today) {
+    // already counted today
+  } else if (data.lastDay === yesterday) {
+    data.streak += 1; data.lastDay = today;
+  } else {
+    data.streak = 1; data.lastDay = today;
+  }
+  data.best = Math.max(data.best || 0, data.streak);
+
+  try { localStorage.setItem(STREAK_KEY, JSON.stringify(data)); } catch {}
+
+  if (el.streakCount) el.streakCount.textContent = data.streak;
+  if (el.streakDots) {
+    el.streakDots.innerHTML = Array.from({ length: 7 }, (_, i) =>
+      `<div class="streak-dot ${i < Math.min(data.streak, 7) ? 'filled' : ''}"></div>`
+    ).join('');
+  }
+  if (el.streakMsg) {
+    el.streakMsg.textContent = data.streak >= 7
+      ? `\ud83d\udd25 ${data.streak} days strong! Best: ${data.best}`
+      : `Come back tomorrow to keep it going. Best: ${data.best} days`;
   }
 }
 

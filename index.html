@@ -139,16 +139,25 @@
         </div>
 
         <!-- Global prize pool (NOT the player's own money) -->
-        <div class="glass-panel profile-panel">
+        <div class="glass-panel prize-pool-panel">
           <h2 class="section-title"><i class="fa-solid fa-vault"></i> Prize Pool</h2>
-          <div class="profile-stats">
-            <div class="stat-row">
-              <span class="stat-label">Vault (global):</span>
-              <span class="stat-value" id="vault-balance-val">—</span>
-            </div>
+          <div class="prize-pool-amount" id="vault-balance-val">—</div>
+          <div class="prize-pool-sub">CPLAY up for grabs</div>
+          <p class="panel-desc" style="margin-top:10px;">
+            Shared on-chain reward pool that funds every payout. Grows with every bet and upgrade.
+          </p>
+        </div>
+
+        <!-- Daily streak -->
+        <div class="glass-panel profile-panel">
+          <h2 class="section-title"><i class="fa-solid fa-fire"></i> Daily Streak</h2>
+          <div class="streak-display">
+            <span class="streak-count" id="streak-count">0</span>
+            <span class="streak-label">day streak</span>
           </div>
-          <p class="panel-desc" style="margin-top:8px;">
-            Shared on-chain reward pool that funds all payouts. Grows as players bet and buy upgrades.
+          <div class="streak-dots" id="streak-dots"></div>
+          <p class="panel-desc" style="margin-top:8px;" id="streak-msg">
+            Come back daily to build your streak.
           </p>
         </div>
       </aside>
@@ -312,6 +321,17 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </section>
+
+    <!-- Live Activity Feed -->
+    <section class="glass-panel activity-panel">
+      <div class="tx-header">
+        <h2 class="section-title"><i class="fa-solid fa-bolt"></i> Live Activity</h2>
+        <span class="badge live-badge"><span class="live-dot"></span> LIVE</span>
+      </div>
+      <div class="activity-feed" id="activity-feed">
+        <div class="activity-empty">Waiting for on-chain activity…</div>
       </div>
     </section>
 
